@@ -1,0 +1,82 @@
+/* patient-list.css */
+
+#patient-list-page {
+    padding: 20px;
+}
+
+.patient-list-container {
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.patient-cards-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px; /* Spacing between cards */
+}
+
+.patient-card {
+    border: 2px solid #b2ebf2;
+    padding: 10px;
+    border-radius: 10px;
+    /*background-color: #b2ebf2; /* Add a background color to the card */
+}
+
+.patient-name-container{
+    display:flex;
+    flex-direction:row;
+    gap:10px;
+    align-items: center;
+}
+
+.patient-card h3 {
+    margin-top: 0;
+    margin-bottom: 5px;
+}
+
+.patient-button {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9em;
+    transition: background-color 0.2s ease;
+    margin-right: 10px;
+}
+
+.patient-button:hover {
+    background-color: #0056b3;
+}
+
+.patient-avatar {
+    font-size: 1.5em;
+    color: #777;
+}
+
+/* Styling for the back button */
+.back-button-container {
+    text-align: center; /* Center the button */
+    margin-top: 20px; /* Add some space above the button */
+}
+
+.back-button {
+    background-color: #007bff; /* Blue background color */
+    color: #fff; /* White text color */
+    border: none; /* Remove the border */
+    padding: 10px 20px; /* Add some padding */
+    border-radius: 5px; /* Round the corners */
+    text-decoration: none; /* Remove underline from the link */
+    font-size: 1em; /* Set the font size */
+    cursor: pointer; /* Change the cursor on hover */
+    transition: background-color 0.2s ease; /* Add a smooth transition */
+}
+
+.back-button:hover {
+    background-color: #0056b3; /* Darker blue on hover */
+}

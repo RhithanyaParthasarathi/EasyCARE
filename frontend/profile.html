@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChroniCARE - Profile</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="profile.css">
+    <link rel="stylesheet" href="header.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <!--img src="your-logo.png" alt="ChroniCARE Logo"-->  <!-- Replace with your logo -->
+            <h1> ChroniCARE</h1>
+            <div class="header-menu">
+                <button class="menu-button">
+                    <i class="fas fa-ellipsis-v"></i> <!-- Three vertical dots -->
+                </button>
+                <div class="menu-dropdown">
+                    <a href="about-us.html">About Us</a>
+                    <a href="contact.html">Contact</a>
+                    <a href="#">Logout</a>
+                </div>
+            </div>
+        </div>
+    </header>
+    <h1 style="margin-left: 20px;">User Profile</h1>
+
+    <main>
+        <section id="profile-info">
+            <h2>Personal Information</h2>
+
+            <div class="profile-field">
+                <label>Name:</label>
+                <span id="user-name">John Doe</span>
+                <input type="text" id="edit-name" class="edit-input" style="display: none;">
+            </div>
+
+            <div class="profile-field">
+                <label>Age:</label>
+                <span id="user-age">30</span>
+                <input type="number" id="edit-age" class="edit-input" style="display: none;">
+            </div>
+
+            <div class="profile-field">
+                <label>Email:</label>
+                <span id="user-email">john.doe@example.com</span>
+                <input type="email" id="edit-email" class="edit-input" style="display: none;">
+            </div>
+
+            <div class="profile-field">
+                <label>Gender:</label>
+                <span id="user-gender">Male</span>
+                <select id="edit-gender" class="edit-input" style="display: none;">
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Other">Other</option>
+                </select>
+            </div>
+
+            <div class="profile-field">
+                <label>Height (cm):</label>
+                <span id="user-height">175</span>
+                <input type="number" id="edit-height" class="edit-input" style="display: none;">
+            </div>
+
+            <div class="profile-field">
+                <label>Weight (kg):</label>
+                <span id="user-weight">70</span>
+                <input type="number" id="edit-weight" class="edit-input" style="display: none;">
+            </div>
+
+            <div class="profile-field">
+                <label>Blood Type:</label>
+                <span id="user-blood-type">O+</span>
+                <select id="edit-blood-type" class="edit-input" style="display: none;">
+                    <option value="O+">O+</option>
+                    <option value="O-">O-</option>
+                    <option value="A+">A+</option>
+                    <option value="A-">A-</option>
+                    <option value="B+">B+</option>
+                    <option value="B-">B-</option>
+                    <option value="AB+">AB+</option>
+                    <option value="AB-">AB-</option>
+                </select>
+            </div>
+
+            <div class="button-container">
+                <button id="edit-profile-btn" class="profile-button">Edit Profile</button>
+                <button id="save-profile-btn" class="profile-button" style="display: none;">Save Changes</button>
+            </div>
+
+        </section>
+
+        <!-- Medical History Section Removed -->
+        <!-- Prescriptions Section Removed -->
+
+    </main>
+
+    <nav class="bottom-nav">
+        <a href="index.html" class="nav-item">
+            <i class="fa-solid fa-house"></i>
+            <span>Home</span>
+        </a>
+        <a href="health-monitor.html" class="nav-item">
+           <i class="fa-solid fa-medkit"></i>
+            <span>Health Monitor</span>
+        </a>
+        <a href="telemedicine.html" class="nav-item">
+            <i class="fa-solid fa-video"></i>
+            <span>Telemedicine</span>
+        </a>
+        <a href="profile.html" class="nav-item active">
+            <i class="fa-solid fa-user"></i>
+            <span>Profile</span>
+        </a>
+    </nav>
+
+    <script src="profile.js"></script>
+    <script src="header.js"></script>
+</body>
+</html>

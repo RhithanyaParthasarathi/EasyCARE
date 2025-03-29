@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChroniCARE - Patient List</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="patient-list.css">
+    <link rel="stylesheet" href="header.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+<body>
+
+    <header>
+        <div class="logo">
+            <h1 style="margin-left: 20px;"> ChroniCARE - Doctor</h1>
+            <div class="header-menu">
+                <button class="menu-button">
+                    <i class="fas fa-ellipsis-v"></i>
+                </button>
+                <div class="menu-dropdown">
+                    <a href="docprofile.html">My Profile</a>
+                    <a href="contact.html">Contact</a>
+                    <a href="about-us.html">About Us</a>
+                    <a href="#">Logout</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section id="patient-list-page">
+            <div class="patient-list-container">
+                <h2>Your Patients</h2>
+                <div class="patient-cards-container">
+                   
+                  <!--  Patient cards will be dynamically added here -->
+                </div>
+            </div>
+        </section>
+        <div class="back-button-container">
+            <button class="back-button" onclick="goBack()">Back</button>
+        </div>
+    </main>
+
+    <script>
+         document.addEventListener('DOMContentLoaded', function() {
+            const patientCardsContainer = document.querySelector('.patient-cards-container');
+
+            // Get accepted appointments from local storage (or wherever you store them)
+            const acceptedAppointments = getAcceptedAppointments();  // Implement this function
+            console.log("hello")
+
+            // Create and append patient cards
+            acceptedAppointments.forEach(appointment => {
+                const card = createPatientCard(appointment);
+                patientCardsContainer.appendChild(card);
+            });
+
+            // Dummy function to retrieve accepted appointments (replace with your actual data source)
+            function getAcceptedAppointments() {
+    // In a real application, this would fetch the data from an API or local storage
+    return [
+        { patientName: "@john", appointmentTime: "13-March-2025 Thursday 2:00pm" },
+        { patientName: "@michael", appointmentTime: "14-March-2025 Friday 11:00am" },
+        { patientName: "@sana", appointmentTime: "15-March-2025 Saturday 2:00pm" }
+        
+    ];
+}
+
+            function createPatientCard(appointment) {
+    const card = document.createElement('div');
+    card.classList.add('patient-card');
+
+    const patientNameContainer = document.createElement('div');
+    patientNameContainer.classList.add('patient-name-container');
+
+    const avatar = document.createElement('i');
+    avatar.classList.add('fas', 'fa-user-circle', 'patient-avatar');
+
+    const patientName = document.createElement('h3');
+    patientName.textContent = appointment.patientName;
+    card.appendChild(patientName);
+
+    patientNameContainer.appendChild(avatar);
+    patientNameContainer.appendChild(patientName);
+    card.appendChild(patientNameContainer)
+
+    const appointmentTime = document.createElement('p');
+    appointmentTime.textContent = "Appointment: " + appointment.appointmentTime;
+    card.appendChild(appointmentTime);
+
+    const medicationButton = document.createElement('button');
+    medicationButton.classList.add('patient-button');
+    medicationButton.textContent = "Show Medication History";
+    card.appendChild(medicationButton);
+
+    const healthDataButton = document.createElement('button');
+    healthDataButton.classList.add('patient-button');
+    healthDataButton.textContent = "Show Health Data";
+    card.appendChild(healthDataButton);
+
+    return card;
+}
+        });
+
+    </script>
+    <script>
+        function goBack() {
+            window.location.href = 'doctor-dashboard.html';
+        }
+    </script>
+      <script src="header.js"></script>
+</body>
+</html>

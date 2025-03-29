@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChroniCARE - Telemedicine Schedule</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="telemedicine-schedule.css">
+    <link rel="stylesheet" href="header.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+<body>
+
+    <header>
+        <div class="logo">
+            <h1 style="margin-left: 20px;"> ChroniCARE - Doctor</h1>
+            <div class="header-menu">
+                <button class="menu-button">
+                    <i class="fas fa-ellipsis-v"></i>
+                </button>
+                <div class="menu-dropdown">
+                    <a href="docprofile.html">My Profile</a>
+                    <a href="contact.html">Contact</a>
+                    <a href="#">Logout</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section id="telemedicine-schedule-page">
+            <div class="schedule-container">
+                <h2>Manage Telemedicine Schedule</h2>
+
+                <div class="scheduling-area">
+                    <div class="calendar-area">
+                        <div class="calendar-container">
+                            <!-- Calendar -->
+                            <h3>Select Date</h3>
+                            <div class="calendar-header">
+                                <button id="prev-month"><i class="fas fa-chevron-left"></i></button>
+                                <span id="current-month">November 2023</span>
+                                <button id="next-month"><i class="fas fa-chevron-right"></i></button>
+                            </div>
+                            <div class="calendar-grid" id="calendar-grid">
+                                <!-- Calendar days will be generated here -->
+                            </div>
+                        </div>
+
+                        <div class="selected-datetime">
+                             <h3>Selected Date and Time</h3>
+                             <p id="selected-date-display">No date selected</p>
+                             <div id="selected-slots-display"></div>
+                        </div>
+                    </div>
+
+                    <div class="time-slots-area">
+                        <div class="time-slots-container">
+                            <h3>Available Time Slots</h3>
+
+                            <div class="time-slots-section">
+                                <h4>Morning</h4>
+                                <div class="time-slots morning" data-section="morning">
+                                    <!-- Morning slots will be dynamically populated here -->
+                                </div>
+                            </div>
+
+                            <div class="time-slots-section">
+                                <h4>Afternoon</h4>
+                                <div class="time-slots afternoon" data-section="afternoon">
+                                    <!-- Afternoon slots will be dynamically populated here -->
+                                </div>
+                            </div>
+
+                            <div class="time-slots-section">
+                                <h4>Evening</h4>
+                                <div class="time-slots evening" data-section="evening">
+                                    <!-- Evening slots will be dynamically populated here -->
+                                </div>
+                            </div>
+
+                             <div class="time-slots-section">
+                                <h4>Night</h4>
+                                <div class="time-slots night" data-section="night">
+                                    <!-- Night slots will be dynamically populated here -->
+                                </div>
+                            </div>
+
+                            <div class="add-timeslot">
+                                <p>Add Available Time Slot</p>
+                                <div>
+                                    <div class="time-input-wrapper">
+                                        <input id="hourInput" type="number" min="1" max="12" value="12"> :
+                                        <input id="minuteInput" type="number" min="0" max="59" value="00">
+                                        <select id="ampmSelect">
+                                            <option value="AM">AM</option>
+                                            <option value="PM">PM</option>
+                                        </select>
+                                    </div>
+                                    <button id="addTimeslotButton" type="button">Add Time Slot</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="save-schedule-button">Save Schedule</button>
+            </div>
+        </section>
+    </main>
+
+    <div class="back-button-container">
+        <a href="doctor-dashboard.html" class="back-button">Back</a>
+    </div>
+
+    <script src="telemedicine-schedule.js"></script>
+</body>
+</html>

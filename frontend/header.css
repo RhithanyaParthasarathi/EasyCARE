@@ -1,0 +1,77 @@
+/* header.css */
+
+/* Style the header */
+.page-header {
+    background-color: #fff;
+    color: #333;
+    padding: 1rem 2rem;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    position: relative;
+    z-index: 10; /* Ensure header is above other content */
+}
+
+.header-container {
+    display: flex;
+    justify-content: space-between; /* Distribute space between items */
+    align-items: center;
+    max-width: 1200px; /* Adjust as needed */
+    margin: 0 auto;
+}
+
+.header-title {
+    font-size: 2rem;
+    margin: 0; /* Remove any margin from the title */
+}
+
+/* Style the menu button and dropdown */
+.header-menu {
+    position: relative;
+    display: inline-block;
+    margin-left: auto; /* Push the menu to the right */
+}
+
+.menu-button {
+    background-color: transparent;
+    border: none;
+    color: #555;
+    cursor: pointer;
+    font-size: 1.5rem;
+    padding: 0.5rem;
+    transition: color 0.3s ease;
+}
+
+.menu-button:hover {
+    color: #007bff;
+}
+
+.menu-dropdown {
+    position: absolute;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    right: 0;
+    top: 100%;
+    margin-top: 0.5rem;
+    padding: 0.5rem 0;
+    width: 150px; /* Adjust as needed */
+    display: none; /* Initially hide the dropdown */
+}
+
+.menu-dropdown a {
+    display: block;
+    padding: 0.5rem 1rem;
+    text-decoration: none;
+    color: #333;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.menu-dropdown a:hover {
+    background-color: #f4f4f4;
+    color: #007bff;
+}
+
+/* JavaScript-controlled class */
+.menu-dropdown.show {
+    display: block;
+}

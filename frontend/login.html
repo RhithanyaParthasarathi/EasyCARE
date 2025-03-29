@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>ChroniCare - Login</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+        integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        /* General Styles */
+        body {
+            font-family: 'Arial', sans-serif;
+            /* Updated font */
+            background-color: #f0f8ff;
+            /* Lighter, more calming blue */
+            background-image: linear-gradient(to bottom, #f0f8ff, #ffffff);
+            display: flex;
+            flex-direction: column;
+            /* Stack header and content */
+            min-height: 100vh;
+            /* Ensure full height */
+            margin: 0;
+            padding: 0;
+            align-items: center;
+            /* Center horizontally */
+        }
+
+        /* Header Styles (Combined from header.css) */
+        .page-header {
+            background-color: #fff;
+            color: #333;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            /* Header takes full width */
+        }
+
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .header-title {
+            font-size: 2rem;
+            margin: 0;
+            text-align: left;
+            /* Added text align left */
+        }
+
+        .header-menu {
+            position: relative;
+            display: inline-block;
+            margin-left: auto;
+            text-align: right;
+            /* Added text align right */
+        }
+
+        .menu-button {
+            background-color: transparent;
+            border: none;
+            color: #555;
+            cursor: pointer;
+            font-size: 1.5rem;
+            padding: 0.5rem;
+            transition: color 0.3s ease;
+        }
+
+        .menu-button:hover {
+            color: #007bff;
+        }
+
+        .menu-dropdown {
+            position: absolute;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            right: 0;
+            top: 100%;
+            margin-top: 0.5rem;
+            padding: 0.5rem 0;
+            width: 150px;
+            display: none;
+        }
+
+        .menu-dropdown a {
+            display: block;
+            padding: 0.5rem 1rem;
+            text-decoration: none;
+            color: #333;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .menu-dropdown a:hover {
+            background-color: #f4f4f4;
+            color: #007bff;
+        }
+
+        .menu-dropdown.show {
+            display: block;
+        }
+
+        /* Login Container Styles */
+        .login-container {
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 5px 12px rgba(0, 0, 0, 0.18);
+            width: 500px;
+            text-align: center;
+            margin: 20px auto;
+        }
+
+        .quote {
+            font-style: italic;
+            color: #495057;
+            margin-bottom: 25px;
+            padding: 18px;
+            background-color: #e9ecef;
+            border-radius: 8px;
+            font-weight: 500;
+        }
+
+        .button-container {
+            margin-bottom: 25px;
+            display: flex;
+            flex-direction: column;
+            /* Stack buttons vertically */
+            align-items: center;
+            /* Center buttons horizontally */
+        }
+
+        .button-container button {
+            padding: 14px 28px;
+            margin: 12px 0;
+            /* Add vertical margin between buttons */
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 17px;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            width: auto;
+            /* Adjust width to content */
+        }
+
+        #doctor-button {
+            background-color: #28a745;
+            color: white;
+        }
+
+        #patient-button {
+            background-color: #007bff;
+            color: white;
+        }
+
+        #doctor-button:hover,
+        #patient-button:hover {
+            opacity: 0.9;
+            transform: scale(1.03);
+        }
+
+        .login-form {
+            display: none;
+            padding: 20px 0;
+        }
+
+        .login-form label {
+            display: block;
+            margin-bottom: 7px;
+            text-align: left;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .login-form input[type="text"],
+        .login-form input[type="password"] {
+            width: calc(100% - 22px);
+            padding: 12px;
+            margin-bottom: 10px;
+            /* Reduced margin-bottom for password */
+            border: 1px solid #ced4da;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        .login-form input[type="text"]:focus,
+        .login-form input[type="password"]:focus {
+            border-color: #80bdff;
+            outline: 0;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+        }
+
+        .login-form button {
+            background-color: #343a40;
+            color: white;
+            padding: 14px 28px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 17px;
+            transition: background-color 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .login-form button:hover {
+            background-color: #23272b;
+        }
+
+        h2 {
+            color: #343a40;
+            margin-bottom: 25px;
+            font-weight: 600;
+        }
+
+        /* Footer Styles */
+        footer {
+            text-align: center;
+            padding: 20px;
+            background-color: #f8f9fa;
+            color: #6c757d;
+            margin-top: auto;
+            border-top: 1px solid #dee2e6;
+            width: 100%;
+            /* Footer takes full width */
+        }
+
+        /* Registration Link Styling */
+        .registration-link {
+            display: block;
+            margin-top: 15px;
+            color: #007bff;
+            text-decoration: underline;
+            /* Underline the link */
+            transition: color 0.3s ease;
+        }
+
+        .registration-link:hover {
+            color: #0056b3;
+        }
+
+        /* Error Message Styling */
+        .error-message {
+            color: #dc3545;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+
+        /* Forgot Password Link Styling */
+        #forgot-password-link {
+            display: block;
+            margin-top: 10px;
+            color: #007bff;
+            text-decoration: none;
+            transition: color 0.3s ease;
+            text-align: right;
+            /* Align to the right */
+        }
+
+        #forgot-password-link:hover {
+            color: #0056b3;
+        }
+
+        /* Hidden Form Styles */
+        .hidden-form {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header class="page-header">
+        <div class="header-container">
+            <h1 class="header-title">ChroniCARE</h1>
+            <div class="header-menu">
+                <button class="menu-button">
+                    <i class="fas fa-ellipsis-v"></i>
+                </button>
+                <div class="menu-dropdown">
+                    <a href="#">About Us</a>
+                    <a href="#">Contact</a>
+                    <a href="#">Logout</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="login-container">
+        <div class="quote">"Empowering healthier lives through seamless care coordination. Your journey to wellness starts
+            here."</div>
+
+        <div class="button-container">
+            <button id="patient-button">Login as Patient</button>
+            <button id="doctor-button">Login as Doctor</button>
+
+        </div>
+
+        <div id="patient-login" class="login-form">
+            <h2>Patient Login</h2>
+            <form id="patient-form">
+                <label for="patient-username">Email:</label>
+                <input type="text" id="patient-username" name="patient-username" required>
+
+                <label for="patient-password">Password:</label>
+                <input type="password" id="patient-password" name="patient-password" required>
+
+                <a href="#" id="forgot-password-link" class="registration-link">Forgot Password?</a>
+                <!-- Forgot password here -->
+                <button type="submit">Submit</button>
+                <a href="register.html?userType=patient" class="registration-link">Don't have an account? Register here</a>
+
+                <div id="patient-error-message" class="error-message" style="display:none;"></div>
+            </form>
+        </div>
+
+        <div id="doctor-login" class="login-form">
+            <h2>Doctor Login</h2>
+            <form id="doctor-form">
+                <label for="doctor-uid">Doctor UID:</label>
+                <input type="text" id="doctor-uid" name="doctor-uid" required>
+
+                <label for="doctor-password">Password:</label>
+                <input type="password" id="doctor-password" name="doctor-password" required>
+
+                <a href="#" id="forgot-password-link" class="registration-link">Forgot Password?</a>
+                <!-- Forgot password here -->
+                <button type="submit">Submit</button>
+                <a href="register.html?userType=doctor" class="registration-link">Don't have an account? Register here</a>
+
+                <div id="doctor-error-message" class="error-message" style="display:none;"></div>
+            </form>
+        </div>
+
+        <!-- OTP Verification Form (Hidden Initially) -->
+        <div id="otp-verification-form" class="login-form hidden-form">
+            <h2>Verify OTP</h2>
+            <form id="otp-form">
+                <label for="otp">OTP:</label>
+                <input type="text" id="otp" name="otp" required>
+                <button type="submit">Verify OTP</button>
+                <div id="otp-error-message" class="error-message" style="display:none;"></div>
+            </form>
+        </div>
+
+        <!-- Password Reset Form (Hidden Initially) -->
+        <div id="password-reset-form" class="login-form hidden-form">
+            <h2>Reset Password</h2>
+            <form id="reset-form">
+                <label for="new-password">New Password:</label>
+                <input type="password" id="new-password" name="new-password" required>
+
+                <label for="confirm-password">Confirm Password:</label>
+                <input type="password" id="confirm-password" name="confirm-password" required>
+
+                <button type="submit">Reset Password</button>
+                <div id="reset-error-message" class="error-message" style="display:none;"></div>
+            </form>
+        </div>
+    </div>
+
+    <footer>
+        <!--p>© 2025 ChroniCARE. All rights reserved.</p-->
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Header Menu Toggle
+            const menuButton = document.querySelector('.menu-button');
+            const menuDropdown = document.querySelector('.menu-dropdown');
+
+            menuButton.addEventListener('click', function (event) {
+                menuDropdown.classList.toggle('show');
+                event.stopPropagation();
+            });
+
+            document.addEventListener('click', function (event) {
+                if (!menuButton.contains(event.target) && !menuDropdown.contains(event.target)) {
+                    menuDropdown.classList.remove('show');
+                }
+            });
+
+            const doctorButton = document.getElementById("doctor-button");
+            const patientButton = document.getElementById("patient-button");
+            const patientLogin = document.getElementById("patient-login");
+            const doctorLogin = document.getElementById("doctor-login");
+            const patientForm = document.getElementById("patient-form");
+            const doctorForm = document.getElementById("doctor-form");
+            const buttonContainer = document.querySelector(".button-container");
+            const patientErrorMessage = document.getElementById("patient-error-message");
+            const doctorErrorMessage = document.getElementById("doctor-error-message");
+
+            doctorButton.addEventListener("click", () => {
+                patientLogin.style.display = "none";
+                doctorLogin.style.display = "block";
+                buttonContainer.style.display = "none";
+            });
+
+            patientButton.addEventListener("click", () => {
+                doctorLogin.style.display = "none";
+                patientLogin.style.display = "block";
+                buttonContainer.style.display = "none";
+            });
+
+            // Function to handle login requests
+            async function handleLogin(role, usernameOrUid, password, errorMessageElement, redirectURL) {
+                try {
+                    const response = await fetch('http://127.0.0.1:8000/auth/login', { // Ensure correct backend URL
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            username: usernameOrUid,
+                            password: password,
+                            role: role,
+                            email: usernameOrUid // added email to backend, you can use either username or email now
+                        })
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        // If the backend provides a token, store it
+                        if (data.access_token) {
+                            localStorage.setItem("authToken", data.access_token);
+                        }
+
+                        alert("Login Successful!");
+                        window.location.href = redirectURL; //Redirect based on role
+                    } else {
+                        try {
+                            const errorData = await response.json(); // Try to parse the error response as JSON
+                            errorMessageElement.textContent = errorData.detail || "Invalid credentials.";
+                        } catch (e) {
+                            errorMessageElement.textContent = "Invalid credentials."; // Generic message if parsing fails
+                        }
+                        errorMessageElement.style.display = "block";
+                    }
+                } catch (error) {
+                    console.error("Error during login:", error);
+                    errorMessageElement.textContent = "An error occurred during login.";
+                    errorMessageElement.style.display = "block";
+                }
+            }
+
+            patientForm.addEventListener("submit", (event) => {
+                event.preventDefault();
+                patientErrorMessage.style.display = "none";
+                const username = document.getElementById("patient-username").value;
+                const password = document.getElementById("patient-password").value;
+                handleLogin("patient", username, password, patientErrorMessage, "index.html"); // patient dashboard url
+            });
+
+            doctorForm.addEventListener("submit", (event) => {
+                event.preventDefault();
+                doctorErrorMessage.style.display = "none";
+                const uid = document.getElementById("doctor-uid").value;
+                const password = document.getElementById("doctor-password").value;
+                handleLogin("doctor", uid, password, doctorErrorMessage, "doctor-dashboard.html"); // doctor dashboard url
+            });
+
+            // Forgot Password Logic
+            const forgotPasswordLinks = document.querySelectorAll('#forgot-password-link');
+            const otpVerificationForm = document.getElementById("otp-verification-form");
+            const passwordResetForm = document.getElementById("password-reset-form");
+            const otpForm = document.getElementById("otp-form");
+            const resetForm = document.getElementById("reset-form");
+            const otpErrorMessage = document.getElementById("otp-error-message");
+            const resetErrorMessage = document.getElementById("reset-error-message");
+            let userEmailForReset = null;  // Store the email for the reset process
+
+            forgotPasswordLinks.forEach(link => {
+                link.addEventListener('click', async function (event) {
+                    event.preventDefault();
+                    const email = prompt("Please enter your registered email address:");
+                    if (email) {
+                        try {
+                            const response = await fetch('http://127.0.0.1:8000/auth/forgot-password', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify({
+                                    email: email
+                                })
+                            });
+
+                            const data = await response.json();
+
+                            if (response.ok) {
+                                alert("OTP sent to your email address. Please check.");
+                                // Show OTP verification form
+                                patientLogin.style.display = "none";
+                                doctorLogin.style.display = "none";
+                                otpVerificationForm.style.display = "block";
+                                userEmailForReset = email; // Store the email
+                            } else {
+                                alert(data.detail || "Failed to send OTP. Please try again.");
+                            }
+                        } catch (error) {
+                            console.error("Error during forgot password request:", error);
+                            alert("An error occurred. Please try again.");
+                        }
+                    }
+                });
+            });
+
+            // OTP Verification Form Submission
+            otpForm.addEventListener("submit", async (event) => {
+                event.preventDefault();
+                otpErrorMessage.style.display = "none";
+                const otp = document.getElementById("otp").value;
+
+                try {
+                    const response = await fetch('http://127.0.0.1:8000/auth/verify-otp', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            email: userEmailForReset,
+                            otp: otp
+                        })
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        alert("OTP verified successfully. Please enter your new password.");
+                        otpVerificationForm.style.display = "none";
+                        passwordResetForm.style.display = "block";
+                    } else {
+                        otpErrorMessage.textContent = data.detail || "Invalid OTP.";
+                        otpErrorMessage.style.display = "block";
+                    }
+                } catch (error) {
+                    console.error("Error during OTP verification:", error);
+                    otpErrorMessage.textContent = "An error occurred during OTP verification.";
+                    otpErrorMessage.style.display = "block";
+                }
+            });
+
+            // Password Reset Form Submission
+            resetForm.addEventListener("submit", async (event) => {
+                event.preventDefault();
+                resetErrorMessage.style.display = "none";
+                const newPassword = document.getElementById("new-password").value;
+                const confirmPassword = document.getElementById("confirm-password").value;
+
+                if (newPassword !== confirmPassword) {
+                    resetErrorMessage.textContent = "Passwords do not match.";
+                    resetErrorMessage.style.display = "block";
+                    return;
+                }
+
+                try {
+                    const response = await fetch('http://127.0.0.1:8000/auth/reset-password', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            email: userEmailForReset,
+                            otp: document.getElementById("otp").value, // Assuming OTP is still in the input
+                            new_password: newPassword
+                        })
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        alert("Password reset successfully! Please login with your new password.");
+                        passwordResetForm.style.display = "none";
+                        window.location.href = "login.html"; // Redirect to login
+                    } else {
+                        resetErrorMessage.textContent = data.detail || "Password reset failed.";
+                        resetErrorMessage.style.display = "block";
+                    }
+                } catch (error) {
+                    console.error("Error during password reset:", error);
+                    resetErrorMessage.textContent = "An error occurred during password reset.";
+                    resetErrorMessage.style.display = "block";
+                }
+            });
+
+        });
+    </script>
+
+</body>
+
+</html>

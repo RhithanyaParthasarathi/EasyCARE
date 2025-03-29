@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChroniCARE - Health Monitor</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="health-monitor.css">
+    <link rel="stylesheet" href="header.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <!--img src="your-logo.png" alt="ChroniCARE Logo"-->  <!-- Replace with your logo -->
+            <h1> ChroniCARE</h1>
+            <div class="header-menu">
+                <button class="menu-button">
+                    <i class="fas fa-ellipsis-v"></i> <!-- Three vertical dots -->
+                </button>
+                <div class="menu-dropdown">
+                    <a href="about-us.html">About Us</a>
+                    <a href="contact.html">Contact</a>
+                    <a href="#">Logout</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <h1 style="margin-left: 20px;">Realtime Health Monitoring</h1>
+
+    <main class="monitor-grid">
+        <div class="monitor-item">
+            <i class="fas fa-heartbeat"></i>
+            <span>Heart Rate: <span id="heart-rate">--</span> BPM</span>
+        </div>
+    
+    
+        <div class="monitor-item">
+            <i class="fas fa-tint"></i>
+            <span>Blood Pressure: <span id="blood-pressure">--</span> mmHg</span>
+        </div>
+    
+    
+        <div class="monitor-item">
+            <i class="fas fa-lungs"></i>
+            <span>Oxygen Level: <span id="oxygen-level">--</span>%</span>
+        </div>
+
+        <div class="monitor-item">
+            <i class="fas fa-prescription-bottle"></i>
+            <span>Glucose Level: <span id="glucose-level">--</span> mg/dL</span>
+        </div>
+
+        <div class="monitor-item">
+            <i class="fa-solid fa-temperature-three-quarters"></i>
+            <span>Temperature: <span id="temperature">--</span> °C</span>
+        </div>
+
+        <div class="monitor-item">
+            <i class="fa-solid fa-droplet"></i>
+            <span>Oxygen Saturation (SpO2): <span id="oxygen-saturation">--</span>%</span>
+        </div>
+    </main>
+
+    <nav class="bottom-nav">
+        <a href="index.html" class="nav-item">
+            <i class="fa-solid fa-house"></i>
+            <span>Home</span>
+        </a>
+        <a href="health-monitor.html" class="nav-item active">
+           <i class="fa-solid fa-medkit"></i>
+            <span>Health Monitor</span>
+        </a>
+        <a href="telemedicine.html" class="nav-item">
+            <i class="fa-solid fa-video"></i>
+            <span>Telemedicine</span>
+        </a>
+        <a href="profile.html" class="nav-item">
+            <i class="fa-solid fa-user"></i>
+            <span>Profile</span>
+        </a>
+    </nav>
+    <script>
+        // Basic JavaScript to highlight the active nav item (for demonstration)
+        const navItems = document.querySelectorAll('.nav-item');
+
+        navItems.forEach(item => {
+            item.addEventListener('click', function() {
+                navItems.forEach(item => item.classList.remove('active')); // Remove active class from all
+                this.classList.add('active'); // Add active class to the clicked item
+            });
+        });
+    </script>
+    <script src="header.js"></script>
+</body>
+</html>

@@ -1,0 +1,236 @@
+/* appointment-calendar.css */
+:root {
+    --primary-color: #17A2B8;
+    --secondary-color: #117A8B;
+    --background-color: #D1F2EB;
+    --container-color: #F4F4ED;
+    --time-slot-color: #B2EBF2;
+    --time-slot-hover-color: #A2D9E8;
+    --preferred-color: #E0F7FA;
+    --calendar-day-hover-color: #ddd;
+    --box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: var(--background-color);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    padding: 20px;
+    padding-bottom: 60px;
+}
+
+.back-button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1em;
+    margin: 20px;
+    display: block; /* Make it a block element */
+    margin-left: auto;
+    margin-right: auto; /* Center horizontally */
+    width: fit-content; /* Adjust width to content */
+}
+
+.container {
+    background: var(--container-color);
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: var(--box-shadow);
+    width: 100%;
+    max-width: 600px;
+    transition: transform 0.3s;
+}
+
+.container:hover {
+    transform: scale(1.02);
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: bold;
+    padding: 10px;
+    background: var(--primary-color);
+    color: white;
+    border-radius: 10px 10px 0 0;
+}
+
+.calendar-container {
+    margin-top: 20px;
+}
+
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.calendar-header button {
+    background: none;
+    border: none;
+    font-size: 1.2em;
+    cursor: pointer;
+    color: var(--primary-color);
+    transition: color 0.3s;
+    padding: 5px; /* Add some padding */
+}
+
+.calendar-header button:hover {
+    color: var(--secondary-color);
+}
+
+.calendar {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    text-align: center;
+    border-radius: 5px;
+    overflow: hidden; /* Clip content that might overflow */
+}
+
+.calendar .day-name {
+    font-weight: bold;
+    padding: 8px;
+    background-color: #eee; /* Light grey background for day names */
+}
+
+.calendar .day {
+    padding: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+    border: 1px solid #ddd; /* Add a subtle border */
+}
+
+.calendar .day:hover {
+    background-color: var(--calendar-day-hover-color);
+}
+
+.calendar .selected {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.time-slots-container {
+    margin-top: 20px;
+}
+
+.time-slot {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s, box-shadow 0.3s; /* Smooth transition for hover */
+    background: var(--time-slot-color);
+    box-shadow: var(--box-shadow);
+}
+
+.time-slot:hover {
+    background: var(--time-slot-hover-color);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Stronger shadow on hover */
+}
+
+.preferred {
+    background: var(--preferred-color);
+    color: var(--primary-color);
+    border: 1px solid var(--primary-color);
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: background 0.3s, color 0.3s, box-shadow 0.3s; /* Added shadow */
+    box-shadow: var(--box-shadow);
+}
+
+.preferred:hover {
+    background: var(--primary-color);
+    color: white;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Stronger shadow on hover */
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .container {
+        padding: 10px;
+    }
+
+    .header {
+        padding: 5px;
+        font-size: 0.9em; /* Slightly smaller header text */
+    }
+
+    .calendar-header {
+        flex-direction: column; /* Stack month and buttons */
+        align-items: center;
+    }
+
+    .calendar-header h3 {
+        margin-bottom: 10px; /* Add space below month name */
+    }
+
+    .calendar-header button {
+        font-size: 1em; /* Smaller buttons on small screens */
+    }
+
+    .calendar .day-name,
+    .calendar .day {
+        padding: 5px;
+        font-size: 0.85em; /* Smaller font size for days */
+    }
+
+    .time-slot {
+        padding: 8px;
+        font-size: 0.9em; /* Slightly smaller time slot text */
+    }
+}
+
+/* Bottom Navigation Bar */
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: #fff;
+    display: flex;
+    justify-content: space-around;
+    padding: 0.75rem 0;
+    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+    z-index: 100; /* Ensure it stays on top */
+}
+
+.nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: #555;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.nav-item i {
+    font-size: 1.5rem;
+    margin-bottom: 0.25rem;
+}
+
+.nav-item span {
+    font-size: 0.75rem;
+}
+
+.nav-item:hover, .nav-item.active {
+    color: #007bff;
+}
+
+.nav-item.active{
+    color: #007bff;
+}

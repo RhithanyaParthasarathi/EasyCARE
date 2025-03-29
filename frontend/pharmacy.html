@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChroniCARE - Pharmacy</title>
+    <link rel="stylesheet" href="pharmacy.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+<body>
+    <header>
+        <h1>Pharmacy</h1>
+    </header>
+    <main>
+        <div class="search-container">
+            <input type="text" id="medicine-search" placeholder="Enter medicine name">
+            <button id="search-button">Search</button>
+        </div>
+
+        <h2 id="pharmacies-heading">Available Pharmacies</h2> <!-- Hidden by default -->
+        <div id="pharmacy-list">
+            <!-- Pharmacy list or suggestions will be displayed here -->
+        </div>
+
+        <button class="back-button" onclick="goBack()">Back</button>
+    </main>
+
+    <nav class="bottom-nav">
+        <a href="index.html" class="nav-item">
+            <i class="fa-solid fa-house"></i>
+            <span>Home</span>
+        </a>
+        <a href="health-monitor.html" class="nav-item">
+           <i class="fa-solid fa-medkit"></i>
+            <span>Health Monitor</span>
+        </a>
+        <a href="telemedicine.html" class="nav-item active">
+            <i class="fa-solid fa-video"></i>
+            <span>Telemedicine</span>
+        </a>
+        <a href="profile.html" class="nav-item">
+            <i class="fa-solid fa-user"></i>
+            <span>Profile</span>
+        </a>
+    </nav>
+    <script src="header.js"></script>
+    <script src="pharmacy.js"></script>
+    <script>
+        
+        function goBack() {
+            window.location.href = 'telemedicine.html';
+        }
+    </script>
+</body>
+</html>

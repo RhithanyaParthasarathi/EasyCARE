@@ -1,0 +1,219 @@
+/* General Styles */
+body {
+    font-family: sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f9f5f0; /* Soft beige background */
+    color: #333;
+    line-height: 1.6;
+    padding-bottom: 60px;
+}
+
+
+/* Header Styles */
+header {
+    background-color: #fff;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+
+header h1 {
+    margin-bottom: 15px;
+    color: #1a237e; /* Dark blue heading */
+    font-size: 2.5em; /* Larger heading */
+}
+
+
+/* Search Bar Styles */
+.search-bar {
+    display: flex;
+    align-items: center;
+    background-color: #f0f0f0;
+    border-radius: 25px;
+    padding: 5px 15px;
+    margin-top: 10px;
+}
+
+
+.search-bar input[type="text"] {
+    border: none;
+    background-color: transparent;
+    padding: 8px;
+    width: 100%;
+    font-size: 1em;
+    outline: none;
+}
+
+
+.search-bar button {
+    background-color: transparent;
+    border: none;
+    color: #777;
+    cursor: pointer;
+    font-size: 1.2em;
+    padding: 5px;
+}
+
+
+/* Resource Grid Layout */
+.resource-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* Two columns */
+    gap: 20px;
+    padding: 20px;
+}
+
+
+/* Resource Button Styles */
+.resource-button {
+    display: flex;
+    flex-direction: column; /* Stack icon and text vertically */
+    align-items: center;
+    justify-content: center;
+    height: 100px;
+    border-radius: 15px;
+    text-decoration: none;
+    color: #333;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    font-size: 1.2em;
+    font-weight: bold;
+    text-align: center;
+    transition: transform 0.2s ease-in-out;
+}
+
+
+.resource-button:hover {
+    transform: translateY(-5px);
+}
+
+
+/* Style for the icons */
+.resource-button i {
+    font-size: 1.5em; /* Adjust icon size */
+    margin-bottom: 5px; /* Space between icon and text */
+    color: #007bff; /* Icon color - you can change this */
+}
+
+
+/* Assigning Colors - Based on the Image's Palette */
+#appointment-scheduler {
+    background-color: #b2ebf2; /* Light Yellow */
+}
+
+
+#virtual-doctor {
+    background-color: #b2dfdb; /* Light Purple */
+}
+
+
+#medication-history {
+    background-color: #b2dfdb; /* Light Red */
+}
+
+
+#health-data {
+    background-color: #b2ebf2; /* Light Cyan */
+}
+
+
+#view-prescription {
+    background-color: #b2ebf2; /* Light Orange */
+}
+
+
+#pharmacy {
+    background-color: #b2dfdb; /* Light Teal */
+}
+
+
+/* Mobile Responsiveness */
+@media (max-width: 600px) {
+    .resource-grid {
+        grid-template-columns: 1fr; /* Stack buttons on small screens */
+    }
+}
+
+/* Bottom Navigation Bar */
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: #fff;
+    display: flex;
+    justify-content: space-around;
+    padding: 0.75rem 0;
+    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+    z-index: 100; /* Ensure it stays on top */
+}
+
+.nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: #555;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.nav-item i {
+    font-size: 1.5rem;
+    margin-bottom: 0.25rem;
+}
+
+.nav-item span {
+    font-size: 0.75rem;
+}
+
+.nav-item:hover, .nav-item.active {
+    color: #007bff;
+}
+
+.nav-item.active{
+    color: #007bff;
+}
+
+/* Media Queries for Responsiveness */
+@media (min-width: 768px) {
+    #hero {
+        flex-direction: row;
+        justify-content: space-between;
+        text-align: left;
+    }
+
+    #hero-content {
+        width: 50%;
+        padding-right: 2rem;
+    }
+
+    #hero-image {
+        width: 50%;
+    }
+
+    #hero img {
+        max-width: 100%;
+    }
+}
+
+@media (max-width: 576px) {
+    .bottom-nav {
+        justify-content: space-between;
+        padding: 0.5rem;
+    }
+
+    .nav-item {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .nav-item i {
+        font-size: 1.2rem;
+        margin-bottom: 0.1rem;
+    }
+
+    .nav-item span {
+        font-size: 0.65rem;
+    }
+}

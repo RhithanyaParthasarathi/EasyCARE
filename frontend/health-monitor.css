@@ -1,0 +1,116 @@
+body {
+    font-family: sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f9f5f0; /* Soft beige background */
+    color: #333;
+    line-height: 1.6;
+    padding-bottom: 60px;
+}
+
+
+/* Header Styles */
+header {
+    background-color: #fff;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+
+header h1 {
+    margin-bottom: 15px;
+    color: #1a237e; /* Dark blue heading */
+    font-size: 2.5em; /* Larger heading */
+}
+
+
+.monitor-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* 3 buttons per row */
+    grid-template-rows: repeat(2, 1fr); /* 2 rows */
+    gap: 20px;
+    padding: 20px;
+    
+}
+
+.monitor-item {
+    background-color: #b2ebf2;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    font-size: 1.2em;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+
+/* Bottom Navigation Bar */
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: #fff;
+    display: flex;
+    justify-content: space-around;
+    padding: 0.75rem 0;
+    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+    z-index: 100; /* Ensure it stays on top */
+}
+
+.nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: #555;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.nav-item i {
+    font-size: 1.5rem;
+    margin-bottom: 0.25rem;
+}
+
+.nav-item span {
+    font-size: 0.75rem;
+}
+
+.nav-item:hover, .nav-item.active {
+    color: #007bff;
+}
+
+.nav-item.active{
+    color: #007bff;
+}
+
+/* Media Queries for Responsiveness */
+@media (min-width: 768px) {
+    #hero {
+        flex-direction: row;
+        justify-content: space-between;
+        text-align: left;
+    }
+
+    #hero-content {
+        width: 50%;
+        padding-right: 2rem;
+    }
+
+    #hero-image {
+        width: 50%;
+    }
+
+    #hero img {
+        max-width: 100%;
+    }
+}
+
+/* Media Queries for Responsiveness */
+
+@media (max-width: 600px) {
+    .monitor-grid {
+        grid-template-columns: repeat(2, 1fr); /* 2 items per row */
+    }
+}
+

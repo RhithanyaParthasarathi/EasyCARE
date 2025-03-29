@@ -1,0 +1,220 @@
+/* appointments.css */
+#appointments-page {
+    padding: 20px;
+}
+
+.appointments-container {
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    max-width: 800px;   /*Limit width for readability */
+    margin: 0 auto;
+}
+
+.appointments-header {
+    padding: 20px;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.appointments-header h2 {
+    margin: 0;
+    font-size: 1.5em;
+}
+
+/* Filter Buttons */
+.appointment-filter-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.filter-button {
+    background-color: #f0f0f0;
+    color: #555;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9em;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.filter-button:hover,
+.filter-button.active {
+    background-color: #ddd;
+    color: #333; /* New Text Color when Active*/
+}
+
+.appointment-list {
+    padding: 0;
+    list-style: none;
+}
+
+.appointment-item {
+    padding: 15px 20px;
+    border-bottom: 1px solid #eee;
+    transition: background-color 0.2s ease, opacity 0.2s ease;
+    order: initial; /* Reset order for filtering */
+}
+
+.appointment-item:last-child {
+    border-bottom: none;
+}
+
+.appointment-item:hover {
+    background-color: #f0f8ff; /* A very light blue */
+}
+
+.appointment-details {
+    /* flex-grow: 1; */ /*Removed Flex Grow*/
+    /* display: flex; */ /*Removed the Flex property*/
+    /* justify-content: space-between; */ /*Removed property because we removed Flex*/
+    /* align-items: center; */ /*Removed property because we removed Flex*/
+    width: 100%;
+}
+
+.appointment-info {
+    margin-bottom: 5px;
+    font-size: 0.95em;
+    /* display: flex; */ /*Removed Flex Property to align the request time at the left side*/
+    /* align-items: center; */ /*Removed Flex Alignment*/
+    flex-wrap: wrap; /* Allow items to wrap */
+}
+
+.top-line {
+    display: flex;  /* to position items inline */
+    align-items: center;
+    margin-bottom: 5px;  /* some space before next line */
+}
+
+.patient-avatar {
+    margin-right: 10px;
+    font-size: 1.5em; /* Avatar size */
+    color: #777;  /* Gray color */
+}
+
+.appointment-time {
+    color: #777;
+    /* margin-left: 10px; */ /*Removed the left alignment to allow it go to the new line */
+}
+
+.request-time {
+    color: #999;
+    font-size: 0.8em;
+    margin-left: auto; /* Push time to the right */
+}
+
+.appointment-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    justify-content: flex-start; /*Aling the items the left side*/
+    margin-top: 10px;
+}
+
+.button {
+    color: #555;
+    border: 1px solid #ddd;
+    background-color: #fff;
+    padding: 8px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9em;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.button:hover {
+    background-color: #ddd;
+}
+
+.accept {
+    background-color: #fff; /*Changed the style*/
+    color: green;  /*Changed color style*/
+    border-color: green;
+}
+
+.accept:hover {
+    background-color: green;
+    color: #fff;
+}
+
+.decline {
+    background-color: #fff;
+    color: #dc3545;
+    border-color: #dc3545;
+}
+
+.decline:hover {
+    background-color: #dc3545;
+    color: #fff;
+}
+
+/* Styling for appointment status (Accepted, Declined) */
+.appointment-status {
+    font-weight: bold;
+    /* margin-left: 10px; */ /*Removed the left Alignment because now it has flex alignment*/
+}
+
+.appointment-status.accepted {
+    color: green;
+}
+
+.appointment-status.declined {
+    color: red;
+}
+
+/* Styling for New Appointment Indicator */
+.new-indicator {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: #007bff; /* Blue Dot */
+    display: inline-block;
+    margin-left: 5px;
+}
+
+/*Styling the length for appointment*/
+.appointment-item.pending{
+     min-height: 60px;
+}
+
+/* Sort accepted requests to the end */
+.appointment-list > .appointment-item.accepted,
+.appointment-list > .appointment-item.declined {
+    order: 1;
+}
+
+/* Styling for accept and decline feedback */
+.appointment-item.accepting {
+    background-color: #d4edda; /* Light green */
+    opacity: 0.7;
+}
+
+.appointment-item.declining {
+    background-color: #f8d7da; /* Light red */
+    opacity: 0.7;
+}
+
+/* Styling for the back button */
+.back-button-container {
+    text-align: center; /* Center the button */
+    margin-top: 20px; /* Add some space above the button */
+}
+
+.back-button {
+    background-color: #007bff; /* Blue background color */
+    color: #fff; /* White text color */
+    border: none; /* Remove the border */
+    padding: 10px 20px; /* Add some padding */
+    border-radius: 5px; /* Round the corners */
+    text-decoration: none; /* Remove underline from the link */
+    font-size: 1em; /* Set the font size */
+    cursor: pointer; /* Change the cursor on hover */
+    transition: background-color 0.2s ease; /* Add a smooth transition */
+}
+
+.back-button:hover {
+    background-color: #0056b3; /* Darker blue on hover */
+}

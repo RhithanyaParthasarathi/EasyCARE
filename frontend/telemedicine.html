@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChroniCARE - Telemedicine</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="telemedicine.css">
+    <link rel="stylesheet" href="header.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+<body>
+
+    <header>
+        <div class="logo">
+            <!--img src="your-logo.png" alt="ChroniCARE Logo"-->  <!-- Replace with your logo -->
+            <h1> ChroniCARE</h1>
+            <div class="header-menu">
+                <button class="menu-button">
+                    <i class="fas fa-ellipsis-v"></i> <!-- Three vertical dots -->
+                </button>
+                <div class="menu-dropdown">
+                    <a href="about-us.html">About Us</a>
+                    <a href="contact.html">Contact</a>
+                    <a href="#">Logout</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <h1 style="margin-left: 20px;">Telemedicine</h1>
+
+    <main class="resource-grid">
+        <a href="request-appointment.html" class="resource-button" id="appointment-scheduler">
+            <i class="fas fa-calendar-alt"></i>
+            <span>Request Appointment</span>
+        </a>
+
+
+        <a href="virtual-doctor.html" class="resource-button" id="virtual-doctor">
+            <i class="fas fa-user-md"></i>
+            <span>Virtual Doctor</span>
+        </a>
+
+        <a href="medical-history.html" class="resource-button" id="medication-history">
+            <i class="fas fa-pills"></i>
+            <span>Medical History</span>
+        </a>
+
+        <a href="health-data.html" class="resource-button" id="health-data">
+            <i class="fas fa-heartbeat"></i>
+            <span>Health Data</span>
+        </a>
+
+        <a href="view-prescription.html" class="resource-button" id="view-prescription">
+            <i class="fas fa-file-prescription"></i>
+            <span>View Prescription</span>
+        </a>
+
+        <a href="pharmacy.html" class="resource-button" id="pharmacy">
+            <i class="fas fa-clinic-medical"></i>
+            <span>Pharmacy</span>
+        </a>
+    </main>
+    <script src="script.js"></script>
+
+    <nav class="bottom-nav">
+        <a href="index.html" class="nav-item">
+            <i class="fa-solid fa-house"></i>
+            <span>Home</span>
+        </a>
+        <a href="health-monitor.html" class="nav-item">
+           <i class="fa-solid fa-medkit"></i>
+            <span>Health Monitor</span>
+        </a>
+        <a href="telemedicine.html" class="nav-item active">
+            <i class="fa-solid fa-video"></i>
+            <span>Telemedicine</span>
+        </a>
+        <a href="profile.html" class="nav-item">
+            <i class="fa-solid fa-user"></i>
+            <span>Profile</span>
+        </a>
+    </nav>
+    <script>
+        // Basic JavaScript to highlight the active nav item (for demonstration)
+        const navItems = document.querySelectorAll('.nav-item');
+
+        navItems.forEach(item => {
+            item.addEventListener('click', function() {
+                navItems.forEach(item => item.classList.remove('active')); // Remove active class from all
+                this.classList.add('active'); // Add active class to the clicked item
+            });
+        });
+    </script>
+    <script src="header.js"></script>
+</body>
+</html>

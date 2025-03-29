@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChroniCARE - Your Health, Your Way</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="header.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+</head>
+<body>
+
+    <header>
+        <div class="logo">
+            <!--img src="your-logo.png" alt="ChroniCARE Logo"-->  <!-- Replace with your logo -->
+            <h1 style="margin-left: 20px;"> ChroniCARE</h1>
+            <div class="header-menu">
+                <button class="menu-button">
+                    <i class="fas fa-ellipsis-v"></i> <!-- Three vertical dots -->
+                </button>
+                <div class="menu-dropdown">
+                    <a href="about-us.html">About Us</a>
+                    <a href="contact.html">Contact</a>
+                    <a href="#">Logout</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section id="hero">
+            <div class="hero-content">
+                <h1>Welcome to ChroniCARE</h1>
+                <p>Managing your chronic condition shouldn't be a burden. We're here to simplify your healthcare journey and empower you to live your best life.</p>
+              <!--  <a href="#" class="button">Get Started</a> -->
+            </div>
+            <div class="hero-image">
+                <!--img src="hero-image.png" alt="Person using ChroniCARE app"--> <!-- Replace with a relevant image -->
+            </div>
+        </section>
+
+        <section id="features">
+            <h2>What You Can Do With ChroniCARE</h2>
+            <div class="feature-grid">
+                <div class="feature-card">
+                   <i class="fa-solid fa-calendar-check"></i>
+                    <h3>Appointment Scheduling</h3>
+                    <p>Easily schedule and manage appointments with your healthcare providers.  Receive reminders so you never miss an important visit.</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fa-solid fa-chart-line"></i>
+                     <h3>Health Tracking</h3>
+                     <p>Check your health and track their severity over time. Share this information with your doctor for more informed care.</p>
+                 </div>
+                 <div class="feature-card">
+                    <i class="fa-solid fa-laptop-medical"></i>
+                    <h3>Secure Consultations</h3>
+                    <p>Communicate securely with your healthcare team.  Ask questions, request prescription refills, and receive important updates.</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fa-solid fa-file-medical"></i>
+                    <h3>Health Records Access</h3>
+                    <p>Access your medical records, lab results, and other important health information in one convenient place.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <i class="fa-solid fa-capsules"></i>
+                    <h3>Medication Management</h3>
+                    <p>Keep track of your medications, dosages, and refills.  Set reminders to ensure you take your medications on time.</p>
+                </div>
+                
+                
+               
+                 <div class="feature-card">
+                    <i class="fa-solid fa-book-medical"></i>
+                    <h3>Educational Resources</h3>
+                    <p>Access curated articles and resources to better understand your condition and treatment options.</p>
+                </div>
+            </div>
+        </section>
+
+        <!--section id="call-to-action">
+            <h2>Ready to Take Control of Your Health?</h2>
+            <p>Join ChroniCARE today and experience a more connected and convenient approach to managing your chronic condition.</p>
+            <a href="#" class="button">Sign Up Now</a>
+        </section-->
+    </main>
+
+    <!-- Bottom Navigation Bar -->
+    <nav class="bottom-nav">
+        <a href="index.html" class="nav-item active">
+            <i class="fa-solid fa-house"></i>
+            <span>Home</span>
+        </a>
+        <a href="health-monitor.html" class="nav-item">
+           <i class="fa-solid fa-medkit"></i>
+            <span>Health Monitor</span>
+        </a>
+        <a href="telemedicine.html" class="nav-item">
+            <i class="fa-solid fa-video"></i>
+            <span>Telemedicine</span>
+        </a>
+        <a href="profile.html" class="nav-item">
+            <i class="fa-solid fa-user"></i>
+            <span>Profile</span>
+        </a>
+    </nav>
+
+    <script>
+        // Basic JavaScript to highlight the active nav item (for demonstration)
+        const navItems = document.querySelectorAll('.nav-item');
+
+        navItems.forEach(item => {
+            item.addEventListener('click', function() {
+                navItems.forEach(item => item.classList.remove('active')); // Remove active class from all
+                this.classList.add('active'); // Add active class to the clicked item
+            });
+        });
+    </script>
+<script src="header.js"></script>
+</body>
+</html>

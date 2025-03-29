@@ -1,0 +1,61 @@
+/* doctor-dashboard.css */
+#doctor-dashboard {
+    padding: 20px;
+}
+
+.feature-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* Responsive grid */
+    grid-gap: 20px; /* Increased to provide more spacing */
+    margin-top:1.5rem;
+}
+
+.feature-card {
+    background-color: #fff;
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    text-align: left;
+    transition: transform 0.2s ease;
+    display: flex; /* Enable flexbox layout */
+    flex-direction: column; /* Stack content vertically */
+    justify-content: space-between; /* Distribute space to align button to the bottom */
+    min-height: 250px; /* Increased min-height for longer cards */
+}
+
+.feature-card:hover {
+    transform: translateY(-5px);
+}
+
+.feature-card i {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+    color: #007bff; /* Adjust color as needed */
+}
+
+.feature-card h3 {
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+
+.feature-card p {
+    margin-bottom: 0px; /* Reduced to prevent excessive spacing */
+}
+
+.button {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    padding: 14px 20px;
+    border-radius: 18px;
+    cursor: pointer;
+    margin-top: auto; /* Push the button to the bottom - will take all available space between paragraph and the button, will require to declare "display: flex; flex-direction: column" */
+    text-decoration: none; /*Remove underline for a tag*/
+    display: block; /* Changed to block to take full width */
+    text-align: center; 
+    font-size: 1.1rem;/* Center align the text */
+}
+
+.button:hover {
+    background-color: #0056b3;
+}

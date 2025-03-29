@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChroniCARE - Your Appointments</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="appointments.css">
+    <link rel="stylesheet" href="header.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+<body>
+
+    <header>
+        <div class="logo">
+            <h1 style="margin-left: 20px;"> ChroniCARE - Doctor</h1>
+            <div class="header-menu">
+                <button class="menu-button">
+                    <i class="fas fa-ellipsis-v"></i>
+                </button>
+                <div class="menu-dropdown">
+                    <a href="docprofile.html">My Profile</a>
+                    <a href="contact.html">Contact</a>
+                    <a href="about-us.html">About Us</a>
+                    <a href="#">Logout</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section id="appointments-page">
+            <div class="appointments-container">
+                <div class="appointments-header">
+                    <h2>Your Appointments</h2>
+                    <div class="appointment-filter-buttons">
+                        <button class="filter-button active" data-filter="all">All</button>
+                        <button class="filter-button" data-filter="unread">Unread</button>
+                        <button class="filter-button" data-filter="accepted">Accepted</button>
+                        <button class="filter-button" data-filter="declined">Rejected</button>
+                    </div>
+                </div>
+
+                <div class="appointment-list">
+
+                    <div class="appointment-item pending" data-patient="john_doe">
+                        <div class="appointment-details">
+                            <div class="appointment-info">
+                                <div class="top-line">
+                                    <span class="patient-avatar"><i class="fas fa-user-circle"></i></span>
+                                    <span class="patient-name">@john</span>&nbsp; requested an appointment
+                                    <span class="request-time">2 hours ago &nbsp;&nbsp;</span>
+                                    <span class="new-indicator"></span>
+                                </div>
+                                <div class="appointment-time">
+                                    Appointment Time: 13-March-2025 Thursday 2:00pm
+                                </div>
+                            </div>
+                            <div class="appointment-actions">
+                                <button class="button accept" onclick="acceptAppointment(this)">Accept</button>
+                                <button class="button decline" onclick="declineAppointment(this)">Decline</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="appointment-item pending" data-patient="jane_smith">
+                        <div class="appointment-details">
+                            <div class="appointment-info">
+                                <div class="top-line">
+                                    <span class="patient-avatar"><i class="fas fa-user-circle"></i></span>
+                                    <span class="patient-name">@kabil</span>&nbsp; requested an appointment
+                                    <span class="request-time">3 hours ago &nbsp;&nbsp;</span>
+                                    <span class="new-indicator"></span>
+                                </div>
+                                <div class="appointment-time">
+                                    Appointment Time: 13-March-2025 Thursday 3:00pm
+                                </div>
+                            </div>
+                            <div class="appointment-actions">
+                                <button class="button accept" onclick="acceptAppointment(this)">Accept</button>
+                                <button class="button decline" onclick="declineAppointment(this)">Decline</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="appointment-item pending" data-patient="david_lee">
+                        <div class="appointment-details">
+                            <div class="appointment-info">
+                                <div class="top-line">
+                                    <span class="patient-avatar"><i class="fas fa-user-circle"></i></span>
+                                    <span class="patient-name">@david</span>&nbsp; requested an appointment
+                                    <span class="request-time">1 hour ago &nbsp;&nbsp;</span>
+                                    <span class="new-indicator"></span>
+                                </div>
+                                <div class="appointment-time">
+                                    Appointment Time: 13-March-2025 Thursday 4:00pm
+                                </div>
+                            </div>
+                            <div class="appointment-actions">
+                                <button class="button accept" onclick="acceptAppointment(this)">Accept</button>
+                                <button class="button decline" onclick="declineAppointment(this)">Decline</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="appointment-item pending" data-patient="sarah_jones">
+                        <div class="appointment-details">
+                            <div class="appointment-info">
+                                <div class="top-line">
+                                    <span class="patient-avatar"><i class="fas fa-user-circle"></i></span>
+                                    <span class="patient-name">@sara</span>&nbsp; requested an appointment
+                                    <span class="request-time">5 hours ago &nbsp;&nbsp;</span>
+                                    <span class="new-indicator"></span>
+                                </div>
+                                <div class="appointment-time">
+                                    Appointment Time: 14-March-2025 Friday 10:00am
+                                </div>
+                            </div>
+                            <div class="appointment-actions">
+                                <button class="button accept" onclick="acceptAppointment(this)">Accept</button>
+                                <button class="button decline" onclick="declineAppointment(this)">Decline</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="appointment-item accepted" data-patient="michael_brown">
+                        <div class="appointment-details">
+                            <div class="appointment-info">
+                                <div class="top-line">
+                                    <span class="patient-avatar"><i class="fas fa-user-circle"></i></span>
+                                    <span class="patient-name">@michael</span>&nbsp; requested an appointment
+                                    <span class="request-time">1 day ago &nbsp;&nbsp;</span>
+                                    <span class="appointment-status accepted">Accepted</span>
+                                </div>
+                                <div class="appointment-time">
+                                    Appointment Time: 14-March-2025 Friday 11:00am
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="appointment-item accepted" data-patient="emily_davis">
+                        <div class="appointment-details">
+                            <div class="appointment-info">
+                                <div class="top-line">
+                                    <span class="patient-avatar"><i class="fas fa-user-circle"></i></span>
+                                    <span class="patient-name">@sana</span>&nbsp; requested an appointment
+                                    <span class="request-time">2 days ago &nbsp;&nbsp;</span>
+                                    <span class="appointment-status accepted">Accepted</span>
+                                </div>
+                                <div class="appointment-time">
+                                    Appointment Time: 15-March-2025 Saturday 2:00pm
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="appointment-item declined" data-patient="kevin_wilson">
+                        <div class="appointment-details">
+                            <div class="appointment-info">
+                                <div class="top-line">
+                                    <span class="patient-avatar"><i class="fas fa-user-circle"></i></span>
+                                    <span class="patient-name">@vivek</span>&nbsp; requested an appointment
+                                    <span class="request-time">3 days ago &nbsp;&nbsp;</span>
+                                    <span class="appointment-status declined">Declined</span>
+                                </div>
+                                <div class="appointment-time">
+                                    Appointment Time: 13-March-2025 Saturday 3:00pm
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- More appointment items... -->
+                </div>
+            </div>
+        </section>
+        <div class="back-button-container">
+            <button class="back-button" onclick="goBack()">Back</button>
+        </div>
+    </main>
+
+    <script>
+        function acceptAppointment(button) {
+            const appointmentItem = button.closest('.appointment-item');
+            appointmentItem.classList.add('accepting');
+
+            setTimeout(() => {
+                appointmentItem.classList.remove('pending');
+                appointmentItem.classList.remove('accepting');
+                appointmentItem.classList.add('accepted');
+
+                // Update top line with status
+                const topLine = appointmentItem.querySelector('.top-line');
+                const statusSpan = document.createElement('span');
+                statusSpan.classList.add('appointment-status', 'accepted');
+                statusSpan.textContent = 'Accepted';
+                topLine.appendChild(statusSpan);
+
+                // Remove new indicator
+                const newIndicator = appointmentItem.querySelector('.new-indicator');
+                if (newIndicator) {
+                    newIndicator.remove();
+                }
+
+                //Remove accept/decline buttons
+                appointmentItem.querySelector('.appointment-actions').remove();
+
+                // Reorder the Element
+                document.querySelector('.appointment-list').appendChild(appointmentItem);
+            }, 500);
+        }
+
+        function declineAppointment(button) {
+            const appointmentItem = button.closest('.appointment-item');
+            appointmentItem.classList.add('declining');
+
+            setTimeout(() => {
+                appointmentItem.classList.remove('pending');
+                appointmentItem.classList.remove('declining');
+                appointmentItem.classList.add('declined');
+
+               // Update top line with status
+                const topLine = appointmentItem.querySelector('.top-line');
+                const statusSpan = document.createElement('span');
+                statusSpan.classList.add('appointment-status', 'declined');
+                statusSpan.textContent = 'Declined';
+                topLine.appendChild(statusSpan);
+
+                // Remove new indicator
+                const newIndicator = appointmentItem.querySelector('.new-indicator');
+                if (newIndicator) {
+                    newIndicator.remove();
+                }
+                 //Remove accept/decline buttons
+                 appointmentItem.querySelector('.appointment-actions').remove();
+
+                // Reorder the Element
+                document.querySelector('.appointment-list').appendChild(appointmentItem);
+            }, 500);
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const filterButtons = document.querySelectorAll('.appointment-filter-buttons .filter-button');
+            const appointmentItems = document.querySelectorAll('.appointment-item');
+
+            filterButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    // Remove 'active' class from other buttons
+                    filterButtons.forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+
+                    const filter = this.dataset.filter;
+
+                    appointmentItems.forEach(item => {
+                        item.style.display = 'block'; // Show all initially (changed from 'flex' to 'block')
+
+                        if (filter === 'all') {
+                            //Do nothing, every Item are already showed up
+                        } else if (filter === 'unread') {
+                            if (!item.classList.contains('pending')) {
+                                item.style.display = 'none';
+                            }
+                            if (item.querySelector('.appointment-status')) {
+                                item.style.display = 'none';
+                            }
+                        } else if (filter === 'accepted') {
+                            if (!item.classList.contains('accepted')) {
+                                item.style.display = 'none';
+                            }
+                        } else if (filter === 'declined') {
+                            if (!item.classList.contains('declined')) {
+                                item.style.display = 'none';
+                            }
+                        }
+                    });
+
+                    // Update styling of active button
+                    filterButtons.forEach(button => {
+                        if (button.classList.contains('active')) {
+                            button.style.backgroundColor = '#ddd';  // Or whatever color you want
+                            button.style.color = '#333'; // You can also adjust the text color
+                        } else {
+                            button.style.backgroundColor = ''; // Reset to default background
+                            button.style.color = '';// Reset to default text color
+                        }
+                    });
+                });
+            });
+        });
+    </script>
+    <script>
+        function goBack() {
+            window.location.href = 'doctor-dashboard.html';
+        }
+    </script>
+      <script src="header.js"></script>
+</body>
+</html>

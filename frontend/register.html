@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ChroniCare - Register</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+          integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg=="
+          crossorigin="anonymous" referrerpolicy="no-referrer"/>
+    <style>
+        /*  General Styles */
+        body {
+            font-family: 'Arial', sans-serif; /*  Updated font */
+            background-color: #f0f8ff; /*  Lighter, more calming blue */
+            background-image: linear-gradient(to bottom, #f0f8ff, #ffffff);
+            display: flex;
+            flex-direction: column;  /*  Stack header and content */
+            min-height: 100vh; /*  Ensure full height */
+            margin: 0;
+            padding: 0;
+            align-items: center; /* Center horizontally */
+        }
+
+        /* Header Styles (Combined from header.css) */
+        .page-header {
+            background-color: #fff;
+            color: #333;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            position: relative;
+            z-index: 10;
+            width: 100%; /* Header takes full width */
+        }
+
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .header-title {
+            font-size: 2rem;
+            margin: 0;
+            text-align: left; /* Added text align left */
+        }
+
+        .header-menu {
+            position: relative;
+            display: inline-block;
+            margin-left: auto;
+            text-align: right; /* Added text align right */
+        }
+
+        .menu-button {
+            background-color: transparent;
+            border: none;
+            color: #555;
+            cursor: pointer;
+            font-size: 1.5rem;
+            padding: 0.5rem;
+            transition: color 0.3s ease;
+        }
+
+        .menu-button:hover {
+            color: #007bff;
+        }
+
+        .menu-dropdown {
+            position: absolute;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            right: 0;
+            top: 100%;
+            margin-top: 0.5rem;
+            padding: 0.5rem 0;
+            width: 150px;
+            display: none;
+        }
+
+        .menu-dropdown a {
+            display: block;
+            padding: 0.5rem 1rem;
+            text-decoration: none;
+            color: #333;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .menu-dropdown a:hover {
+            background-color: #f4f4f4;
+            color: #007bff;
+        }
+
+        .menu-dropdown.show {
+            display: block;
+        }
+
+        /* Login Container Styles */
+        .login-container {
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 5px 12px rgba(0, 0, 0, 0.18);
+            width: 500px;
+            text-align: center;
+            margin: 20px auto;
+        }
+
+        .quote {
+            font-style: italic;
+            color: #495057;
+            margin-bottom: 25px;
+            padding: 18px;
+            background-color: #e9ecef;
+            border-radius: 8px;
+            font-weight: 500;
+        }
+
+        .button-container {
+            margin-bottom: 25px;
+            display: flex;
+            flex-direction: column; /* Stack buttons vertically */
+            align-items: center; /* Center buttons horizontally */
+            display: none;
+        }
+
+        .button-container button {
+            padding: 14px 28px;
+            margin: 12px 0; /* Add vertical margin between buttons */
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 17px;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            width: auto; /* Adjust width to content */
+        }
+
+        #doctor-button {
+            background-color: #28a745;
+            color: white;
+        }
+
+        #patient-button {
+            background-color: #007bff;
+            color: white;
+        }
+
+        #doctor-button:hover,
+        #patient-button:hover {
+            opacity: 0.9;
+            transform: scale(1.03);
+        }
+
+        .login-form {
+            display: none;
+            padding: 20px 0;
+        }
+
+        .login-form label {
+            display: block;
+            margin-bottom: 7px;
+            text-align: left;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .login-form input[type="text"],
+        .login-form input[type="password"],
+        .login-form input[type="email"] { /* Include email */
+            width: calc(100% - 22px);
+            padding: 12px;
+            margin-bottom: 10px; /* Reduced margin-bottom for password */
+            border: 1px solid #ced4da;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        .login-form input[type="text"]:focus,
+        .login-form input[type="password"]:focus,
+        .login-form input[type="email"]:focus { /* Include email */
+            border-color: #80bdff;
+            outline: 0;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+        }
+
+        .login-form button {
+            background-color: #343a40;
+            color: white;
+            padding: 14px 28px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 17px;
+            transition: background-color 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .login-form button:hover {
+            background-color: #23272b;
+        }
+
+        h2 {
+            color: #343a40;
+            margin-bottom: 25px;
+            font-weight: 600;
+        }
+
+        /* Footer Styles */
+        footer {
+            text-align: center;
+            padding: 20px;
+            background-color: #f8f9fa;
+            color: #6c757d;
+            margin-top: auto;
+            border-top: 1px solid #dee2e6;
+            width: 100%;  /*Footer takes full width*/
+        }
+
+        /* Registration Link Styling */
+        .registration-link {
+            display: block;
+            margin-top: 15px;
+            color: #007bff;
+            text-decoration: underline; /* Underline the link */
+            transition: color 0.3s ease;
+        }
+
+        .registration-link:hover {
+            color: #0056b3;
+        }
+
+        /* Error Message Styling */
+        .error-message {
+            color: #dc3545;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+
+        /* Forgot Password Link Styling */
+        #forgot-password-link {
+            display: block;
+            margin-top: 10px;
+            color: #007bff;
+            text-decoration: none;
+            transition: color 0.3s ease;
+            text-align: right; /* Align to the right */
+        }
+
+        #forgot-password-link:hover {
+            color: #0056b3;
+        }
+
+    </style>
+</head>
+<body>
+
+<header class="page-header">
+    <div class="header-container">
+        <h1 class="header-title">ChroniCARE</h1>
+        <div class="header-menu">
+            <button class="menu-button">
+                <i class="fas fa-ellipsis-v"></i>
+            </button>
+            <div class="menu-dropdown">
+                <a href="#">About Us</a>
+                <a href="#">Contact</a>
+                <a href="#">Logout</a>
+            </div>
+        </div>
+    </div>
+</header>
+
+<div class="login-container">
+    <div class="quote">"Join our community for better health management!"</div>
+
+    <div class="button-container">
+        <button id="patient-button">Register as Patient</button>
+        <button id="doctor-button">Register as Doctor</button>
+    </div>
+
+    <div id="patient-registration" class="login-form">
+        <h2>Patient Registration</h2>
+        <form id="patient-form">
+            <label for="patient-username">Username:</label>
+            <input type="text" id="patient-username" name="patient-username" required>
+
+            <label for="patient-email">Email:</label>
+            <input type="email" id="patient-email" name="patient-email" required>
+
+            <label for="patient-password">Password:</label>
+            <input type="password" id="patient-password" name="patient-password" required>
+
+            <label for="patient-confirm-password">Confirm Password:</label>
+            <input type="password" id="patient-confirm-password" name="patient-confirm-password" required>
+
+            <button type="submit">Register</button>
+            <a href="login.html" class="registration-link">Already have an account? Login here</a>
+
+            <div id="patient-error-message" class="error-message" style="display:none;"></div>
+        </form>
+    </div>
+
+    <div id="doctor-registration" class="login-form">
+        <h2>Doctor Registration</h2>
+        <form id="doctor-form">
+            <label for="doctor-username">Username:</label>
+            <input type="text" id="doctor-username" name="doctor-username" required>
+
+            <label for="doctor-email">Email:</label>
+            <input type="email" id="doctor-email" name="doctor-email" required>
+
+            <label for="doctor-password">Password:</label>
+            <input type="password" id="doctor-password" name="doctor-password" required>
+
+            <label for="doctor-confirm-password">Confirm Password:</label>
+            <input type="password" id="doctor-confirm-password" name="doctor-confirm-password" required>
+
+            <label for="doctor-license">License Number:</label>
+            <input type="text" id="doctor-license" name="doctor-license" required>
+
+            <button type="submit">Register</button>
+            <a href="login.html" class="registration-link">Already have an account? Login here</a>
+            <div id="doctor-error-message" class="error-message" style="display:none;"></div>
+        </form>
+    </div>
+</div>
+
+<footer>
+    <p>© 2024 ChroniCARE. All rights reserved.</p>
+</footer>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Function to get query parameter by name
+        function getQueryParam(name) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(name);
+        }
+
+        // Header Menu Toggle (from your original code)
+        const menuButton = document.querySelector('.menu-button');
+        const menuDropdown = document.querySelector('.menu-dropdown');
+
+        menuButton.addEventListener('click', function (event) {
+            menuDropdown.classList.toggle('show');
+            event.stopPropagation();
+        });
+
+        document.addEventListener('click', function (event) {
+            if (!menuButton.contains(event.target) && !menuDropdown.contains(event.target)) {
+                menuDropdown.classList.remove('show');
+            }
+        });
+
+        const doctorButton = document.getElementById("doctor-button");
+        const patientButton = document.getElementById("patient-button");
+        const patientRegistration = document.getElementById("patient-registration");
+        const doctorRegistration = document.getElementById("doctor-registration");
+        const patientForm = document.getElementById("patient-form");
+        const doctorForm = document.getElementById("doctor-form");
+        const buttonContainer = document.querySelector(".button-container");
+        const patientErrorMessage = document.getElementById("patient-error-message");
+        const doctorErrorMessage = document.getElementById("doctor-error-message");
+
+        //Hide buttons
+        buttonContainer.style.display = 'none';
+
+        // Automatically show the correct form based on the query parameter
+        const userType = getQueryParam('userType');
+        if (userType === 'patient') {
+            patientRegistration.style.display = "block";
+            doctorRegistration.style.display = "none";
+        } else if (userType === 'doctor') {
+            doctorRegistration.style.display = "block";
+            patientRegistration.style.display = "none";
+        } else {
+            // If no userType is specified, hide both forms.  This should ideally not happen.
+            doctorRegistration.style.display = "none";
+            patientRegistration.style.display = "none";
+            buttonContainer.style.display = 'flex'; // Show buttons if no userType
+        }
+
+        // Function to handle registration requests
+        async function handleRegistration(role, formData, errorMessageElement) {
+            try {
+                const response = await fetch('http://127.0.0.1:8000/auth/register', {  // Backend registration URL
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ...formData, role: role })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    alert("Registration Successful! Please login.");
+                    window.location.href = "login.html";  // Redirect to login page
+                } else {
+                    errorMessageElement.textContent = data.detail || "Registration failed.";
+                    errorMessageElement.style.display = "block";
+                }
+            } catch (error) {
+                console.error("Error during registration:", error);
+                errorMessageElement.textContent = "An error occurred during registration.";
+                errorMessageElement.style.display = "block";
+            }
+        }
+
+        patientForm.addEventListener("submit", (event) => {
+            event.preventDefault();
+            patientErrorMessage.style.display = "none";
+            const username = document.getElementById("patient-username").value;
+            const email = document.getElementById("patient-email").value;
+            const password = document.getElementById("patient-password").value;
+            const confirmPassword = document.getElementById("patient-confirm-password").value;
+
+            if (password !== confirmPassword) {
+                patientErrorMessage.textContent = "Passwords do not match.";
+                patientErrorMessage.style.display = "block";
+                return;
+            }
+
+            handleRegistration("patient", {username: username, email: email, password: password}, patientErrorMessage);
+        });
+
+        doctorForm.addEventListener("submit", (event) => {
+            event.preventDefault();
+            doctorErrorMessage.style.display = "none";
+            const username = document.getElementById("doctor-username").value;
+            const email = document.getElementById("doctor-email").value;
+            const password = document.getElementById("doctor-password").value;
+            const confirmPassword = document.getElementById("doctor-confirm-password").value;
+            const licenseNumber = document.getElementById("doctor-license").value;
+
+            if (password !== confirmPassword) {
+                doctorErrorMessage.textContent = "Passwords do not match.";
+                doctorErrorMessage.style.display = "block";
+                return;
+            }
+
+            handleRegistration("doctor", {
+                username: username,
+                email: email,
+                password: password,
+                license_number: licenseNumber
+            }, doctorErrorMessage);
+        });
+    });
+</script>
+
+</body>
+</html>
