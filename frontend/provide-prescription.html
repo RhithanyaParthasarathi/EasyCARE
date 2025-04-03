@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChroniCARE - Provide Prescription</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <style>
+        /* Reusing and adapting styles */
+        body {
+            font-family: sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f5f0; /* Soft beige background */
+            color: #333;
+            line-height: 1.6;
+            padding-bottom: 60px; /* Space at bottom */
+        }
+
+        /* Header Styles */
+        header {
+            background-color: #fff;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        header h1 {
+            margin: 0;
+            color: #1a237e; /* Dark blue heading */
+            font-size: 2.5em;
+        }
+
+        /* Main Content */
+        main {
+            padding: 20px;
+            max-width: 900px; /* Increased width for table */
+            margin: 20px auto;
+        }
+
+        #prescription-form-container {
+            padding: 25px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #fff;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        #prescription-form-container h2 {
+            text-align: center;
+            margin-top: 0;
+            margin-bottom: 25px;
+            color: #333;
+        }
+
+        /* Form Styling */
+        .form-grid {
+            display: grid;
+            /* Adjusted grid template for potentially fewer items */
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px; /* Increased gap slightly */
+            margin-bottom: 25px;
+        }
+
+        /* Removed empty .form-group ruleset */
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        .form-group input[type="text"],
+        .form-group input[type="number"], /* Added type number */
+        .form-group input[type="date"],
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px; /* Slightly smaller padding */
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+            font-size: 0.95em;
+        }
+
+        .form-group input:focus,
+        .form-group input[type="number"]:focus, /* Added focus style */
+        .form-group select:focus,
+        .form-group textarea:focus {
+             border-color: #007bff;
+             outline: none;
+             box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+         }
+
+        /* Medications Table Styling */
+        #medications-section {
+            margin-top: 30px;
+            border-top: 1px solid #eee;
+            padding-top: 20px;
+        }
+
+        #medications-section h3 {
+            margin-bottom: 15px;
+            color: #1a237e;
+        }
+
+        #medications-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 15px;
+        }
+
+        #medications-table th,
+        #medications-table td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+            vertical-align: top; /* Align content to top */
+        }
+
+        #medications-table th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+            font-size: 0.9em;
+            white-space: nowrap; /* Prevent headers from wrapping */
+        }
+
+        /* Inputs inside the table */
+        #medications-table input[type="text"],
+        #medications-table textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 0.9em;
+        }
+         #medications-table textarea {
+             resize: vertical;
+             min-height: 40px; /* Smaller default height */
+         }
+
+        #medications-table td.actions-cell {
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        /* Buttons */
+        .add-med-button {
+            background-color: #28a745; /* Green */
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            margin-bottom: 20px; /* Space below add button */
+            transition: background-color 0.3s ease;
+        }
+        .add-med-button:hover {
+            background-color: #218838;
+        }
+         .add-med-button i {
+             margin-right: 5px;
+         }
+
+        .remove-med-button {
+            background-color: #dc3545; /* Red */
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8em;
+            transition: background-color 0.3s ease;
+        }
+        .remove-med-button:hover {
+            background-color: #c82333;
+        }
+        .remove-med-button i {
+            margin-right: 3px;
+        }
+
+
+        .button-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 30px;
+            border-top: 1px solid #eee;
+            padding-top: 20px;
+        }
+
+        .submit-button, .back-button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            text-decoration: none;
+            text-align: center;
+            transition: background-color 0.3s ease;
+        }
+
+        .submit-button:hover, .back-button:hover {
+            background-color: #0056b3;
+        }
+
+        .back-button {
+             background-color: #6c757d;
+        }
+        .back-button:hover {
+            background-color: #5a6268;
+        }
+
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Provide Prescription</h1>
+    </header>
+
+    <main>
+        <div id="prescription-form-container">
+            <h2>Create New Prescription</h2>
+            <form id="prescription-form">
+
+                <!-- Top Details Section - Modified -->
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="patient-name">Patient Name</label>
+                        <input type="text" id="patient-name" name="patientName" required placeholder="Enter patient's full name">
+                    </div>
+                    <!-- Added Age Field -->
+                    <div class="form-group">
+                        <label for="patient-age">Patient Age</label>
+                        <input type="number" id="patient-age" name="patientAge" placeholder="Enter age in years" min="0">
+                    </div>
+                    <!-- Removed Patient ID -->
+                    <!-- Removed Consultation ID -->
+                    <div class="form-group">
+                        <label for="prescription-date">Date</label>
+                        <input type="date" id="prescription-date" name="prescriptionDate" required>
+                    </div>
+                </div>
+
+                <!-- Medications Section (No changes needed here) -->
+                <div id="medications-section">
+                    <h3>Medications</h3>
+                    <table id="medications-table">
+                        <thead>
+                            <tr>
+                                <th>Medication</th>
+                                <th>Dosage</th>
+                                <th>Frequency</th>
+                                <th>Duration</th>
+                                <th>Instructions</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="medications-tbody">
+                            <!-- Medication rows will be added here by JavaScript -->
+                        </tbody>
+                    </table>
+                    <button type="button" class="add-med-button" id="add-medication-btn">
+                        <i class="fas fa-plus"></i> Add Medication
+                    </button>
+                </div>
+
+                <!-- Submit/Back Buttons -->
+                <div class="button-container">
+                    <button type="button" class="back-button" onclick="goBack()">Back to Dashboard</button>
+                    <button type="submit" class="submit-button">Submit Prescription</button>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <script>
+        // --- Helper Functions ---
+        function createInput(type, name, placeholder = '', required = false) {
+            const input = document.createElement(type === 'textarea' ? 'textarea' : 'input');
+            if (type !== 'textarea') input.type = type;
+            input.name = name; // Use array notation for backend processing
+            input.placeholder = placeholder;
+            if (required) input.required = true;
+            return input;
+        }
+
+        function addMedicationRow() {
+            const tableBody = document.getElementById('medications-tbody');
+            const newRow = tableBody.insertRow(); // Creates a new <tr> element and adds it to <tbody>
+
+            // Medication Cell
+            const medCell = newRow.insertCell();
+            medCell.appendChild(createInput('text', 'medication[]', 'e.g., Paracetamol', true)); // First med required=true (handled better in submit)
+
+            // Dosage Cell
+            const dosageCell = newRow.insertCell();
+            dosageCell.appendChild(createInput('text', 'dosage[]', 'e.g., 500mg'));
+
+            // Frequency Cell
+            const freqCell = newRow.insertCell();
+            freqCell.appendChild(createInput('text', 'frequency[]', 'e.g., Twice daily'));
+
+            // Duration Cell
+            const durationCell = newRow.insertCell();
+            durationCell.appendChild(createInput('text', 'duration[]', 'e.g., 7 days'));
+
+            // Instructions Cell
+            const instrCell = newRow.insertCell();
+            instrCell.appendChild(createInput('textarea', 'instructions[]', 'e.g., Take with food'));
+
+            // Action Cell (Remove Button)
+            const actionCell = newRow.insertCell();
+            actionCell.classList.add('actions-cell');
+            const removeBtn = document.createElement('button');
+            removeBtn.type = 'button';
+            removeBtn.classList.add('remove-med-button');
+            removeBtn.innerHTML = '<i class="fas fa-trash-alt"></i> Remove';
+            actionCell.appendChild(removeBtn);
+        }
+
+        function handleTableActions(event) {
+             // Use event delegation for remove buttons
+            if (event.target.classList.contains('remove-med-button') || event.target.closest('.remove-med-button')) {
+                const button = event.target.closest('.remove-med-button');
+                const row = button.closest('tr');
+                if (row) {
+                    row.remove();
+                }
+            }
+        }
+
+        function handleSubmit(event) {
+            event.preventDefault(); // Prevent default form submission
+
+            const medications = [];
+            const medicationRows = document.querySelectorAll('#medications-tbody tr');
+
+            medicationRows.forEach(row => {
+                const medInput = row.querySelector('input[name="medication[]"]');
+                // Only add row if medication name is filled (basic validation)
+                if (medInput && medInput.value.trim() !== '') {
+                     medications.push({
+                        medication: medInput.value.trim(),
+                        dosage: row.querySelector('input[name="dosage[]"]').value.trim(),
+                        frequency: row.querySelector('input[name="frequency[]"]').value.trim(),
+                        duration: row.querySelector('input[name="duration[]"]').value.trim(),
+                        instructions: row.querySelector('textarea[name="instructions[]"]').value.trim()
+                    });
+                }
+            });
+
+             // Basic check: Ensure at least one medication is added if submitting
+            if (medications.length === 0) {
+                alert("Please add at least one medication to the prescription.");
+                // Optionally focus the first input if the table is empty
+                const firstMedInput = document.querySelector('#medications-tbody input[name="medication[]"]');
+                if (firstMedInput) firstMedInput.focus();
+                return; // Stop submission
+            }
+
+            // Get other form data - Modified
+            const formData = {
+                patientName: document.getElementById('patient-name').value,
+                patientAge: document.getElementById('patient-age').value, // Added age
+                date: document.getElementById('prescription-date').value,
+                // patientId and consultationId removed
+                medications: medications // Array of medication objects
+            };
+
+            // **Simulation:** In a real application, you would send this 'formData' object
+            // to your backend server using fetch() or XMLHttpRequest.
+            console.log("Submitting Prescription Data:", JSON.stringify(formData, null, 2)); // Pretty print JSON
+            alert(`Prescription for ${formData.patientName} (Age: ${formData.patientAge || 'N/A'}) submitted successfully!\nContains ${formData.medications.length} medication(s).`);
+
+            // Optional: Redirect or reset form
+            // window.location.href = 'doctor-dashboard.html';
+            // Or reset the form:
+            // document.getElementById('prescription-form').reset();
+            // document.getElementById('medications-tbody').innerHTML = ''; // Clear table
+            // setupInitialState(); // Re-run setup
+        }
+
+        function setupInitialState() {
+            // Set default date to today
+            const today = new Date().toISOString().split('T')[0];
+            const dateInput = document.getElementById('prescription-date');
+            if (dateInput) {
+                 dateInput.value = today;
+            }
+
+            // Add one empty medication row to start with
+            addMedicationRow();
+        }
+
+        function goBack() {
+            // Navigate back to the doctor's dashboard
+            window.location.href = 'doctor-dashboard.html';
+        }
+
+        // --- Event Listeners ---
+        document.addEventListener('DOMContentLoaded', function() {
+            setupInitialState();
+
+            // Add medication button listener
+            const addBtn = document.getElementById('add-medication-btn');
+            if(addBtn) {
+                addBtn.addEventListener('click', addMedicationRow);
+            }
+
+             // Event delegation for remove buttons within the table body
+            const tableBody = document.getElementById('medications-tbody');
+            if (tableBody) {
+                tableBody.addEventListener('click', handleTableActions);
+            }
+
+            // Form submission listener
+            const form = document.getElementById('prescription-form');
+            if(form) {
+                form.addEventListener('submit', handleSubmit);
+            }
+        });
+    </script>
+</body>
+</html>

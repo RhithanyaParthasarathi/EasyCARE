@@ -1,3 +1,4 @@
+# auth.py
 import os
 import random
 import smtplib
@@ -5,7 +6,7 @@ from email.message import EmailMessage
 from datetime import datetime, timedelta
 import jwt
 from fastapi import APIRouter, Depends, HTTPException, status
-from pydantic import BaseModel, EmailStr, field_validator
+from pydantic import BaseModel, EmailStr, field_validator, ValidationInfo
 from sqlalchemy.orm import Session
 from typing import Annotated, Optional
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -24,6 +25,9 @@ db_dependency = Annotated[Session, Depends(get_db)]
 SECRET_KEY = os.environ.get("SECRET_KEY") or "your_secret_key"  # Use an environment variable for security!
 ALGORITHM = "HS256"  # HMAC SHA-256
 
+#Hardcoded liscence
+HARDCODED_LICENSE_NUMBER = "12345" # Change this to real valid registration Number
+
 class UserCreate(BaseModel):
     username: str
     password: str
@@ -32,13 +36,13 @@ class UserCreate(BaseModel):
     license_number: Optional[str] = None  # Doctor Specific
 
     @field_validator("license_number")
-    def license_number_must_be_present_for_doctors(cls, value, values):
-        if values.get("role") == UserRole.doctor and not value:
+    def license_number_must_be_present_for_doctors(cls, value: str | None, info: ValidationInfo) -> str | None:
+        if info.data.get("role") == UserRole.doctor and not value:
             raise ValueError("License number is required for doctors.")
         return value
 
     @field_validator("role")
-    def role_must_be_valid(cls, value):
+    def role_must_be_valid(cls, value: UserRole) -> UserRole:
         if value not in (UserRole.patient, UserRole.doctor):
             raise ValueError("Role must be either 'patient' or 'doctor'.")
         return value
@@ -98,6 +102,16 @@ def verify_jwt_token(token: str):
     except jwt.InvalidTokenError:
         raise HTTPException(status_code=401, detail="Invalid token")
 
+
+def validate_license_number(license_number: str) -> bool:
+    """
+    Validates a doctor's license number (HARDCODED FOR NOW).
+
+    Returns True if the license number matches the hardcoded value, False otherwise.
+    """
+    return license_number == HARDCODED_LICENSE_NUMBER
+
+
 @router.post("/register", status_code=status.HTTP_201_CREATED)
 async def register(user: UserCreate, db: db_dependency):
     print(f"Registering user: {user}")  # Debugging
@@ -117,6 +131,10 @@ async def register(user: UserCreate, db: db_dependency):
         existing_doctor = db.query(User).filter(User.license_number == user.license_number, User.email == user.email, User.role == UserRole.doctor).first()
         if existing_doctor:
              raise HTTPException(status_code=400, detail="A doctor with this license number and email already exists.")
+
+        # Validate the license number against hardcoded
+        if not validate_license_number(user.license_number):
+            raise HTTPException(status_code=400, detail="Invalid license number.")
 
 
     hashed_password = generate_password_hash(user.password)
