@@ -150,32 +150,110 @@ main {
             <span>Profile</span>
         </a>
     </nav>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-    const meetingStatusDiv = document.getElementById('meeting-status');
-    const joinMeetingBtn = document.getElementById('join-meeting-btn');
+    <!-- virtual-doctor.html -->
+<!-- Keep HTML structure -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const meetingStatusDiv = document.getElementById('meeting-status');
+        const joinMeetingBtn = document.getElementById('join-meeting-btn');
+        const API_BASE_URL = 'http://127.0.0.1:8000'; // Your API base
 
-    // Simulate checking for upcoming sessions
-    // In a real app, you'd fetch this data from your backend
-    const hasUpcomingSession = true; // Change this to true to test the "upcoming session" case
-    const meetingTime = "2025-02-23T09:00:00"; // Example meeting time
+        function getAuthToken() { return localStorage.getItem('accessToken'); }
 
-    if (hasUpcomingSession) {
-        meetingStatusDiv.textContent = `You have an upcoming virtual session at ${new Date(meetingTime).toLocaleString()}`;
-        joinMeetingBtn.classList.remove('hidden');
-
-        joinMeetingBtn.addEventListener('click', function() {
-            // In a real app, this would initiate the video/audio conference
-            alert('Connecting you to your Virtual doctor...');
-            // You'd likely redirect to a third-party video conferencing service here
-        });
-    } else {
-        meetingStatusDiv.textContent = "No upcoming virtual sessions.";
-    }
-});
-        function goBack() {
-            window.location.href = 'telemedicine.html';
+        function formatAppointmentInfo(appt) {
+             // Check for necessary fields, including the new doctor field
+     if (!appt || !appt.appointment_date || !appt.start_time || !appt.doctor || !appt.doctor.username) {
+         console.error("Incomplete appointment data received:", appt);
+         return "Appointment details are incomplete.";
+     }
+             // Assuming the 'patient' field in the response always refers to the actual patient
+             // We need the *doctor's* name here. Let's assume we fetch it separately or it's passed differently.
+             // For now, let's just show the basics. We need to adjust the backend response model ideally.
+             const doctorName = appt.doctor.username; // Get doctor name from response
+     const formattedTime = new Date(appt.appointment_date + 'T' + appt.start_time).toLocaleString(undefined, {dateStyle: 'medium', timeStyle: 'short'});
+     return `You have a confirmed appointment with Dr. ${doctorName} on ${formattedTime}.`; // Use doctor name
         }
+
+        async function fetchUpcomingAppointment() {
+            if (!meetingStatusDiv || !joinMeetingBtn) return;
+
+            meetingStatusDiv.textContent = "Checking for upcoming appointments...";
+            joinMeetingBtn.classList.add('hidden'); // Hide button initially
+
+            const token = getAuthToken();
+            if (!token) {
+                meetingStatusDiv.textContent = "Please log in to view appointments.";
+                return;
+            }
+
+            const apiUrl = `${API_BASE_URL}/appointments/upcoming-confirmed`;
+
+            try {
+                const response = await fetch(apiUrl, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (response.status === 401 || response.status === 403) {
+                     localStorage.removeItem('accessToken');
+                     throw new Error("Authentication error. Please log in again.");
+                }
+                 // 200 OK but no content means no upcoming appointment
+                if (response.status === 200) {
+                     const appointment = await response.json(); // Will be null if backend returns None
+
+                     if (appointment) {
+                          console.log("Upcoming appointment data:", appointment);
+                          meetingStatusDiv.textContent = formatAppointmentInfo(appointment);
+                          joinMeetingBtn.classList.remove('hidden');
+                          joinMeetingBtn.dataset.appointmentId = appointment.id; // Store ID for joining
+                     } else {
+                          meetingStatusDiv.textContent = "No upcoming confirmed virtual sessions.";
+                          joinMeetingBtn.classList.add('hidden');
+                     }
+                } else {
+                    // Handle other potential errors (e.g., 500)
+                     const errorData = await response.json().catch(() => ({}));
+                     throw new Error(errorData.detail || `Failed to fetch appointments (${response.status})`);
+                }
+
+            } catch(error) {
+                console.error("Error fetching upcoming appointment:", error);
+                meetingStatusDiv.textContent = `Error loading appointment status: ${error.message}`;
+                joinMeetingBtn.classList.add('hidden');
+            }
+        }
+
+        // Event listener for the Join button
+        joinMeetingBtn.addEventListener('click', function() {
+            const appointmentId = this.dataset.appointmentId;
+            console.log(`Join button clicked for appointment ID: ${appointmentId}`);
+            // --- TODO: Video Call Integration ---
+            // 1. Fetch video access token from your backend:
+            //    fetch(`${API_BASE_URL}/appointments/${appointmentId}/join-token`, { headers: {'Authorization': `Bearer ${getAuthToken()}`}})
+            //    .then(res => res.json())
+            //    .then(data => {
+            //        const videoToken = data.token;
+            //        // 2. Use CPaaS SDK to connect using videoToken
+            //        //    e.g., connectToVideoCall(videoToken);
+            //        alert(`(Simulated) Connecting to video call for appointment ${appointmentId} using token...`);
+            //    })
+            //    .catch(err => {
+            //        console.error("Failed to get video token or connect:", err);
+            //        alert("Failed to join video call.");
+            //    });
+            alert(`(Simulated) Joining meeting for appointment ID: ${appointmentId}...`); // Placeholder
+             // --- End Video Call Integration ---
+        });
+
+
+        // Initial fetch
+        fetchUpcomingAppointment();
+
+    }); // End DOMContentLoaded
+
+    function goBack() {
+        window.location.href = 'telemedicine.html'; // Adjust as needed
+    }
     </script>
 </body>
 </html>

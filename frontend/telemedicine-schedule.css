@@ -217,3 +217,99 @@
 .back-button:hover {
     background-color: #0056b3; /* Darker blue on hover */
 }
+
+/* Add styles for the loading message */
+#loading-message {
+    color: #666;
+    font-style: italic;
+    text-align: center;
+    margin: 15px 0;
+    padding: 10px;
+    background-color: #f9f9f9;
+    border-radius: 4px;
+}
+
+/* Styling for saved slots (optional visual distinction) */
+.time-slots button.saved {
+    border: 2px solid #28a745; /* Green border for saved slots */
+    background-color: #e9f7ec; /* Light green background */
+}
+/* Ensure selected style overrides saved background */
+.time-slots button.selected {
+    background-color: #007bff;
+    color: white;
+    border-color: #0056b3; /* Use border color consistent with selected state */
+}
+.time-slots button.saved.selected {
+     border-color: #0056b3; /* Selected border takes precedence */
+}
+
+
+/* Action Buttons Area */
+.action-buttons {
+    margin-top: 25px; /* More space */
+    padding-top: 20px;
+    border-top: 1px solid #eee; /* Separator line */
+    display: flex;
+    justify-content: flex-end; /* Align buttons to the right */
+    gap: 15px; /* Space between buttons */
+}
+
+.action-button {
+    color: #fff;
+    border: none;
+    padding: 12px 18px; /* Slightly larger padding */
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1em; /* Ensure readable font size */
+    transition: background-color 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+}
+.action-button:hover {
+     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15); /* Enhance shadow on hover */
+}
+
+
+.save-button {
+    background-color: #28a745; /* Green */
+}
+.save-button:hover {
+    background-color: #218838;
+}
+.save-button:disabled { /* Style for disabled state */
+    background-color: #a5d6a7;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+.delete-button {
+    background-color: #dc3545; /* Red */
+}
+.delete-button:hover {
+    background-color: #c82333;
+}
+.delete-button:disabled { /* Style for disabled state */
+     background-color: #f8d7da;
+     cursor: not-allowed;
+     box-shadow: none;
+}
+
+
+/* Calendar day disabled state */
+.calendar-day.disabled {
+    color: #ccc;
+    cursor: not-allowed;
+    background-color: #f9f9f9;
+}
+.calendar-day.disabled:hover {
+    background-color: #f9f9f9; /* Prevent hover effect */
+}
+
+/* Add weekday headers style (optional but good) */
+.calendar-weekday {
+    text-align: center;
+    font-weight: bold;
+    color: #555;
+    padding: 5px 0;
+    font-size: 0.9em;
+}

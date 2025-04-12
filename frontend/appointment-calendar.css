@@ -234,3 +234,32 @@ body {
 .nav-item.active{
     color: #007bff;
 }
+.time-slot.selected {
+    background-color: var(--secondary-color, #117A8B); /* Use var if defined, fallback */
+    color: white;
+    border-color: var(--secondary-color, #117A8B);
+    font-weight: bold;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15); /* Optional: slightly stronger shadow */
+}
+
+/* Styles for the Proceed to Pay button */
+.proceed-button {
+    background-color: #28a745; /* Green background */
+    color: white;
+    border: none;
+    padding: 10px 20px; /* Adjust padding as needed */
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1em; /* Match general button size */
+    font-weight: 500;
+    transition: background-color 0.3s ease;
+    box-shadow: var(--box-shadow, 0 2px 4px rgba(0, 0, 0, 0.1)); /* Use existing shadow var or fallback */
+}
+
+.proceed-button i {
+    margin-right: 8px; /* Space between icon and text */
+}
+
+.proceed-button:hover {
+    background-color: #218838; /* Darker Green */
+} 

@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notifications - ChroniCARE</title>
+    <!--link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.6.0/css/bootstrap.min.css"
+          integrity="sha512-wV7CYnsXTcg6vUZ3JZH5O8raaE6QK3UUtX6NwznbHXIpIegczjjza4GjqzaayykP6sirvmiMZPAuQd6nQTirvQ=="
+          crossorigin="anonymous" referrerpolicy="no-referrer"-->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+          integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg=="
+          crossorigin="anonymous" referrerpolicy="no-referrer"/>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f9f5f0; /* Light beige background */
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+        }
+
+        .notification-card {
+            background-color: #fff; /* White card background */
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+            padding: 20px;
+            margin-bottom: 15px;
+        }
+
+        .notification-header {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #343a40; /* Dark gray header */
+        }
+
+        .notification-item {
+            display: flex; /* Use flexbox for overall layout */
+            /* justify-content: space-between; */ /* Let content grow */
+            align-items: flex-start; /* Align items to the top */
+            padding: 15px 0;
+            border-bottom: 1px solid #b2dfdb;
+            margin-bottom: 15px;
+        }
+        .notification-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+
+        .notification-content {
+            display: flex; /* Make this a flex container too */
+            align-items: flex-start; /* Align icon and text block to top */
+            flex-grow: 1; /* Allow text content to take available space */
+            margin-right: 10px; /* Space between content and action buttons */
+        }
+
+        .notification-icon {
+            color: #007bff; /* ChroniCARE blue */
+            font-size: 1.5em; /* << INCREASED SIZE */
+            margin-right: 15px; /* << Increased margin for spacing */
+            width: 25px; /* Give icon a fixed width for alignment */
+            text-align: center; /* Center icon within its box */
+            flex-shrink: 0; /* Prevent icon from shrinking */
+            margin-top: 2px; /* Optional: Fine-tune vertical alignment */
+        }
+
+        /* NEW Style for the text block */
+        .notification-text-content {
+            display: flex;
+            flex-direction: column; /* Stack message and time */
+        }
+
+        .notification-text-content strong {
+             line-height: 1.4; /* Improve readability */
+        }
+
+        .notification-time {
+            font-size: 0.8rem;
+            color: #6c757d; /* Gray time */
+            margin-top: 4px; /* Add space below message */
+        }
+
+        /* Keep existing .notification-actions styles */
+        .notification-actions {
+             /* Styles for button container */
+             flex-shrink: 0; /* Prevent action buttons container from shrinking */
+        }
+        .notification-actions button {
+            margin-left: 5px;
+            padding: 8px 16px;
+            font-size: 0.9rem;
+            border-radius: 5px;
+            font-weight: 500;
+            transition: transform 0.15s ease-in-out;
+        }
+
+        .chroniCARE-blue {
+            color: #007bff; /* ChroniCARE blue */
+        }
+
+        /* Custom Snooze Style */
+        .snooze-button {
+            background-color: #f8e71c; /* Yellow */
+            border: 1px solid #f8e71c;
+            color: #333; /* Dark Text */
+        }
+
+        .snooze-button:hover {
+            background-color: #e2d31a;
+            border-color: #e2d31a;
+        }
+
+        /* More defined button styles */
+        .btn {
+            border: 1px solid transparent; /* Add a transparent border */
+        }
+
+        .btn:hover {
+    transform: translateY(-2px); /* Subtle lift effect */
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15); /* More noticeable shadow on hover */
+}
+
+        /* Blue Button Styling (for View Details and Mark as Read) */
+        .blue-button {
+            background-color: #007bff; /* Blue background */
+            color: #fff; /* White text */
+            border-color: #007bff;
+        }
+
+        .blue-button:hover {
+            background-color: #007bff; /* Blue background */
+            color: #fff; /* White text */
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="notification-card">
+        <h1 class="notification-header">Notifications</h1>
+        
+         <!-- ADD this empty container for dynamic content -->
+         <div id="notificationList">
+            <!-- JS will put loading message and notifications here -->
+        </div>
+        <!-- END Add -->
+        
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+<!--script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.6.0/js/bootstrap.min.js"
+        integrity="sha512-XKa9HgPMNrJc56QzvhGuAnnmKZdonJKFkbv7J/gWtALVrffF35gnNLWz3sH2c9iEnYSnKmCVuLVSWjfk5wtkhA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script-->
+        <script>
+            // notifications.js logic (integrated)
+        
+            // --- Helper: Get Auth Token ---
+            function getAuthToken() {
+                const token = localStorage.getItem('accessToken');
+                console.log("Notif page token check:", token ? "Found" : "Not Found");
+                return token;
+            }
+        
+            // --- Helper: Format Date ---
+            function formatNotificationDate(dateString) {
+                 try {
+                     // Show date and time, make it locale-specific
+                     return new Date(dateString).toLocaleString(undefined, {
+                         dateStyle: 'medium', // e.g., Apr 11, 2025
+                         timeStyle: 'short'   // e.g., 2:30 PM
+                     });
+                 } catch(e) {
+                     console.error("Error formatting notification date:", e);
+                     return "Invalid Date";
+                 }
+            }
+        
+            // --- Main Logic ---
+            document.addEventListener('DOMContentLoaded', function() {
+                console.log("Notifications page JS loaded."); // DEBUG
+        
+                const notificationListDiv = document.getElementById('notificationList'); // Target for list items
+                const notificationsContainer = document.getElementById('notificationsContainer'); // Main container
+                const API_BASE_URL = 'http://127.0.0.1:8000'; // Base URL
+        
+                // Add a container specifically for the list if needed, or use notificationListDiv
+                if (!notificationListDiv && notificationsContainer) {
+                     // If only container exists, create a list inside it
+                     const listContainer = document.createElement('div');
+                     listContainer.id = 'notificationListItems'; // Give it an ID
+                     notificationsContainer.appendChild(listContainer);
+                     // Reassign variable - This might be needed if your HTML doesn't have notificationListDiv
+                     // notificationListDiv = listContainer;
+                     console.warn("Could not find #notificationList, may create list inside #notificationsContainer");
+                }
+        
+        
+                async function fetchAndDisplayNotifications() {
+            const notificationListDiv = document.getElementById('notificationList');
+            if (!notificationListDiv) { console.error("Cannot find #notificationList"); return; }
+
+            notificationListDiv.innerHTML = '<p id="loading-notifications" style="text-align: center; padding: 20px; color: #555;">Loading notifications...</p>';
+
+            const token = getAuthToken();
+            if (!token) {
+                 notificationListDiv.innerHTML = '<p style="color: orange; text-align: center;">Please log in to view notifications.</p>';
+                 if (typeof updateNotificationIndicator === 'function') updateNotificationIndicator();
+                return;
+            }
+
+            const apiUrl = `${API_BASE_URL}/notifications?mark_as_read=true`;
+            console.log("Fetching notifications from:", apiUrl);
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'GET',
+                    headers: { 'Accept': 'application/json', 'Authorization': `Bearer ${token}` }
+                });
+                console.log("Fetch notifications status:", response.status);
+
+                if (!response.ok){
+                            if (response.status === 401 || response.status === 403) {
+                                localStorage.removeItem('accessToken'); // Clear bad token
+                                throw new Error("Authentication error. Please log in again.");
+                            }
+                            const errorData = await response.json().catch(() => ({}));
+                            throw new Error(errorData.detail || `Failed to load notifications (${response.status})`);
+                        }
+        
+                        const notifications = await response.json();
+                console.log("Received notifications:", notifications);
+                notificationListDiv.innerHTML = ''; // Clear loading
+
+                if (!Array.isArray(notifications) || notifications.length === 0) {
+                    notificationListDiv.innerHTML = '<p style="text-align: center;">You have no notifications.</p>';
+                } else {
+                    notifications.forEach(notif => {
+                        const itemDiv = document.createElement('div');
+                        itemDiv.className = `notification-item ${notif.is_read ? 'is-read' : ''}`;
+
+                        let iconClass = 'fas fa-info-circle';
+                        const lowerCaseMessage = notif.message.toLowerCase();
+                        if (lowerCaseMessage.includes('confirm')) {
+                            iconClass = 'fas fa-calendar-check';
+                        } else if (lowerCaseMessage.includes('reject')) {
+                            iconClass = 'fas fa-calendar-times';
+                        } else if (lowerCaseMessage.includes('reminder')) {
+                             iconClass = 'fas fa-pills';
+                        }
+
+                        // --- MODIFIED HTML Structure ---
+                        itemDiv.innerHTML = `
+                            <div class="notification-content">
+                                <i class="chroniCARE-blue ${iconClass} notification-icon"></i>
+                                <!-- NEW wrapper for text -->
+                                <div class="notification-text-content">
+                                    <strong>${notif.message || 'Notification message missing.'}</strong>
+                                    <div class="notification-time">
+                                        <small>${formatNotificationDate(notif.created_at)}</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="notification-actions">
+                                <!-- Conditionally show View Details Button -->
+                                ${ (notif.appointment_id && !lowerCaseMessage.includes('reject'))
+                                    ? `<button class="btn btn-sm blue-button view-details-btn" data-appid="${notif.appointment_id}">View Details</button>`
+                                    : ''
+                                 }
+                            </div>
+                        `;
+                        // --- END MODIFIED HTML Structure ---
+
+                        notificationListDiv.appendChild(itemDiv);
+                    });
+                     addNotificationActionListeners(); // Re-attach listeners
+                }
+
+                if (typeof updateNotificationIndicator === 'function') updateNotificationIndicator();
+
+                    } catch (error) {
+                         console.error("Error fetching notifications:", error);
+                         if (notificationListDiv) {
+                             notificationListDiv.innerHTML = `<p style='color: red; text-align:center;'>Error loading notifications: ${error.message}</p>`;
+                         }
+                    }
+                }
+        
+                 // Function to add listeners to buttons inside notifications (Example)
+                 function addNotificationActionListeners() {
+                     document.querySelectorAll('.view-details-btn').forEach(button => {
+                         // Remove existing listener before adding new one
+                         button.replaceWith(button.cloneNode(true));
+                     });
+                     document.querySelectorAll('.view-details-btn').forEach(button => {
+                         button.addEventListener('click', function() {
+                             const appointmentId = this.dataset.appid;
+                             // TODO: Implement navigation or modal to show appointment details
+                             alert(`Navigate to details for appointment ID: ${appointmentId}`);
+                             // window.location.href = `/appointment-details.html?id=${appointmentId}`; // Example navigation
+                         });
+                     });
+        
+                     // Add listeners for other buttons like "Mark Read" if you implement them
+                 }
+        
+        
+                // --- Global function needed for header indicator update ---
+                 // Ensure this is accessible or included in header.js too
+                 async function updateNotificationIndicator() {
+                     console.log("Updating notification indicator (from notifications page context)...");
+                     const indicator = document.getElementById('notification-indicator');
+                     const notificationLink = document.getElementById('notification-link');
+                     if (!indicator || !notificationLink) return;
+        
+                     const token = getAuthToken();
+                     if (!token) {
+                          indicator.style.display = 'none';
+                          notificationLink.classList.remove('has-unread');
+                          return;
+                     }
+        
+                     const apiUrl = `${API_BASE_URL}/notifications/unread-count`;
+                     try {
+                         const response = await fetch(apiUrl, {
+                             headers: { 'Authorization': `Bearer ${token}` }
+                         });
+                         if (!response.ok) { /* Handle error, hide indicator */ indicator.style.display = 'none'; notificationLink.classList.remove('has-unread'); return; }
+                         const data = await response.json();
+                         if (data.unread_count > 0) {
+                              indicator.style.display = 'block';
+                              notificationLink.classList.add('has-unread');
+                              console.log("Indicator: Shown (Unread:", data.unread_count, ")");
+                         } else {
+                              indicator.style.display = 'none';
+                              notificationLink.classList.remove('has-unread');
+                              console.log("Indicator: Hidden (Unread: 0)");
+                         }
+                     } catch (error) {
+                          console.error("Error updating notification indicator:", error);
+                          indicator.style.display = 'none';
+                          notificationLink.classList.remove('has-unread');
+                     }
+                 }
+                 // --- End global function ---
+        
+        
+                // Initial fetch when page loads
+                fetchAndDisplayNotifications();
+        
+            });
+            </script>
+</body>
+</html>

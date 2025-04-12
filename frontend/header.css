@@ -24,39 +24,78 @@
 }
 
 /* Style the menu button and dropdown */
-.header-menu {
-    position: relative;
-    display: inline-block;
-    margin-left: auto; /* Push the menu to the right */
-}
 
-.menu-button {
-    background-color: transparent;
-    border: none;
-    color: #555;
-    cursor: pointer;
-    font-size: 1.5rem;
-    padding: 0.5rem;
-    transition: color 0.3s ease;
-}
-
-.menu-button:hover {
-    color: #007bff;
-}
-
-.menu-dropdown {
-    position: absolute;
-    background-color: #fff;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    right: 0;
-    top: 100%;
-    margin-top: 0.5rem;
-    padding: 0.5rem 0;
-    width: 150px; /* Adjust as needed */
-    display: none; /* Initially hide the dropdown */
-}
+    .header-menu {
+        position: relative;
+        display: flex; /* Use flex to align items horizontally */
+        align-items: center; /* Vertically align items */
+        gap: 10px; /* Add space between notification and menu button */
+        margin-left: auto; /* Push the menu items to the right */
+    }
+    
+    /* Style for the notification button/link */
+    .notification-button {
+        background-color: transparent;
+        border: none;
+        color: #555;
+        cursor: pointer;
+        font-size: 1.4rem; /* Slightly smaller than menu? Adjust as needed */
+        padding: 0.5rem;
+        transition: color 0.3s ease;
+        position: relative; /* Needed for positioning the indicator dot */
+        text-decoration: none; /* Remove underline if using <a> tag */
+        display: inline-block; /* Ensure it behaves like a button */
+    }
+    
+    .notification-button:hover {
+        color: #007bff;
+    }
+    
+    /* Style for the indicator dot (initially hidden) */
+    .notification-indicator-dot {
+        position: absolute;
+        top: 4px;      /* Adjust position */
+        right: 4px;     /* Adjust position */
+        width: 8px;
+        height: 8px;
+        background-color: red;
+        border-radius: 50%;
+        border: 1px solid white; /* Optional border */
+        /* display: none; */ /* Hiding is controlled by JS initially */
+    }
+    
+    
+    /* Style the existing menu button */
+    .menu-button {
+        background-color: transparent;
+        border: none;
+        color: #555;
+        cursor: pointer;
+        font-size: 1.5rem;
+        padding: 0.5rem;
+        transition: color 0.3s ease;
+        margin: 0; /* Reset margin if flex gap handles spacing */
+    }
+    
+    .menu-button:hover {
+        color: #007bff;
+    }
+    
+    .menu-dropdown {
+        position: absolute;
+        background-color: #fff;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        right: 0;
+        /* Adjust top relative to the 3-dot button */
+        top: calc(100% + 0.5rem); /* Position below the button */
+        margin-top: 0; /* Remove margin-top if top is set */
+        padding: 0.5rem 0;
+        width: 180px; /* Slightly wider maybe? */
+        display: none;
+        z-index: 20; /* Ensure dropdown is above other elements */
+    }
 
 .menu-dropdown a {
     display: block;

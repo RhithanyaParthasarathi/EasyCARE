@@ -412,50 +412,71 @@
             });
 
             // Function to handle login requests
-            async function handleLogin(role, usernameOrUid, password, errorMessageElement, redirectURL) {
+                        // --- MODIFY this handleLogin function ---
+                        async function handleLogin(intendedRole, usernameOrUid, password, errorMessageElement, redirectURL) {
+                // Reset error message
+                errorMessageElement.textContent = '';
+                errorMessageElement.style.display = 'none';
+
                 try {
-                    const response = await fetch('http://127.0.0.1:8000/auth/login', { // Ensure correct backend URL
+                    const formData = new FormData();
+                    formData.append("username", usernameOrUid); // Backend expects 'username'
+                    formData.append("password", password);
+
+                    const response = await fetch('http://127.0.0.1:8000/auth/login', {
                         method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            username: usernameOrUid,
-                            password: password,
-                            role: role,
-                            email: usernameOrUid // added email to backend, you can use either username or email now
-                        })
+                        body: formData
                     });
 
-                    const data = await response.json();
+                    const data = await response.json(); // Always try to parse JSON
 
-                    if (response.ok) {
-                        // If the backend provides a token, store it
-                        if (data.access_token) {
-                            localStorage.setItem("authToken", data.access_token);
-                        }
-
-                        alert("Login Successful!");
-                        window.location.href = redirectURL; //Redirect based on role
-                    } else {
-                        try {
-                            const errorData = await response.json(); // Try to parse the error response as JSON
-                            errorMessageElement.textContent = errorData.detail || "Invalid credentials.";
-                        } catch (e) {
-                            errorMessageElement.textContent = "Invalid credentials."; // Generic message if parsing fails
-                        }
-                        errorMessageElement.style.display = "block";
+                    if (!response.ok) {
+                        // Use detail from backend if available, otherwise generic message
+                        throw new Error(data.detail || `Login failed (${response.status})`);
                     }
+
+                    // --- Login Successful - Check Role and Store Token ---
+                    console.log('Login API success:', data);
+
+                    // Check if the role returned by the backend matches the intended login role
+                    if (data.role !== intendedRole) {
+                         throw new Error(`Login failed: You attempted to log in as a ${intendedRole}, but the account is registered as a ${data.role}.`);
+                    }
+
+                    // Ensure token exists before storing
+                    if (data.access_token) {
+                        localStorage.setItem('accessToken', data.access_token);
+                        // Store other useful info if needed
+                        localStorage.setItem('username', data.username);
+                        localStorage.setItem('userRole', data.role);
+                        localStorage.setItem('userId', data.user_id); // Assuming backend sends this
+
+                        alert("Login Successful!"); // Keep alert or replace with smoother UX
+                        window.location.href = redirectURL; // Redirect on success
+
+                    } else {
+                        // This case shouldn't happen if backend sends token on success
+                        console.error("Login successful but no access token received from backend.");
+                        throw new Error("Login failed: Could not retrieve authentication token.");
+                    }
+
                 } catch (error) {
                     console.error("Error during login:", error);
-                    errorMessageElement.textContent = "An error occurred during login.";
+                    errorMessageElement.textContent = error.message || "An error occurred during login.";
                     errorMessageElement.style.display = "block";
+                    // Clear any potentially stored invalid token/info
+                    localStorage.removeItem('accessToken');
+                    localStorage.removeItem('username');
+                    localStorage.removeItem('userRole');
+                    localStorage.removeItem('userId');
                 }
             }
+            // --- END OF MODIFIED handleLogin ---
+
 
             patientForm.addEventListener("submit", (event) => {
                 event.preventDefault();
-                patientErrorMessage.style.display = "none";
+                //patientErrorMessage.style.display = "none";
                 const username = document.getElementById("patient-username").value;
                 const password = document.getElementById("patient-password").value;
                 handleLogin("patient", username, password, patientErrorMessage, "index.html"); // patient dashboard url
@@ -463,7 +484,7 @@
 
             doctorForm.addEventListener("submit", (event) => {
                 event.preventDefault();
-                doctorErrorMessage.style.display = "none";
+                //doctorErrorMessage.style.display = "none";
                 const uid = document.getElementById("doctor-uid").value;
                 const password = document.getElementById("doctor-password").value;
                 handleLogin("doctor", uid, password, doctorErrorMessage, "doctor-dashboard.html"); // doctor dashboard url

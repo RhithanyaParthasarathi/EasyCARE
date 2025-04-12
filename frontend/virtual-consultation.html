@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChroniCARE - Virtual Consultation</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        /* Consistent Styling from virtual-doctor.html */
+        body {
+            font-family: sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f5f0; /* Soft beige background */
+            color: #333;
+            line-height: 1.6;
+            text-align: center;
+            padding-bottom: 20px; /* Reduced padding-bottom since no nav */
+        }
+
+        header {
+            background-color: #fff;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        header h1 {
+            margin-bottom: 15px;
+            color: #1a237e; /* Dark blue heading */
+            font-size: 2.5em; /* Larger heading */
+        }
+
+        main {
+            padding: 20px;
+        }
+
+        #meeting-status {
+            font-size: 1.2em;
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        #start-consultation-btn {
+            background-color: #28a745; /* Green */
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+        }
+
+        #start-consultation-btn:hover {
+            background-color: #218838; /* Darker green */
+        }
+
+        /* Back Button */
+        .back-button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+        }
+
+        .back-button:hover {
+            background-color: #0056b3;
+        }
+
+    </style>
+</head>
+<body>
+<header>
+    <h1>Virtual Consultation</h1>
+</header>
+<main>
+    <div id="meeting-status">
+        <!-- Content will be dynamically updated by JavaScript -->
+    </div>
+    <button id="start-consultation-btn" class="hidden">Start Consultation</button>
+    <button class="back-button" onclick="goBack()">Back</button>
+</main>
+<!-- virtual-consultation.html -->
+<!-- Keep HTML structure -->
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const meetingStatusDiv = document.getElementById('meeting-status');
+        const startConsultationBtn = document.getElementById('start-consultation-btn');
+        const API_BASE_URL = 'http://127.0.0.1:8000'; // Your API base
+
+        function getAuthToken() { return localStorage.getItem('accessToken'); }
+
+        function formatAppointmentInfoDoctor(appt) {
+             if (!appt || !appt.appointment_date || !appt.start_time || !appt.patient) {
+                 return "Error: Incomplete appointment data.";
+             }
+             // 'patient' object should contain patient details from backend response
+             const patientName = appt.patient.username || 'Unknown Patient';
+             const formattedTime = new Date(appt.appointment_date + 'T' + appt.start_time).toLocaleString(undefined, {dateStyle: 'medium', timeStyle: 'short'});
+             return `You have a confirmed consultation with ${patientName} on ${formattedTime}.`;
+        }
+
+
+        async function fetchUpcomingAppointment() {
+            if (!meetingStatusDiv || !startConsultationBtn) return;
+
+            meetingStatusDiv.textContent = "Checking for upcoming consultations...";
+            startConsultationBtn.classList.add('hidden'); // Hide button initially
+
+            const token = getAuthToken();
+            if (!token) {
+                meetingStatusDiv.textContent = "Please log in to view consultations.";
+                return;
+            }
+
+            // Use the same endpoint, backend filters by logged-in user's role (doctor)
+            const apiUrl = `${API_BASE_URL}/appointments/upcoming-confirmed`;
+
+            try {
+                const response = await fetch(apiUrl, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (response.status === 401 || response.status === 403) {
+                    localStorage.removeItem('accessToken');
+                    throw new Error("Authentication error. Please log in again.");
+                }
+
+                 if (response.status === 200) {
+                     const appointment = await response.json(); // Will be null if none
+
+                     if (appointment) {
+                          console.log("Upcoming consultation data:", appointment);
+                          meetingStatusDiv.textContent = formatAppointmentInfoDoctor(appointment);
+                          startConsultationBtn.classList.remove('hidden');
+                          startConsultationBtn.dataset.appointmentId = appointment.id; // Store ID
+                     } else {
+                          meetingStatusDiv.textContent = "No upcoming confirmed consultations.";
+                          startConsultationBtn.classList.add('hidden');
+                     }
+                 } else {
+                     const errorData = await response.json().catch(() => ({}));
+                     throw new Error(errorData.detail || `Failed to fetch consultations (${response.status})`);
+                 }
+
+            } catch(error) {
+                console.error("Error fetching upcoming consultation:", error);
+                meetingStatusDiv.textContent = `Error loading consultation status: ${error.message}`;
+                startConsultationBtn.classList.add('hidden');
+            }
+        }
+
+        // Event listener for the Start button
+        startConsultationBtn.addEventListener('click', function() {
+            const appointmentId = this.dataset.appointmentId;
+             console.log(`Start button clicked for appointment ID: ${appointmentId}`);
+            // --- TODO: Video Call Integration (Similar to patient side) ---
+            // 1. Fetch video access token from backend
+            // 2. Use CPaaS SDK to connect
+            alert(`(Simulated) Starting consultation for appointment ID: ${appointmentId}...`); // Placeholder
+             // --- End Video Call Integration ---
+        });
+
+
+        // Initial fetch
+        fetchUpcomingAppointment();
+
+    }); // End DOMContentLoaded
+
+    function goBack() {
+        window.location.href = 'doctor-dashboard.html'; // Adjust as needed
+    }
+</script>
+</body>
+</html>

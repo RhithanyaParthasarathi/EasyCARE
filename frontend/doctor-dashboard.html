@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="header.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
-<body>
+<body onload="onLoad()">
 
     <header>
         <div class="logo">
@@ -31,7 +31,7 @@
 
     <main>
         <section id="doctor-dashboard">
-            <h2>Welcome, Dr. [Doctor's Name]</h2>
+            <h2 id="welcome-message">Welcome, Dr. [Doctor's Name]</h2>
 
             <p>Use ChroniCARE to efficiently manage your patients with chronic conditions and provide timely, personalized care.</p>
 
@@ -41,6 +41,13 @@
                     <h3>Manage Patients</h3>
                     <p>View and manage your patient list, access patient profiles, and review their medical history and vital signs.</p>
                     <a href="patient-list.html" class="button">Go to Patient List</a> <!-- Link to patient list page -->
+                </div>
+
+                <div class="feature-card" id="consultation">
+                    <i class="fas fa-stethoscope"></i>
+                    <h3>Provide Consultation</h3>
+                    <p>Provide consultation for your patients through a video/audio call.</p>
+                    <a href="virtual-consultation.html" class="button">Provide Consultation</a> <!-- Link to reporting page -->
                 </div>
 
                 <div class="feature-card" id="telemedicine">
@@ -66,6 +73,20 @@
             </div>
         </section>
     </main>
+    <script>
+         function onLoad() {
+
+const username = localStorage.getItem("username");
+const welcomeMessageElement = document.querySelector("#welcome-message");
+
+if (username) {
+    welcomeMessageElement.textContent = `Welcome, Dr. ${username}`;
+} else {
+    // Handle the case where the username is not found (e.g., redirect to login)
+    window.location.href = "login.html";
+}
+}
+</script>
       <script src="header.js"></script>
 </body>
 </html>
