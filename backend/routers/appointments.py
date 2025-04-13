@@ -1,12 +1,13 @@
 # backend/routers/appointments.py
 from fastapi import APIRouter, Depends, HTTPException, status, Query, Request
 from pydantic import BaseModel, field_validator
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from typing import Annotated, List, Optional
 from backend.database import get_db
 from backend.models import TimeSlot, User, UserRole, Appointment, AppointmentStatus # Ensure correct import
-from sqlalchemy import exc, and_
+from sqlalchemy import exc, and_,func
 from datetime import datetime, date as py_date
+from datetime import timezone
 # Import the new dependency
 from backend.routers.auth import get_current_doctor, get_current_active_user
 from backend.models import Notification #import notification model
@@ -24,12 +25,21 @@ current_doctor_dependency = Annotated[User, Depends(get_current_doctor)]
 
 # *** ADD THIS NEW MODEL ***
 
+# *** ADD THIS NEW MODEL ***
+class DoctorProfileInfo(BaseModel): # Defines profile fields for the doctor list
+     specialty: Optional[str] = None
+     years_experience: Optional[int] = None
+     about_me: Optional[str] = None # Decide if you want full bio in list
+
+     class Config: from_attributes = True
+# *** END OF NEW MODEL ***
 
 class Doctor(BaseModel): # For listing doctors
     id: int
     username: str
-    email: str
-    license_number: Optional[str] = None
+    #email: str
+    #license_number: Optional[str] = None
+    profile: Optional[DoctorProfileInfo] = None
 
     class Config:
         from_attributes = True
@@ -111,11 +121,39 @@ def format_time_ampm(time_str_24: str) -> str:
 
 # --- API Endpoints ---
 
-@router.get("/doctors", response_model=List[Doctor])
+@router.get("/doctors", response_model=List[Doctor]) # Response uses NEW Doctor model
 async def get_doctors(db: db_dependency):
-    """Lists all users with the doctor role."""
-    doctors = db.query(User).filter(User.role == UserRole.doctor).all()
-    return doctors # Returns empty list if no doctors, which is fine (HTTP 200)
+    """
+    Lists all users with the doctor role, including selected profile info.
+    """
+    print("Fetching list of doctors with profiles...")
+    doctors_query = db.query(User).options(
+        joinedload(User.doctor_profile) # Eagerly load DoctorProfile relationship from User model
+    ).filter(User.role == UserRole.doctor).order_by(User.username)
+
+    doctors_result = doctors_query.all()
+    print(f"Found {len(doctors_result)} doctors.")
+
+    # Manually construct response to ensure correct nesting and field selection
+    response_list: List[Doctor] = []
+    for doc in doctors_result:
+         profile_info_subset = None
+         if doc.doctor_profile: # Check if the eager-loaded profile exists
+             # Create the DoctorProfileInfo subset from the full profile
+             profile_info_subset = DoctorProfileInfo.model_validate(doc.doctor_profile)
+
+         # Create the main Doctor response object including the profile subset
+         response_list.append(
+             Doctor(
+                 id=doc.id,
+                 username=doc.username,
+                 # email=doc.email, # Uncomment if needed
+                 # license_number=doc.license_number, # Uncomment if needed
+                 profile=profile_info_subset # Assign the subset object
+             )
+         )
+
+    return response_list
 
 # --- Schedule Management for Logged-in Doctor ---
 
@@ -395,27 +433,43 @@ async def get_my_appointment_requests(
             pass # Ignore invalid status filter
 
     # Order by creation time or appointment date as preferred
-    appointments = query.order_by(Appointment.created_at.desc()).all()
+    appointments = query.options(
+        joinedload(Appointment.patient), # Load patient data
+        joinedload(Appointment.time_slot) # Load time_slot data (for start_time)
+        # No need to explicitly load doctor here, as current_doctor already has it,
+        # BUT Pydantic needs the data structured correctly for validation.
+        # We can pass the current_doctor object or extract relevant fields.
+    ).order_by(Appointment.created_at.desc()).all()
 
     # Prepare response data, including necessary related info
     response_data = []
     for appt in appointments:
-        if appt.time_slot: # Ensure the related timeslot exists
-             response_data.append(
-                 AppointmentRequestDetails(
-                    id=appt.id,
-                    appointment_date=appt.appointment_date,
-                    status=appt.status,
-                    created_at=appt.created_at,
-                    patient=PatientInfo.model_validate(appt.patient), # Use model_validate (Pydantic v2)
-                    start_time=appt.time_slot.start_time # Get start time from relationship
-                 )
-             )
+        # Check if required relationships were loaded successfully
+        if appt.time_slot and appt.patient:
+             try: # Add try-except around model validation for robustness
+                response_data.append(
+                    AppointmentRequestDetails(
+                        id=appt.id,
+                        appointment_date=appt.appointment_date,
+                        status=appt.status,
+                        created_at=appt.created_at,
+                        patient=PatientInfo.model_validate(appt.patient),
+                        start_time=appt.time_slot.start_time,
+                        # *** ADD DOCTOR INFO HERE ***
+                        # Since current_doctor IS the doctor for these requests,
+                        # we can use the Doctor model to validate/structure it.
+                        doctor=Doctor.model_validate(current_doctor)
+                        # *** END ADDED DOCTOR INFO ***
+                    )
+                )
+             except Exception as e:
+                 # Log if Pydantic validation fails for a specific appointment
+                 print(f"Warning: Could not validate Appointment {appt.id} for response. Error: {e}")
         else:
-             print(f"Warning: Appointment {appt.id} is missing its related TimeSlot.")
+             print(f"Warning: Appointment {appt.id} is missing related Patient or TimeSlot data.")
 
 
-    print(f"Found {len(response_data)} requests matching filter.") # DEBUG
+    print(f"Found {len(response_data)} requests matching filter.")
     return response_data
 
 

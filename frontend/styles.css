@@ -207,32 +207,34 @@ main {
 /* Pop-up Message for Profile Completion Prompt */
 .profile-prompt-popup {
     position: fixed; /* Fixed relative to the viewport */
-    top: 0;          /* Stick to the top */
-    left: 0;         /* Stretch from left... */
-    right: 0;        /* ...to right */
-    width: 100%;     /* Ensure full width */
+    top: 75px;          /* Stick to the top */
+    left: 50%;         /* Stretch from left... */
+    transform: translateX(-50%);         /* ...to right */
+    /*width: 100%;     /* Ensure full width */
     background-color: #b2ebf2; /* Light teal */
     color: #1f3b4d;
-    padding: 12px 20px; /* Adjust padding */
+    padding: 15px 25px; /* Adjust padding */
     /* Remove border-radius if you want a full banner */
-    /* border-radius: 8px; */
+     border-radius: 8px; 
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15); /* Shadow below */
     z-index: 1050;
     display: flex;
     align-items: center;
     gap: 15px;
+    max-width: 90%; /* Prevent it getting too wide on large screens */
     box-sizing: border-box;
     opacity: 0;
     visibility: hidden;
-    transform: translateY(-100%); /* Start hidden above viewport */
+    
     transition: opacity 0.4s ease, visibility 0s linear 0.4s, transform 0.4s ease-out; /* Slide down effect */
+    font-size: 0.95em; /* Slightly smaller font */
 }
 
 /* Style to show the popup */
 .profile-prompt-popup.show {
     opacity: 1;
     visibility: visible;
-    transform: translateY(0%); /* Slide into view */
+    /*transform: translateY(0%); /* Slide into view */
     transition: opacity 0.4s ease, visibility 0s linear 0s, transform 0.4s ease-out;
 }
 

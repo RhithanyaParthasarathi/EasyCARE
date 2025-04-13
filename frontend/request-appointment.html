@@ -52,36 +52,74 @@
 
         document.addEventListener('DOMContentLoaded', function() {
         const doctorListContainer = document.getElementById('doctor-list-container');
+        const API_BASE_URL = 'http://127.0.0.1:8000'; // Adjust if needed
 
          const generateDoctorCard = (doctor) => {
-                return `
+
+            // *** ADD DEBUG LOGS ***
+            console.log("--- Generating Card for Doctor:", doctor.id, doctor.username);
+                 console.log("Raw doctor object:", JSON.stringify(doctor)); // Log the whole object
+                 console.log("Accessing profile:", doctor.profile); // Log the profile object directly
+                 console.log("Accessing specialty:", doctor.profile?.specialty); // Log specific field access
+                 // *** END DEBUG LOGS ***
+
+                // Use profile data if available, provide defaults/placeholders otherwise
+                 const fullName = doctor.profile?.full_name || doctor.username || 'Dr. Unknown'; // Prefer full name from profile
+                 const specialty = doctor.profile?.specialty || 'General Practice'; // Default if missing
+                 const experience = doctor.profile?.years_experience; // Can be number or null/undefined
+                 const about = doctor.profile?.about_me || ''; // Default to empty string
+
+                 // Format experience string
+                 let experienceStr = '';
+                 if (experience !== null && experience !== undefined) {
+                     experienceStr = `${experience} year${experience === 1 ? '' : 's'} experience`;
+                 } else {
+                     experienceStr = 'Experience not specified';
+                 }
+
+                 // Optional: Truncate long 'about me' for card view
+                 
+
+                 // Use doctor.username for the button data-doctor-name if needed, or fullName
+                 const nameForButton = doctor.username || fullName;
+
+                 // Use template literal for cleaner HTML
+                 return `
                     <div class="doctor-card">
-                        <h3>Dr. ${doctor.username}</h3>
-                        <div class="specialty">General</div> <!-- Example, replace with real specialty if you have it -->
+                        <h3>Dr. ${fullName}</h3>
+                        <div class="specialty">${specialty}</div>
+                        <div class="experience">${experienceStr}</div>
+                        ${about ? `<p class="about">${about}</p>` : ''} <!-- Only show about if present -->
                         <div class="rating">
-                        <span class="star">★★★★★</span>
+                            <span class="star">★★★★★</span> <!-- Placeholder rating -->
                         </div>
-                        <button class="request-button" data-doctor-id="${doctor.id}" data-doctor-name="${doctor.username}">Request</button>
+                        <button class="request-button" data-doctor-id="${doctor.id}" data-doctor-name="${encodeURIComponent(nameForButton)}">Request</button>
                     </div>
-                `;
+                 `;
             };
 
             const loadDoctors = async () => {
+                if (!doctorListContainer) return;
+                doctorListContainer.innerHTML = "<p>Loading doctors...</p>"; // Show loading
+
             try {
                 const response = await fetch('http://127.0.0.1:8000/appointments/doctors');
+                console.log("Fetch doctors status:", response.status); // DEBUG
 
                 if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+                     const errorData = await response.json().catch(() => ({}));
+                        throw new Error(errorData.detail || `HTTP error! status: ${response.status}`);
                 }
 
                 const doctors = await response.json();
+                console.log("Received doctors:", doctors); // D
 
                 //Generate the cards
-                  if (doctors) {
-                      doctorListContainer.innerHTML = doctors.map(generateDoctorCard).join('');
-                  }
-                else
-                    doctorListContainer.innerHTML = "<p>There are no Doctors!</p>";
+                if (doctors && doctors.length > 0) {
+                        doctorListContainer.innerHTML = doctors.map(generateDoctorCard).join('');
+                    } else {
+                        doctorListContainer.innerHTML = "<p>No doctors found or available at this time.</p>";
+                    }
 
                  //Reattch the Listener, because its a dynamic load
                  document.querySelectorAll('.request-button').forEach(button => {
@@ -92,8 +130,8 @@
                   });
 });
             } catch (error) {
-                   console.error('There was a problem loading the doctors: ' + error);
-                   doctorListContainer.innerHTML = "<p>There was an issue with the server!</p>";
+                console.error('There was a problem loading the doctors:', error);
+                doctorListContainer.innerHTML = `<p style="color:red;">Could not load doctors: ${error.message}</p>`;
             }
         };
         loadDoctors();

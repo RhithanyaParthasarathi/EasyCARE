@@ -240,12 +240,12 @@ async def register(user: UserCreate, db: db_dependency):
         if not user.license_number:
              raise HTTPException(status_code=400, detail="License number is required for doctors.")
         # Check if the license number already exists for another doctor
-        existing_doctor_license = db.query(User).filter(
-            User.license_number == user.license_number,
-            User.role == UserRole.doctor
-            ).first()
-        if existing_doctor_license:
-            raise HTTPException(status_code=400, detail="This license number is already registered to another doctor.")
+        #existing_doctor_license = db.query(User).filter(
+         #   User.license_number == user.license_number,
+          #  User.role == UserRole.doctor
+           # ).first()
+        #if existing_doctor_license:
+         #   raise HTTPException(status_code=400, detail="This license number is already registered to another doctor.")
 
         # Validate the license number format/logic (using hardcoded for now)
         if not validate_license_number(user.license_number):
