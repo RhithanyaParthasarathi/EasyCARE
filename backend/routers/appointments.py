@@ -22,6 +22,9 @@ current_doctor_dependency = Annotated[User, Depends(get_current_doctor)]
 
 # --- Pydantic Models (NO end_time) ---
 
+# *** ADD THIS NEW MODEL ***
+
+
 class Doctor(BaseModel): # For listing doctors
     id: int
     username: str
@@ -30,6 +33,7 @@ class Doctor(BaseModel): # For listing doctors
 
     class Config:
         from_attributes = True
+
 
 class TimeSlotBase(BaseModel): # Base for input/output
     start_time: str # Expect HH:MM (24hr)

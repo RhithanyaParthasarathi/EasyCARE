@@ -1,5 +1,5 @@
 // header.js
-
+const API_BASE_URL_HEADER = 'http://127.0.0.1:8000'; // Define Base URL  globally
 // --- Logout Functionality ---
 function handleLogout() {
     if (confirm("Are you sure you want to log out?")) {
@@ -8,6 +8,7 @@ function handleLogout() {
         localStorage.removeItem('userId');
         localStorage.removeItem('userRole');
         localStorage.removeItem('username');
+        sessionStorage.removeItem('profilePromptDismissed'); // Clear prompt dismissal for next login session
         // Add any other items if needed
         window.location.href = 'login.html'; // Redirect to login
     } else {
@@ -64,7 +65,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // --- Placeholder for Notification Indicator Logic ---
     // --- Notification Indicator Logic ---
-    const API_BASE_URL_HEADER = 'http://127.0.0.1:8000'; // Define Base URL if not already available globally
+    
 
     // Function to get token (can be defined here or imported if you create shared utils)
     function getAuthTokenHeader() {
@@ -135,6 +136,69 @@ document.addEventListener('DOMContentLoaded', function() {
     // ** Call the function when the header's script loads **
     updateNotificationIndicator();
 
+     // --- *** NEW: Profile Completion Prompt Logic *** ---
+     async function checkAndShowProfilePrompt() {
+        const isLoggedIn = getAuthTokenHeader(); // Use shared helper
+        const userRole = localStorage.getItem('userRole');
+
+        if (!isLoggedIn || sessionStorage.getItem('profilePromptDismissed') === 'true') {
+            const existingPopup = document.getElementById('profilePromptPopup');
+            if (existingPopup) existingPopup.remove();
+            return;
+        }
+        if (document.getElementById('profilePromptPopup')) return;
+
+        console.log("Checking profile completion status...");
+
+        const token = isLoggedIn; // Already confirmed it exists
+        const apiUrl = `${API_BASE_URL_HEADER}/profile/me`; // Use constant
+        let isComplete = true; // Assume complete or on error
+
+        try {
+            const response = await fetch(apiUrl, { headers: { 'Authorization': `Bearer ${token}` } });
+            if (response.ok) {
+                const data = await response.json();
+                isComplete = data.is_profile_complete;
+                console.log("Profile status fetched for prompt:", isComplete);
+            } else {
+                 console.error("Failed to fetch profile status for prompt:", response.status);
+                 if (response.status === 401 || response.status === 403) localStorage.removeItem('accessToken');
+            }
+        } catch (error) { console.error("Error fetching profile status for prompt:", error); }
+
+        if (isComplete === false) {
+             console.log("Profile incomplete, showing prompt.");
+             const popup = document.createElement('div');
+             popup.id = 'profilePromptPopup';
+             popup.className = 'profile-prompt-popup';
+
+             const profilePage = (userRole === 'doctor') ? 'docprofile.html' : 'profile.html';
+             const patientMessage = `Welcome! Please complete your profile information so we can assist you better. <a href="${profilePage}">Update Profile Now</a>`;
+             const doctorMessage = `Welcome, Doctor! Please complete your professional profile to help patients connect with you. <a href="${profilePage}">Update Profile Now</a>`;
+
+             popup.innerHTML = `
+                 <p>${userRole === 'doctor' ? doctorMessage : patientMessage}</p>
+                 <button class="close-prompt-btn" aria-label="Dismiss prompt">×</button>
+             `;
+             document.body.appendChild(popup);
+
+             popup.querySelector('.close-prompt-btn').addEventListener('click', () => {
+                 popup.classList.remove('show');
+                 sessionStorage.setItem('profilePromptDismissed', 'true');
+                 setTimeout(() => { if (popup.parentNode) popup.remove(); }, 500);
+             });
+
+              setTimeout(() => { popup.classList.add('show'); }, 500);
+        } else {
+             console.log("Profile prompt check: Complete, not logged in, dismissed, or fetch failed.");
+             const existingPopup = document.getElementById('profilePromptPopup');
+             if (existingPopup) existingPopup.remove();
+        }
+    }
+    // --- *** END: Profile Completion Prompt Logic *** ---
+
+    checkAndShowProfilePrompt(); // Check profile status immediately
+    
     // Optional: Update periodically? (Usually not needed unless actions outside the app trigger notifications)
     // setInterval(updateNotificationIndicator, 60000); // e.g., Check every minute
 

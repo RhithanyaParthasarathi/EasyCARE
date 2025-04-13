@@ -6,7 +6,7 @@ from backend.database import engine
 from backend.models import Base
 from backend.routers import appointments
 from backend.routers import notifications  # Import the new router
-
+from backend.routers import profile
 
 Base.metadata.create_all(bind=engine)
 
@@ -26,3 +26,4 @@ app.add_middleware(
 app.include_router(auth.router)
 app.include_router(appointments.router)  # Include the new router
 app.include_router(notifications.router) # Include the new router
+app.include_router(profile.router)

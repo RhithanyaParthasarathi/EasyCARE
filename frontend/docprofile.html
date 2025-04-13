@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile</title>
+    <!-- Link your main stylesheet -->
+    <link rel="stylesheet" href="styles.css">
+    <!-- Optional: Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<style>
+    header {
+    background-color: #ffffff; /* Optional: Give header a background */
+    padding: 15px 20px;      /* Optional: Add some padding */
+    text-align: center;      /* THIS IS THE KEY CHANGE: Centers inline/text content */
+    border-bottom: 1px solid #eee; /* Optional: Add a separator */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); /* Optional: Subtle shadow */
+}
+
+header h1 {
+    margin: 0; /* Remove default H1 margin to prevent extra space */
+    color: #1a237e; /* Match the dark blue from your theme */
+    font-size: 2.2em; /* Make it prominent */
+    font-weight: bold;
+}
+/* --- END NEW HEADER STYLES --- */
+
+
+/* General Body Style (Apply globally or here if needed) */
+body {
+    font-family: sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f9f5f0;
+    color: #333;
+    line-height: 1.6;
+    padding-bottom: 60px; /* If using bottom nav */
+}
+
+
+/* Form Container */
+.form-container {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 20px;
+}
+
+/* Style for the H1 *inside* the form */
+.form-container > h1 { /* Using > makes it specific to the direct child */
+    text-align: center;
+    color: #1a237e;
+    margin-bottom: 0.5rem;
+    font-size: 2em;
+    margin-top: 0; /* Adjust if needed */
+}
+
+/* ... rest of your existing doctor-form.css styles ... */
+/* General Body Style (Apply globally or here if needed) */
+body {
+    font-family: sans-serif; /* Inherit from profile.css */
+    margin: 0;
+    padding: 0;
+    background-color: #f9f5f0; /* Soft beige background from profile.css */
+    color: #333;
+    line-height: 1.6;
+    padding-bottom: 60px; /* If using bottom nav */
+}
+
+
+/* Form Container */
+.form-container {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 20px; /* Use padding like main in profile.css */
+    /* Remove background/shadow here if sections have it */
+}
+
+.form-container h1 {
+    text-align: center;
+    color: #1a237e; /* Dark blue from profile.css */
+    margin-bottom: 0.5rem;
+    font-size: 2em; /* Match profile.css heading */
+}
+
+.form-container p {
+    text-align: center;
+    margin-bottom: 2rem;
+    color: #555;
+}
+
+/* Form Sections (Fieldsets) - Apply section style from profile.css */
+.form-section {
+    margin-bottom: 20px; /* Consistent margin */
+    background-color: #fff; /* White background like profile sections */
+    padding: 20px; /* Padding like profile sections */
+    border-radius: 10px; /* Rounded corners like profile sections */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Shadow like profile sections */
+    border: none; /* Remove default fieldset border */
+    position: relative;
+}
+
+.form-section legend {
+     padding: 0 0.5em; /* Add some padding around legend text */
+     margin-left: 10px; /* Align slightly with content */
+     display: block;
+     width: 100%;
+     box-sizing: border-box;
+}
+
+.form-section legend h2 {
+    color: #1a237e; /* Dark blue like profile.css */
+    font-size: 1.4em;
+    font-weight: 600;
+    margin-bottom: 1rem; /* Space below legend */
+}
+
+
+/* Form Group - Label and Input container */
+.form-group {
+    margin-bottom: 1.2rem;
+}
+
+.form-group label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: #333;
+}
+
+.form-group input[type="text"],
+.form-group input[type="email"],
+.form-group input[type="tel"],
+.form-group input[type="number"],
+.form-group textarea {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 1em;
+    box-sizing: border-box;
+    transition: border-color 0.3s ease;
+}
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+    border-color: #007bff; /* Standard focus highlight */
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+
+/* Error Message Styling */
+.error-message {
+    color: #dc3545; /* Red */
+    font-size: 0.85em;
+    margin-top: 0.3rem;
+    display: none;
+}
+
+.form-group input.input-error,
+.form-group textarea.input-error {
+    border-color: #dc3545;
+}
+
+/* Button Container & Save Button - Use profile.css styles */
+.button-container{
+   display: flex;
+   gap: 10px; /* Optional gap if multiple buttons */
+   justify-content: center;
+   margin-top: 20px;
+}
+
+
+
+/* Re-include .profile-button class definition for clarity/direct use */
+.profile-button {
+    background-color: #b2ebf2; /* light teal button */
+    color: #333;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1em;
+    transition: background-color 0.3s ease;
+}
+
+
+.profile-button:hover {
+    background-color: #81d4fa;  /* light cyan */
+}
+
+/* Override for the main save button if desired */
+#save-profile-btn {
+     background-color: #1a237e; /* Dark blue */
+     color: white;
+     padding: 12px 30px;
+     font-size: 1.1em;
+     font-weight: 600;
+}
+
+#save-profile-btn:hover {
+     background-color: #303f9f; /* Slightly lighter blue */
+}
+
+
+</style>
+<body>
+    <!-- You might want to include your standard header here -->
+
+
+    <main class="form-container">
+        <h1>Doctor Profile</h1>
+        <p>Please fill in your details to complete your professional profile.</p>
+
+        <form id="doctor-profile-form" novalidate> <!-- novalidate prevents default browser validation, letting JS handle it -->
+
+            <!-- Personal Information Section -->
+            <fieldset class="form-section">
+                <h2> &nbsp; Personal Information</h2>
+
+                <div class="form-group">
+                    <label for="fullName">Full Name:</label>
+                    <input type="text" id="fullName" name="fullName" placeholder="e.g., Dr. Aishwarya Sharma" required>
+                    <span class="error-message" id="fullNameError">Full Name is required.</span>
+                </div>
+              
+               <div class="form-group">
+                    <label for="email">Email:</label>
+                    <!-- This might be pre-filled from login, make readonly if needed -->
+                    <input type="email" id="email" name="email" placeholder="your.email@example.com" required>
+                    <span class="error-message" id="emailError">A valid Email is required.</span>
+                </div>
+
+                <div class="form-group">
+                    <label for="specialty">Specialty:</label>
+                    <input type="text" id="specialty" name="specialty" placeholder="e.g., Cardiologist" required>
+                     <span class="error-message" id="specialtyError">Specialty is required.</span>
+                </div>
+
+               
+            </fieldset>
+
+            <!-- Professional Information Section -->
+            <fieldset class="form-section">
+                <h2> &nbsp; Professional Information</h2>
+
+                <div class="form-group">
+                    <label for="hospital">Hospital/Clinic Affiliation:</label>
+                    <input type="text" id="hospital" name="hospital" placeholder="e.g., Apollo Hospital, Chennai" required>
+                    <span class="error-message" id="hospitalError">Hospital/Clinic is required.</span>
+                </div>
+
+                <div class="form-group">
+                    <label for="licenseNumber">License Number:</label>
+                    <input type="text" id="licenseNumber" name="licenseNumber" placeholder="Your medical license number" required>
+                    <span class="error-message" id="licenseNumberError">License Number is required.</span>
+                     <!-- You might have backend validation for format/uniqueness -->
+                </div>
+
+                <div class="form-group">
+                    <label for="yearsExperience">Years of Experience:</label>
+                    <input type="number" id="yearsExperience" name="yearsExperience" min="0" placeholder="e.g., 15" required>
+                    <span class="error-message" id="yearsExperienceError">Years of Experience is required (must be 0 or more).</span>
+                </div>
+
+                 <div class="form-group">
+                    <label for="qualifications">Qualifications:</label>
+                    <textarea id="qualifications" name="qualifications" rows="3" placeholder="e.g., MBBS, MD (Cardiology)" required></textarea>
+                    <span class="error-message" id="qualificationsError">Qualifications are required.</span>
+                </div>
+            </fieldset>
+
+            <!-- About Me Section -->
+             <fieldset class="form-section">
+                <h2> &nbsp; About Me</h2>
+                <div class="form-group">
+                    <label for="aboutMe">Professional Bio:</label>
+                    <textarea id="aboutMe" name="aboutMe" rows="5" placeholder="Write a brief description about your expertise, approach to patient care, etc." required></textarea>
+                     <span class="error-message" id="aboutMeError">A brief bio is required.</span>
+                </div>
+            </fieldset>
+
+            <!-- Submission Button -->
+            <div class="button-container">
+                 <button type="submit" id="save-profile-btn" class="profile-button">Save Profile</button>
+            </div>
+
+        </form>
+    </main>
+
+    <!-- Include your standard footer if you have one -->
+
+    <script src="doctor-profile.js"></script>
+</body>
+</html>

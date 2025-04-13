@@ -201,3 +201,71 @@ main {
         font-size: 0.65rem;
     }
 }
+
+/* styles.css or header.css */
+
+/* Pop-up Message for Profile Completion Prompt */
+.profile-prompt-popup {
+    position: fixed; /* Fixed relative to the viewport */
+    top: 0;          /* Stick to the top */
+    left: 0;         /* Stretch from left... */
+    right: 0;        /* ...to right */
+    width: 100%;     /* Ensure full width */
+    background-color: #b2ebf2; /* Light teal */
+    color: #1f3b4d;
+    padding: 12px 20px; /* Adjust padding */
+    /* Remove border-radius if you want a full banner */
+    /* border-radius: 8px; */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15); /* Shadow below */
+    z-index: 1050;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    box-sizing: border-box;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-100%); /* Start hidden above viewport */
+    transition: opacity 0.4s ease, visibility 0s linear 0.4s, transform 0.4s ease-out; /* Slide down effect */
+}
+
+/* Style to show the popup */
+.profile-prompt-popup.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0%); /* Slide into view */
+    transition: opacity 0.4s ease, visibility 0s linear 0s, transform 0.4s ease-out;
+}
+
+/* Style the text paragraph inside */
+.profile-prompt-popup p {
+    margin: 0;
+    flex-grow: 1; /* Allow text to take available space */
+}
+
+/* Style the link inside the popup */
+.profile-prompt-popup a {
+    color: #0056b3; /* Darker blue link */
+    font-weight: bold;
+    text-decoration: underline;
+    white-space: nowrap; /* Prevent link from wrapping if possible */
+}
+.profile-prompt-popup a:hover {
+    color: #003d80; /* Even darker on hover */
+}
+
+/* Style the close button (X) */
+.profile-prompt-popup .close-prompt-btn {
+    background: none;
+    border: none;
+    font-size: 1.5rem; /* Make X bigger */
+    color: #555;
+    cursor: pointer;
+    padding: 0 5px;
+    line-height: 1; /* Ensure tight line height */
+    font-weight: bold;
+    opacity: 0.7;
+    transition: opacity 0.2s ease;
+}
+.profile-prompt-popup .close-prompt-btn:hover {
+    opacity: 1;
+}
