@@ -5,10 +5,93 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ChroniCARE - Patient List</title>
     <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="patient-list.css">
     <link rel="stylesheet" href="header.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
+<style>
+    /* patient-list.css */
+
+#patient-list-page {
+    padding: 20px;
+}
+
+.patient-list-container {
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.patient-cards-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px; /* Spacing between cards */
+}
+
+.patient-card {
+    border: 2px solid #b2ebf2;
+    padding: 10px;
+    border-radius: 10px;
+    /*background-color: #b2ebf2; /* Add a background color to the card */
+}
+
+.patient-name-container{
+    display:flex;
+    flex-direction:row;
+    gap:10px;
+    align-items: center;
+}
+
+.patient-card h3 {
+    margin-top: 0;
+    margin-bottom: 5px;
+}
+
+.patient-button {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9em;
+    transition: background-color 0.2s ease;
+    margin-right: 10px;
+}
+
+.patient-button:hover {
+    background-color: #0056b3;
+}
+
+.patient-avatar {
+    font-size: 1.5em;
+    color: #777;
+}
+
+/* Styling for the back button */
+.back-button-container {
+    text-align: center; /* Center the button */
+    margin-top: 20px; /* Add some space above the button */
+}
+
+.back-button {
+    background-color: #007bff; /* Blue background color */
+    color: #fff; /* White text color */
+    border: none; /* Remove the border */
+    padding: 10px 20px; /* Add some padding */
+    border-radius: 5px; /* Round the corners */
+    text-decoration: none; /* Remove underline from the link */
+    font-size: 1em; /* Set the font size */
+    cursor: pointer; /* Change the cursor on hover */
+    transition: background-color 0.2s ease; /* Add a smooth transition */
+}
+
+.back-button:hover {
+    background-color: #0056b3; /* Darker blue on hover */
+}
+</style>
 <body>
 
     <header>
@@ -44,67 +127,151 @@
     </main>
 
     <script>
-         document.addEventListener('DOMContentLoaded', function() {
+        // patient-list.js - Fetching Confirmed Patients
+    
+        // --- Helper Function: Get Auth Token ---
+        function getAuthToken() {
+            const token = localStorage.getItem('accessToken');
+            console.log("Patient List: Token Check - ", token ? "Found" : "Not Found");
+            return token;
+        }
+    
+        // --- Main Logic ---
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log("Patient List JS Loaded"); // DEBUG
+    
             const patientCardsContainer = document.querySelector('.patient-cards-container');
+            const API_BASE_URL = 'http://127.0.0.1:8000'; // Adjust if needed
+    
+            // Check if container exists
+            if (!patientCardsContainer) {
+                console.error("Cannot find '.patient-cards-container'. Aborting script.");
+                return; // Stop if critical element is missing
+            }
+    
+            // --- Function to create a single Patient Card ---
+                    // --- Function to create a single Patient Card ---
+        function createPatientCard(patientInfo) { // Expects {id, username, full_name?}
+            if (!patientInfo || !patientInfo.id) {
+                console.warn("Skipping invalid patient data:", patientInfo);
+                return null;
+            }
 
-            // Get accepted appointments from local storage (or wherever you store them)
-            const acceptedAppointments = getAcceptedAppointments();  // Implement this function
-            console.log("hello")
+            const card = document.createElement('div');
+            card.classList.add('patient-card');
+            card.dataset.patientId = patientInfo.id;
 
-            // Create and append patient cards
-            acceptedAppointments.forEach(appointment => {
-                const card = createPatientCard(appointment);
-                patientCardsContainer.appendChild(card);
+            const patientNameContainer = document.createElement('div');
+            patientNameContainer.classList.add('patient-name-container');
+
+            const avatar = document.createElement('i');
+            avatar.classList.add('fas', 'fa-user-circle', 'patient-avatar');
+
+            const patientName = document.createElement('h3');
+            patientName.textContent = patientInfo.full_name || patientInfo.username || 'Unknown Patient';
+
+            patientNameContainer.appendChild(avatar);
+            patientNameContainer.appendChild(patientName);
+            card.appendChild(patientNameContainer);
+
+            // --- ADD SPECIFIC ACTION BUTTONS ---
+            const actionsDiv = document.createElement('div');
+            actionsDiv.style.marginTop = '15px'; // Add space above buttons
+            actionsDiv.style.display = 'flex'; // Arrange buttons side-by-side
+            actionsDiv.style.gap = '10px'; // Space between buttons
+
+            // 1. View Health Data Button
+            const healthDataButton = document.createElement('button');
+            healthDataButton.classList.add('patient-button'); // Use existing style class
+            healthDataButton.textContent = "View Health Data";
+            healthDataButton.addEventListener('click', () => {
+                // TODO: Implement navigation or modal for Health Data (IoT)
+                alert(`Navigate to HEALTH DATA for patient ID: ${patientInfo.id} (${patientName.textContent})`);
+                // Example: window.location.href = `/doctor/patient/${patientInfo.id}/health-data`;
             });
+            actionsDiv.appendChild(healthDataButton);
 
-            // Dummy function to retrieve accepted appointments (replace with your actual data source)
-            function getAcceptedAppointments() {
-    // In a real application, this would fetch the data from an API or local storage
-    return [
-        { patientName: "@john", appointmentTime: "13-March-2025 Thursday 2:00pm" },
-        { patientName: "@michael", appointmentTime: "14-March-2025 Friday 11:00am" },
-        { patientName: "@sana", appointmentTime: "15-March-2025 Saturday 2:00pm" }
-        
-    ];
-}
+            // 2. View Medication History Button
+            const medicationButton = document.createElement('button');
+            medicationButton.classList.add('patient-button'); // Use existing style class
+            medicationButton.textContent = "View Medication History";
+            medicationButton.addEventListener('click', () => {
+                // TODO: Implement navigation or modal for Medication History
+                alert(`Navigate to MEDICATION HISTORY for patient ID: ${patientInfo.id} (${patientName.textContent})`);
+                 // Example: window.location.href = `/doctor/patient/${patientInfo.id}/medications`;
+            });
+            actionsDiv.appendChild(medicationButton);
 
-            function createPatientCard(appointment) {
-    const card = document.createElement('div');
-    card.classList.add('patient-card');
+            card.appendChild(actionsDiv);
+            // --- END SPECIFIC ACTION BUTTONS ---
 
-    const patientNameContainer = document.createElement('div');
-    patientNameContainer.classList.add('patient-name-container');
-
-    const avatar = document.createElement('i');
-    avatar.classList.add('fas', 'fa-user-circle', 'patient-avatar');
-
-    const patientName = document.createElement('h3');
-    patientName.textContent = appointment.patientName;
-    card.appendChild(patientName);
-
-    patientNameContainer.appendChild(avatar);
-    patientNameContainer.appendChild(patientName);
-    card.appendChild(patientNameContainer)
-
-    const appointmentTime = document.createElement('p');
-    appointmentTime.textContent = "Appointment: " + appointment.appointmentTime;
-    card.appendChild(appointmentTime);
-
-    const medicationButton = document.createElement('button');
-    medicationButton.classList.add('patient-button');
-    medicationButton.textContent = "Show Medication History";
-    card.appendChild(medicationButton);
-
-    const healthDataButton = document.createElement('button');
-    healthDataButton.classList.add('patient-button');
-    healthDataButton.textContent = "Show Health Data";
-    card.appendChild(healthDataButton);
-
-    return card;
-}
-        });
-
-    </script>
+            return card;
+        } // --- End createPatientCard ---
+    
+    
+            // --- Function to Load the Patient List from API ---
+            async function loadPatientList() {
+                patientCardsContainer.innerHTML = '<p style="padding: 20px; text-align: center;">Loading patient list...</p>'; // Loading message
+                const token = getAuthToken();
+    
+                if (!token) {
+                    patientCardsContainer.innerHTML = '<p style="color:orange; padding: 20px; text-align: center;">Please log in to view your patients.</p>';
+                    // Consider redirecting: window.location.href = 'login.html';
+                    return;
+                }
+    
+                // *** Use the CORRECT endpoint for confirmed patients ***
+                const apiUrl = `${API_BASE_URL}/appointments/my-confirmed-patients`;
+                console.log("Fetching confirmed patient list from:", apiUrl); // DEBUG
+    
+                try {
+                    const response = await fetch(apiUrl, {
+                        method: 'GET',
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    console.log("Fetch confirmed patient list status:", response.status); // DEBUG
+    
+                    if (!response.ok) {
+                         if (response.status === 401 || response.status === 403) {
+                             localStorage.removeItem('accessToken'); // Clear token on auth error
+                             throw new Error("Authentication failed. Please log in again.");
+                         }
+                         const errorData = await response.json().catch(() => ({}));
+                         throw new Error(errorData.detail || `Failed to load patients (${response.status})`);
+                    }
+    
+                    const patients = await response.json(); // Expecting List[PatientInfo {id, username, full_name?}]
+                    console.log("Received confirmed patients:", patients); // DEBUG
+                    patientCardsContainer.innerHTML = ''; // Clear loading message
+    
+                    if (!Array.isArray(patients) || patients.length === 0) {
+                        patientCardsContainer.innerHTML = '<p style="padding: 20px; text-align: center;">You currently have no patients with confirmed appointments.</p>';
+                    } else {
+                        patients.forEach(patient => {
+                            const cardElement = createPatientCard(patient);
+                             if (cardElement) { // Append card only if created successfully
+                                 patientCardsContainer.appendChild(cardElement);
+                             }
+                        });
+                    }
+    
+                } catch (error) {
+                     console.error("Error loading confirmed patient list:", error);
+                     patientCardsContainer.innerHTML = `<p style="color:red; padding: 20px;">Error loading patients: ${error.message}</p>`;
+                }
+            } // --- End loadPatientList ---
+    
+    
+            // --- Initial Load ---
+            loadPatientList(); // Fetch and display the list when the page loads
+    
+        }); // End DOMContentLoaded
+    
+        // --- Keep goBack function ---
+        function goBack() {
+            window.location.href = 'doctor-dashboard.html';
+        }
+        </script>
     <script>
         function goBack() {
             window.location.href = 'doctor-dashboard.html';

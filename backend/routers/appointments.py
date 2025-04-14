@@ -2,6 +2,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Query, Request
 from pydantic import BaseModel, field_validator
 from sqlalchemy.orm import Session, joinedload
+from sqlalchemy import distinct
 from typing import Annotated, List, Optional
 from backend.database import get_db
 from backend.models import TimeSlot, User, UserRole, Appointment, AppointmentStatus # Ensure correct import
@@ -647,3 +648,41 @@ async def get_my_next_confirmed_appointment(
         # This might indicate missing relationship data if the join succeeded but related objects are None
         print(f"Warning: Upcoming appointment {upcoming_appointment.id if upcoming_appointment else 'N/A'} missing expected related data (patient, doctor, or timeslot info).")
         return None
+    
+@router.get("/my-confirmed-patients", response_model=List[PatientInfo])
+async def get_my_confirmed_patient_list(
+    db: db_dependency,
+    current_doctor: current_doctor_dependency
+):
+    """
+    Fetches a unique list of patients (ID and username) who have CONFIRMED
+    appointments (past, present, or future) with the logged-in doctor.
+    """
+    print(f"Fetching unique confirmed patients (basic info) for doctor {current_doctor.id}")
+
+    # Query distinct patient Users associated with the doctor via CONFIRMED appointments
+    # No need to explicitly load patient_profile if only username/id needed
+    distinct_patients_query = db.query(User).join(
+        Appointment, Appointment.patient_id == User.id
+    ).filter(
+        Appointment.doctor_id == current_doctor.id,
+        Appointment.status == AppointmentStatus.CONFIRMED
+    ).distinct(
+        User.id
+    ).order_by(User.username)
+
+    distinct_patients_result = distinct_patients_query.all()
+
+    # Prepare response using PatientInfo model (id, username only)
+    response_list: List[PatientInfo] = []
+    for patient in distinct_patients_result:
+         response_list.append(
+             PatientInfo(
+                 id=patient.id,
+                 username=patient.username
+                 # No full_name here
+             )
+         )
+
+    print(f"Found {len(response_list)} unique confirmed patients.")
+    return response_list

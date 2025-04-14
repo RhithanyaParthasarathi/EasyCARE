@@ -140,11 +140,33 @@
             </p>
 
             <div class="button-container">
-                 <!-- Link this back to the appropriate starting page, e.g., dashboard or index -->
-                 <a href="doctor-dashboard.html" class="back-button">Back</a>
+                <!-- ADD THIS BUTTON INSTEAD -->
+<button class="back-button" onclick="goBackContextual()">Back</button>
             </div>
         </div>
     </main>
+    <script>
+        // --- Helper to get Query Parameter ---
+        function getQueryParam(name) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(name);
+        }
+
+        // --- Contextual Back Function ---
+        function goBackContextual() {
+            const origin = getQueryParam('origin'); // Check for 'origin' parameter
+            console.log("Back button clicked on about-us.html, origin:", origin); // Debug
+
+            if (origin === 'doctor') {
+                // If origin is 'doctor', go to doctor dashboard
+                window.location.href = 'doctor-dashboard.html';
+            } else {
+                // Default back destination (assume patient or unknown)
+                // Go to patient dashboard (index.html) - safer than history.back()
+                window.location.href = 'index.html';
+            }
+        }
+    </script>
 
 </body>
 </html>
