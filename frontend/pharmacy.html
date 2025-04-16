@@ -12,17 +12,26 @@
         <h1>Pharmacy</h1>
     </header>
     <main>
-        <div class="search-container">
-            <input type="text" id="medicine-search" placeholder="Enter medicine name">
-            <button id="search-button">Search</button>
+        <!-- Add this container div -->
+        <div class="pharmacy-buttons-container">
+            <button class="pharmacy-button" style="background-image: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQCWgxnMmopw1HyP_RuES3feWwydIWd9DeRwA&s');" onclick="openWebsite('https://pharmeasy.in')"></button>
+  <button class="pharmacy-button" style="background-image: url('https://play-lh.googleusercontent.com/ryuYnI5Uy3GWAYFOYQJI-3IN1Gb0tPhd_UYeTuZA7AjP3NxL2ViTOrf5QsIIFNCWBdg');" onclick="openWebsite('https://www.apollo247.com')"></button>
+  <button class="pharmacy-button" style="background-image: url('https://seeklogo.com/images/N/netmeds-logo-4A3580CB35-seeklogo.com.png');" onclick="openWebsite('https://www.netmeds.com')"></button>
+  <button class="pharmacy-button" style="background-image: url('https://du8ef2qvb6oy7.cloudfront.net/media/images/1018f6b6-263e-44df-b129-a360601ca484/truemedslogo2x.png?fm=jpg&q=80&fit=crop&w=900&h=470&crop=1000%2C1000%2C0%2C0');" onclick="openWebsite('https://www.truemeds.in')"></button>
+  <button class="pharmacy-button" style="background-image: url('https://content.jdmagicbox.com/comp/bhubaneshwar/s1/0674px674.x674.180414112525.n4s1/catalogue/medplus-pharmacy-and-general-store-kanuru-bhubaneshwar-chemists-1lk6asn3hs.jpg');" onclick="openWebsite('https://www.medplusmart.com')"></button>
+  <button class="pharmacy-button" style="background-image: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRgxJBgukCchNihbjonkw9fEGSKBpndwpkJzA&s');" onclick="openWebsite('https://www.medcart.in')"></button>
         </div>
-
-        <h2 id="pharmacies-heading">Available Pharmacies</h2> <!-- Hidden by default -->
-        <div id="pharmacy-list">
-            <!-- Pharmacy list or suggestions will be displayed here -->
-        </div>
+        <!-- End of container div -->
 
         <button class="back-button" onclick="goBack()">Back</button>
+
+        <!-- Script related to buttons can stay here or move to the end -->
+        <script>
+            function openWebsite(url) {
+            window.open(url, '_blank');
+            }
+        </script>
+
     </main>
 
     <nav class="bottom-nav">
@@ -34,7 +43,7 @@
            <i class="fa-solid fa-medkit"></i>
             <span>Health Monitor</span>
         </a>
-        <a href="telemedicine.html" class="nav-item active">
+        <a href="telemedicine.html" class="nav-item active"> <!-- Should this be active? Or maybe the home page? -->
             <i class="fa-solid fa-video"></i>
             <span>Telemedicine</span>
         </a>
@@ -43,12 +52,12 @@
             <span>Profile</span>
         </a>
     </nav>
-    <script src="header.js"></script>
-    <script src="pharmacy.js"></script>
+    <script src="header.js"></script> <!-- Assuming this exists -->
+    <!--script src="pharmacy.js"></script--> <!-- Assuming this is not needed or contains other logic -->
     <script>
-        
+        // Back button specific script
         function goBack() {
-            window.location.href = 'telemedicine.html';
+            window.location.href = 'telemedicine.html'; // Or history.back();
         }
     </script>
 </body>
