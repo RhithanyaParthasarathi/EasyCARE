@@ -119,16 +119,71 @@ main {
 .nav-item.active{
     color: #007bff;
 }
+
+/* Add to <style> or linked CSS for both pages */
+    #call-controls button.control-button {
+    background-color: #6c757d; /* Grey */
+    color: white;
+    border: none;
+    border-radius: 50%; /* Make them round */
+    width: 40px;
+    height: 40px;
+    font-size: 1.1em;
+    margin: 0 8px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+#call-controls button.control-button:hover {
+    background-color: #5a6268;
+}
+#call-controls button.disconnect {
+    background-color: #dc3545; /* Red for disconnect */
+}
+ #call-controls button.disconnect:hover {
+    background-color: #c82333;
+}
+
+/* Style for video elements inside divs (handled by SDK) */
+ #local-media-div video,
+ #remote-media-div video {
+     width: 100%;
+     height: 100%;
+     object-fit: cover; /* Cover the area nicely */
+ }
+  #remote-media-div audio {
+      display: none; /* Usually don't need to see audio element */
+  }
+  /* Hide placeholder text when video is attached */
+   #remote-media-div video ~ p { display: none; }
+   #remote-media-div > p { display: block; } /* Show placeholder if no video */
     </style>
+    <script src="//media.twiliocdn.com/sdk/js/video/releases/2.29.0/twilio-video.min.js"></script>
 </head>
 <body>
     <header>
         <h1>Virtual Doctor</h1>
     </header>
     <main>
-        <div id="meeting-status">
-            <!-- Content will be dynamically updated by JavaScript -->
+        <div id="meeting-status">Loading appointment status...</div>
+
+    <!-- NEW: Video Call Area (Initially Hidden) -->
+    <div id="video-call-area" class="hidden" style="margin-top: 20px; border: 1px solid #ccc; padding: 10px; background-color: #f0f0f0; position: relative; min-height: 300px;"> <!-- Added min-height -->
+        <p id="connection-status" style="text-align: center; color: #555;">Connecting...</p> <!-- Connection status text -->
+        <div id="remote-media-div" style="width: 100%; height: 300px; background-color: #333; margin-bottom: 10px; display: flex; align-items: center; justify-content: center;">
+             <p style="color: #aaa;">Waiting for other participant...</p> <!-- Waiting text -->
         </div>
+        <div id="local-media-div" style="width: 150px; height: auto; aspect-ratio: 4 / 3; background-color: #555; position: absolute; bottom: 50px; right: 15px; border: 1px solid white; overflow: hidden;">
+            <!-- Local video here -->
+        </div>
+        <div id="call-controls" style="text-align: center; margin-top: 10px; padding-bottom: 5px;">
+            <button id="button-mute-audio" title="Mute/Unmute Audio" class="control-button"><i class="fas fa-microphone"></i></button>
+            <button id="button-mute-video" title="Start/Stop Video" class="control-button"><i class="fas fa-video"></i></button>
+            <button id="button-disconnect" title="Leave Call" class="control-button disconnect"><i class="fas fa-phone-slash"></i></button>
+        </div>
+    </div>
+    <!-- End Video Call Area -->
+
+    <!-- Keep existing Join/Start Button -->
         <button id="join-meeting-btn" class="hidden">Join Meeting</button>
         <button class="back-button" onclick="goBack()">Back</button>
     </main>
@@ -152,108 +207,322 @@ main {
     </nav>
     <!-- virtual-doctor.html -->
 <!-- Keep HTML structure -->
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const meetingStatusDiv = document.getElementById('meeting-status');
-        const joinMeetingBtn = document.getElementById('join-meeting-btn');
-        const API_BASE_URL = 'http://127.0.0.1:8000'; // Your API base
+  <script>
+    // virtual-doctor.html SCRIPT (Patient Side - Twilio Integrated - COMPLETE & CORRECTED)
 
-        function getAuthToken() { return localStorage.getItem('accessToken'); }
+    // --- Constants and State ---
+    const API_BASE_URL = 'http://127.0.0.1:8000';
+    const TwilioVideo = Twilio.Video; // Access Twilio SDK global object
+    let activeRoom = null; // To hold the connected Twilio Room object
+    let upcomingAppointment = null; // To hold fetched appointment details
 
-        function formatAppointmentInfo(appt) {
-             // Check for necessary fields, including the new doctor field
-     if (!appt || !appt.appointment_date || !appt.start_time || !appt.doctor || !appt.doctor.username) {
-         console.error("Incomplete appointment data received:", appt);
-         return "Appointment details are incomplete.";
-     }
-             // Assuming the 'patient' field in the response always refers to the actual patient
-             // We need the *doctor's* name here. Let's assume we fetch it separately or it's passed differently.
-             // For now, let's just show the basics. We need to adjust the backend response model ideally.
-             const doctorName = appt.doctor.username; // Get doctor name from response
-     const formattedTime = new Date(appt.appointment_date + 'T' + appt.start_time).toLocaleString(undefined, {dateStyle: 'medium', timeStyle: 'short'});
-     return `You have a confirmed appointment with Dr. ${doctorName} on ${formattedTime}.`; // Use doctor name
+    // --- DOM Elements ---
+    const meetingStatusDiv = document.getElementById('meeting-status');
+    const videoCallAreaDiv = document.getElementById('video-call-area');
+    const localMediaDiv = document.getElementById('local-media-div');
+    const remoteMediaDiv = document.getElementById('remote-media-div');
+    const connectionStatusP = document.getElementById('connection-status');
+    const joinMeetingBtn = document.getElementById('join-meeting-btn'); // Patient's button
+    const backButton = document.querySelector('.back-button');
+    // Control Buttons
+    const muteAudioBtn = document.getElementById('button-mute-audio');
+    const muteVideoBtn = document.getElementById('button-mute-video');
+    const disconnectBtn = document.getElementById('button-disconnect');
+    // Define the button specific to this page
+    const currentJoinOrStartButton = joinMeetingBtn; // For this patient page
+    const isDoctorPage = false; // This is the patient page
+
+    // --- Helper Functions ---
+    function getAuthToken() { return localStorage.getItem('accessToken'); }
+
+    function formatAppointmentInfo(appt) {
+         if (!appt || !appt.appointment_date || !appt.start_time || !appt.doctor || !appt.doctor.username) {
+             console.error("Incomplete appointment data received:", appt);
+             return "Appointment details are incomplete.";
+         }
+         const doctorName = appt.doctor.username;
+         try {
+             const formattedTime = new Date(appt.appointment_date + 'T' + appt.start_time).toLocaleString(undefined, {dateStyle: 'medium', timeStyle: 'short'});
+             return `You have a confirmed appointment with Dr. ${doctorName} on ${formattedTime}.`;
+         } catch(e) {
+             console.error("Error formatting appointment time:", e);
+             return `You have a confirmed appointment with Dr. ${doctorName} on ${appt.appointment_date}.`; // Fallback
+         }
+    }
+
+    function isWithinJoinWindow(appointmentDateStr, appointmentTimeStr24) {
+        try {
+            const now = new Date();
+            const startTime = new Date(`${appointmentDateStr}T${appointmentTimeStr24}`);
+            if (isNaN(startTime)) throw new Error("Invalid date/time for join check");
+            const windowStart = new Date(startTime.getTime() - 15 * 60 * 1000); // 15 mins before
+            const windowEnd = new Date(startTime.getTime() + 60 * 60 * 1000);   // 60 mins after
+            console.log(`Join Window Check: Now=${now.toISOString()}, Start=${windowStart.toISOString()}, End=${windowEnd.toISOString()}`);
+            return now >= windowStart && now <= windowEnd;
+        } catch (e) { console.error("Error checking join window:", e); return false; }
+    }
+
+    // --- Twilio Media Handling ---
+    function attachTracks(tracks, container) {
+        tracks.forEach(function(track) {
+            if (track && track.attach) {
+                container.appendChild(track.attach());
+                console.log(`Attaching track ${track.kind}`);
+            }
+        });
+    }
+    function attachParticipantTracks(participant, container) {
+         const tracks = Array.from(participant.tracks.values()).map(t => t.track).filter(t => t);
+         if (container) container.innerHTML = ''; // Clear "Waiting..."
+         attachTracks(tracks, container);
+    }
+    function detachTracks(tracks) {
+        tracks.forEach(function(track) {
+            if (track && track.detach) { track.detach().forEach(el => el.remove()); }
+        });
+    }
+    function detachParticipantTracks(participant) {
+        const tracks = Array.from(participant.tracks.values()).map(t => t.track).filter(t => t);
+        detachTracks(tracks);
+    }
+     // --- End Twilio Media Handling ---
+
+    // --- Main Logic ---
+    document.addEventListener('DOMContentLoaded', async function() {
+        console.log("Virtual Doctor JS Loaded");
+
+        // Ensure critical elements exist
+        if (!meetingStatusDiv || !currentJoinOrStartButton || !videoCallAreaDiv || !localMediaDiv || !remoteMediaDiv || !muteAudioBtn || !muteVideoBtn || !disconnectBtn || !connectionStatusP) {
+            console.error("One or more required page elements are missing.");
+            if(meetingStatusDiv) meetingStatusDiv.textContent = "Error: Page setup incomplete.";
+            return;
         }
 
+        const token = getAuthToken();
+        if (!token) {
+            if(meetingStatusDiv) meetingStatusDiv.textContent = "Please log in to view appointments.";
+            if(currentJoinOrStartButton) currentJoinOrStartButton.classList.add('hidden');
+            return;
+        }
+
+        // --- Fetch Upcoming Appointment ---
         async function fetchUpcomingAppointment() {
-            if (!meetingStatusDiv || !joinMeetingBtn) return;
-
+            console.log("--- fetchUpcomingAppointment START ---");
             meetingStatusDiv.textContent = "Checking for upcoming appointments...";
-            joinMeetingBtn.classList.add('hidden'); // Hide button initially
-
-            const token = getAuthToken();
-            if (!token) {
-                meetingStatusDiv.textContent = "Please log in to view appointments.";
-                return;
-            }
+            currentJoinOrStartButton.classList.add('hidden');
+            currentJoinOrStartButton.disabled = true;
 
             const apiUrl = `${API_BASE_URL}/appointments/upcoming-confirmed`;
+            console.log("Fetching upcoming appointment from:", apiUrl);
 
             try {
-                const response = await fetch(apiUrl, {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
+                const response = await fetch(apiUrl, { headers: { 'Authorization': `Bearer ${token}` } });
+                console.log(`Fetch status for ${apiUrl}: ${response.status}`);
 
-                if (response.status === 401 || response.status === 403) {
-                     localStorage.removeItem('accessToken');
-                     throw new Error("Authentication error. Please log in again.");
+                if (!response.ok) {
+                    if (response.status === 401 || response.status === 403) localStorage.removeItem('accessToken');
+                    let errorDetail = `Failed to fetch appointment (${response.status})`;
+                    try { errorDetail = (await response.json()).detail || errorDetail; } catch (e) {}
+                    console.error("Fetch error:", errorDetail);
+                    throw new Error(errorDetail);
                 }
-                 // 200 OK but no content means no upcoming appointment
-                if (response.status === 200) {
-                     const appointment = await response.json(); // Will be null if backend returns None
 
-                     if (appointment) {
-                          console.log("Upcoming appointment data:", appointment);
-                          meetingStatusDiv.textContent = formatAppointmentInfo(appointment);
-                          joinMeetingBtn.classList.remove('hidden');
-                          joinMeetingBtn.dataset.appointmentId = appointment.id; // Store ID for joining
-                     } else {
-                          meetingStatusDiv.textContent = "No upcoming confirmed virtual sessions.";
-                          joinMeetingBtn.classList.add('hidden');
-                     }
+                if (response.status === 204) {
+                     upcomingAppointment = null; console.log("Received 204 No Content.");
                 } else {
-                    // Handle other potential errors (e.g., 500)
-                     const errorData = await response.json().catch(() => ({}));
-                     throw new Error(errorData.detail || `Failed to fetch appointments (${response.status})`);
+                     upcomingAppointment = await response.json();
+                     console.log("Parsed upcoming appointment data:", upcomingAppointment);
+                }
+
+                // --- Logic after fetch ---
+                if (upcomingAppointment && upcomingAppointment.appointment_date && upcomingAppointment.start_time) {
+                    console.log("Valid appointment data found.");
+                    const canJoin = isWithinJoinWindow(upcomingAppointment.appointment_date, upcomingAppointment.start_time);
+                    const now = new Date();
+                    const startTime = new Date(`${upcomingAppointment.appointment_date}T${upcomingAppointment.start_time}`);
+                    const windowEnd = new Date(startTime.getTime() + 60 * 60 * 1000); // 60 mins after start
+
+                    console.log(`Join check: canJoin=${canJoin}, now=${now.toISOString()}, windowEnd=${windowEnd.toISOString()}`);
+
+                    if (now > windowEnd) {
+                        console.log("Appointment time window has passed.");
+                        meetingStatusDiv.textContent = "No upcoming confirmed virtual sessions."; // Show standard message
+                        currentJoinOrStartButton.classList.add('hidden');
+                        upcomingAppointment = null; // Clear state
+                    } else {
+                        meetingStatusDiv.textContent = formatAppointmentInfo(upcomingAppointment); // Use patient formatter
+
+                        currentJoinOrStartButton.classList.remove('hidden');
+                        currentJoinOrStartButton.disabled = !canJoin;
+                        currentJoinOrStartButton.dataset.appointmentId = upcomingAppointment.id;
+
+                        if (!canJoin && now < startTime) { currentJoinOrStartButton.textContent = 'Too Early to Join'; }
+                        else if (!canJoin && now > startTime) { currentJoinOrStartButton.textContent = 'Join Window Closed'; }
+                        else if (canJoin) { currentJoinOrStartButton.textContent = 'Join Meeting'; }
+                        console.log("Button state updated based on time window.");
+                    }
+                } else {
+                    console.log("No valid upcoming appointment data to display.");
+                    meetingStatusDiv.textContent = "No upcoming confirmed virtual sessions.";
+                    currentJoinOrStartButton.classList.add('hidden');
                 }
 
             } catch(error) {
-                console.error("Error fetching upcoming appointment:", error);
-                meetingStatusDiv.textContent = `Error loading appointment status: ${error.message}`;
-                joinMeetingBtn.classList.add('hidden');
+                console.error("Error in fetchUpcomingAppointment process:", error);
+                meetingStatusDiv.textContent = `Error loading status: ${error.message}`;
+                currentJoinOrStartButton.classList.add('hidden');
+                upcomingAppointment = null;
             }
+            console.log("--- fetchUpcomingAppointment END ---");
+        } // --- End fetchUpcomingAppointment ---
+
+
+        // --- Join Button Click Handler ---
+        currentJoinOrStartButton.addEventListener('click', async function() {
+            const appointmentId = this.dataset.appointmentId;
+            if (!appointmentId || this.disabled) return;
+
+            console.log(`Join button clicked for appointment ID: ${appointmentId}`);
+            this.disabled = true; this.textContent = 'Connecting...';
+            meetingStatusDiv.textContent = 'Preparing video call...';
+            if(connectionStatusP) connectionStatusP.textContent = 'Fetching access token...';
+            videoCallAreaDiv.classList.remove('hidden');
+
+            try {
+                 // 1. Fetch Twilio Token
+                 const tokenApiUrl = `${API_BASE_URL}/video/token/appointment/${appointmentId}`;
+                 const tokenResponse = await fetch(tokenApiUrl, {
+                     method: 'POST',
+                     headers: { 'Authorization': `Bearer ${token}` }
+                 });
+
+                 if (!tokenResponse.ok) {
+                      const errorData = await tokenResponse.json().catch(() => ({ detail: `Request failed (${tokenResponse.status})` }));
+                      throw new Error(errorData.detail || `Failed to get join token (${tokenResponse.status})`);
+                 }
+                 const { token: videoToken, room_name: roomName } = await tokenResponse.json();
+                 if (!videoToken || !roomName) { throw new Error("Invalid token data from server."); }
+                 console.log(`Received video token for room: ${roomName}`);
+                 if(connectionStatusP) connectionStatusP.textContent = `Connecting to room: ${roomName}...`;
+
+                 // 2. Connect to Twilio Room
+                 activeRoom = await TwilioVideo.connect(videoToken, { name: roomName, audio: true, video: { width: 640 } })
+                     .catch(error => { throw new Error(`Failed to connect: ${error.message}`); });
+
+                 console.log(`Joined room "${activeRoom.name}" as "${activeRoom.localParticipant.identity}"`);
+                 if(connectionStatusP) connectionStatusP.textContent = 'Connected.';
+                 meetingStatusDiv.textContent = `Connected. Waiting for doctor...`;
+
+                 // 3. Handle Local Media
+                 localMediaDiv.innerHTML = '';
+                 attachTracks(Array.from(activeRoom.localParticipant.tracks.values()).map(t => t.track).filter(t => t), localMediaDiv);
+
+                 // 4. Handle Existing Remote Participants
+                 remoteMediaDiv.innerHTML = '';
+                 activeRoom.participants.forEach(participant => {
+                     console.log(`Doctor "${participant.identity}" already in room.`);
+                     meetingStatusDiv.textContent = `Connected with Doctor ${participant.identity}.`;
+                     if(connectionStatusP) connectionStatusP.style.display = 'none';
+                     participant.on('trackSubscribed', track => { if(remoteMediaDiv) attachTracks([track], remoteMediaDiv); });
+                     participant.on('trackUnsubscribed', track => detachTracks([track]));
+                     attachParticipantTracks(participant, remoteMediaDiv);
+                 });
+
+                 // 5. Handle Doctor Joining Later
+                 activeRoom.on('participantConnected', participant => {
+                      console.log(`Doctor "${participant.identity}" connected.`);
+                      meetingStatusDiv.textContent = `Doctor ${participant.identity} joined.`;
+                      if(connectionStatusP) connectionStatusP.style.display = 'none';
+                      if(remoteMediaDiv) remoteMediaDiv.innerHTML = '';
+                      participant.on('trackSubscribed', track => { if(remoteMediaDiv) attachTracks([track], remoteMediaDiv); });
+                      participant.on('trackUnsubscribed', track => detachTracks([track]));
+                      attachParticipantTracks(participant, remoteMediaDiv);
+                 });
+
+                 // 6. Handle Doctor Leaving
+                 activeRoom.on('participantDisconnected', participant => {
+                      console.log(`Doctor "${participant.identity}" disconnected.`);
+                      meetingStatusDiv.textContent = `Doctor has left the session.`;
+                      if(connectionStatusP) { connectionStatusP.textContent = ''; connectionStatusP.style.display = 'block'; }
+                      detachParticipantTracks(participant);
+                      if(remoteMediaDiv) remoteMediaDiv.innerHTML = '<p style="color: #aaa;text-align: center; padding: 50px 0;">Doctor left.</p>';
+                 });
+
+                 // 7. Handle Local Disconnection
+                 activeRoom.on('disconnected', (room, error) => {
+                      if (error) { console.error("Disconnected with error:", error); meetingStatusDiv.textContent = `Disconnected: ${error.message}`; }
+                      else { console.log("Disconnected cleanly."); meetingStatusDiv.textContent = "You left the session."; }
+                      cleanupAfterCall();
+                 });
+
+                 // Hide Join button after connection
+                 currentJoinOrStartButton.classList.add('hidden'); // Use combined variable
+
+            } catch (error) {
+                console.error("Failed to initiate video call:", error);
+                alert(`Error connecting: ${error.message}`);
+                if(meetingStatusDiv) meetingStatusDiv.textContent = `Failed to connect: ${error.message}`;
+                if(videoCallAreaDiv) videoCallAreaDiv.classList.add('hidden');
+                if (activeRoom) { activeRoom.disconnect(); activeRoom = null; }
+                if (!activeRoom && currentJoinOrStartButton) { // Use combined variable
+                     currentJoinOrStartButton.disabled = false;
+                     currentJoinOrStartButton.textContent = 'Join Meeting';
+                }
+            }
+        }); // --- End Join Button Listener ---
+
+
+        // --- Call Control Button Listeners ---
+        muteAudioBtn.addEventListener('click', () => {
+             if (!activeRoom) return;
+             const pub = Array.from(activeRoom.localParticipant.audioTracks.values())[0];
+             if (pub && pub.track) {
+                  if (pub.track.isEnabled) { pub.track.disable(); muteAudioBtn.innerHTML = '<i class="fas fa-microphone-slash"></i>'; }
+                  else { pub.track.enable(); muteAudioBtn.innerHTML = '<i class="fas fa-microphone"></i>'; }
+                  console.log("Audio enabled:", pub.track.isEnabled);
+             }
+        });
+        muteVideoBtn.addEventListener('click', () => {
+            if (!activeRoom) return;
+             const pub = Array.from(activeRoom.localParticipant.videoTracks.values())[0];
+             if (pub && pub.track) {
+                  if (pub.track.isEnabled) { pub.track.disable(); muteVideoBtn.innerHTML = '<i class="fas fa-video-slash"></i>'; }
+                  else { pub.track.enable(); muteVideoBtn.innerHTML = '<i class="fas fa-video"></i>'; }
+                  console.log("Video enabled:", pub.track.isEnabled);
+             }
+        });
+        disconnectBtn.addEventListener('click', () => {
+            if (activeRoom) { activeRoom.disconnect(); }
+             else { cleanupAfterCall(); }
+        });
+        // --- End Call Control ---
+
+
+        // --- Cleanup function ---
+        function cleanupAfterCall() {
+            console.log("Cleaning up after call...");
+            if (activeRoom) {
+                 activeRoom.participants.forEach(detachParticipantTracks);
+                 detachTracks(Array.from(activeRoom.localParticipant.tracks.values()).map(t => t.track).filter(t => t !== null));
+            }
+            if(localMediaDiv) localMediaDiv.innerHTML = '';
+            if(remoteMediaDiv) remoteMediaDiv.innerHTML = '<p style="color: #aaa; text-align: center; padding: 50px 0;">Call ended.</p>';
+            if(videoCallAreaDiv) videoCallAreaDiv.classList.add('hidden');
+            fetchUpcomingAppointment(); // Re-check for next appointment
+            activeRoom = null;
         }
 
-        // Event listener for the Join button
-        joinMeetingBtn.addEventListener('click', function() {
-            const appointmentId = this.dataset.appointmentId;
-            console.log(`Join button clicked for appointment ID: ${appointmentId}`);
-            // --- TODO: Video Call Integration ---
-            // 1. Fetch video access token from your backend:
-            //    fetch(`${API_BASE_URL}/appointments/${appointmentId}/join-token`, { headers: {'Authorization': `Bearer ${getAuthToken()}`}})
-            //    .then(res => res.json())
-            //    .then(data => {
-            //        const videoToken = data.token;
-            //        // 2. Use CPaaS SDK to connect using videoToken
-            //        //    e.g., connectToVideoCall(videoToken);
-            //        alert(`(Simulated) Connecting to video call for appointment ${appointmentId} using token...`);
-            //    })
-            //    .catch(err => {
-            //        console.error("Failed to get video token or connect:", err);
-            //        alert("Failed to join video call.");
-            //    });
-            alert(`(Simulated) Joining meeting for appointment ID: ${appointmentId}...`); // Placeholder
-             // --- End Video Call Integration ---
-        });
+        // --- Back Button ---
+        function goBack() {
+            if (activeRoom) { activeRoom.disconnect(); }
+            window.location.href = 'telemedicine.html'; // Patient back destination
+        }
+        if(backButton) backButton.addEventListener('click', goBack);
 
-
-        // Initial fetch
+        // --- Initial Fetch ---
         fetchUpcomingAppointment();
 
     }); // End DOMContentLoaded
-
-    function goBack() {
-        window.location.href = 'telemedicine.html'; // Adjust as needed
-    }
     </script>
 </body>
 </html>

@@ -603,6 +603,7 @@ async def get_my_next_confirmed_appointment(
     Fetches the next upcoming confirmed appointment for the logged-in user
     (either as patient or doctor).
     """
+    
     now_date = datetime.utcnow().date() # Use a distinct variable name
 
     # --- MODIFIED QUERY with JOIN ---
