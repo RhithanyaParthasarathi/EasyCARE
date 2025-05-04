@@ -12,6 +12,34 @@ class UserRole(str, enum.Enum):
     patient = "patient"
     doctor = "doctor"
 
+class Prescription(Base):
+    __tablename__ = "prescriptions"
+
+    id = Column(Integer, primary_key=True, index=True)
+    patient_id = Column(Integer, ForeignKey("users.id", ondelete="SET NULL"), nullable=True, index=True)
+    doctor_id = Column(Integer, ForeignKey("users.id", ondelete="SET NULL"), nullable=True, index=True)
+    prescription_date = Column(Date, nullable=False, index=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+
+    medications = relationship("PrescriptionMedication", back_populates="prescription", cascade="all, delete-orphan")
+    # Add back_populates in User if needed
+    patient = relationship("User", foreign_keys=[patient_id], back_populates="patient_prescriptions")
+    doctor = relationship("User", foreign_keys=[doctor_id], back_populates="doctor_prescriptions")
+
+
+class PrescriptionMedication(Base):
+    __tablename__ = "prescription_medications"
+
+    id = Column(Integer, primary_key=True, index=True)
+    prescription_id = Column(Integer, ForeignKey("prescriptions.id", ondelete="CASCADE"), nullable=False, index=True)
+    medication_name = Column(String, nullable=False)
+    dosage = Column(String, nullable=True)
+    frequency = Column(String, nullable=True)
+    duration = Column(String, nullable=True)
+    instructions = Column(Text, nullable=True)
+
+    prescription = relationship("Prescription", back_populates="medications")
+
 class User(Base):
     __tablename__ = "users"
 
@@ -36,6 +64,8 @@ class User(Base):
     doctor_appointments = relationship("Appointment", foreign_keys="[Appointment.doctor_id]", back_populates="doctor", cascade="all, delete-orphan")
     # Notifications FOR this user
     notifications = relationship("Notification", back_populates="user", cascade="all, delete-orphan")
+    doctor_prescriptions = relationship("Prescription", foreign_keys=[Prescription.doctor_id], back_populates="doctor") # Add back_populates here if needed
+    patient_prescriptions = relationship("Prescription", foreign_keys=[Prescription.patient_id], back_populates="patient") # Add back_populates here if needed
 
 class TimeSlot(Base):
     __tablename__ = "time_slots"
@@ -134,3 +164,4 @@ class DoctorProfile(Base):
     # Relationship back to User
     user = relationship("User", back_populates="doctor_profile")
 # --- *** END Doctor Profile Table *** ---
+

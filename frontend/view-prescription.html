@@ -3,167 +3,289 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ChroniCARE - View Prescription</title>
-    <!--link rel="stylesheet" href="view-prescription.css"-->
+    <title>ChroniCARE - My Prescriptions</title>
+    <!-- Link CSS -->
+    <link rel="stylesheet" href="styles.css"> <!-- Your global styles -->
+    <link rel="stylesheet" href="header.css"> <!-- Header specific styles -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-
     <style>
-        /* view-prescription.css */
-    body {
-        font-family: sans-serif;
-        margin: 0;
-        padding: 0;
-        background-color: #f9f5f0; /* Soft beige background */
-        color: #333;
-        line-height: 1.6;
-        padding-bottom: 60px;
-    }
-    
-    /* Header Styles */
-    header {
-        background-color: #fff;
-        padding: 20px;
-        text-align: center;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
-    
-    header h1 {
-        margin-bottom: 15px;
-        color: #1a237e; /* Dark blue heading */
-        font-size: 2.5em; /* Larger heading */
-    }
-    
-    /* Main Content */
-    main {
-        padding: 20px;
-    }
-    
-    #prescription-details {
-        font-size: 1.2em;
-        margin-bottom: 20px;
-        padding: 15px;
-        border: 1px solid #ddd;
-        border-radius: 5px;
-        background-color: #f9f9f9;
-        text-align: left; /* Align prescription details to the left */
-    }
-    
-    /* Back Button */
-    .back-button {
-        background-color: #007bff;
-        color: white;
-        border: none;
-        padding: 10px 20px;
-        border-radius: 5px;
-        cursor: pointer;
-        font-size: 1em;
-    }
-    
-    .back-button:hover {
-        background-color: #0056b3;
-    }
-    
-    /* Bottom Navigation Bar */
-    .bottom-nav {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        width: 100%;
-        background-color: #fff;
-        display: flex;
-        justify-content: space-around;
-        padding: 0.75rem 0;
-        box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
-        z-index: 100; /* Ensure it stays on top */
-    }
-    
-    .nav-item {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        color: #555;
-        text-decoration: none;
-        transition: color 0.3s ease;
-    }
-    
-    .nav-item i {
-        font-size: 1.5rem;
-        margin-bottom: 0.25rem;
-    }
-    
-    .nav-item span {
-        font-size: 0.75rem;
-    }
-    
-    .nav-item:hover, .nav-item.active {
-        color: #007bff;
-    }
-    
-    .nav-item.active{
-        color: #007bff;
-    }
-    </style>
+        /* Base Styles (reuse from previous examples or your main css) */
+        body { font-family: sans-serif; background-color: #f9f5f0; margin: 0; padding-bottom: 80px; color: #333; line-height: 1.6; }
+        main { max-width: 900px; margin: 20px auto; padding: 0 15px; }
+        h2 { text-align: center; color: #1a237e; margin-bottom: 25px; font-size: 2em;}
 
+        /* Prescription List Specific Styles */
+        
+        .prescription-card {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin-bottom: 25px; /* Increased spacing */
+            padding: 20px 25px; /* Increased padding */
+            box-shadow: 0 2px 5px rgba(0,0,0,0.08); /* Slightly stronger shadow */
+        }
+        .prescription-header {
+            border-bottom: 1px solid #eee;
+            padding-bottom: 12px;
+            margin-bottom: 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+         .prescription-header h3 { margin: 0; font-size: 1.2em; color: #1a237e;}
+         .prescription-header span { font-size: 0.95em; color: #555; margin-left: 10px; white-space: nowrap;}
+
+         .medications-table {
+             width: 100%;
+             border-collapse: collapse;
+             margin-top: 15px;
+         }
+         .medications-table caption {
+              font-weight: bold;
+              text-align: left;
+              caption-side: top;
+              padding-bottom: 8px;
+              font-size: 1.05em;
+              color: #333;
+         }
+         .medications-table th,
+         .medications-table td {
+             border: 1px solid #eee;
+             padding: 10px 12px; /* Consistent padding */
+             text-align: left;
+             font-size: 0.9em;
+             vertical-align: top; /* Align text top */
+         }
+         .medications-table th {
+             background-color: #f8f9fa;
+             font-weight: 600; /* Slightly less bold */
+             white-space: nowrap;
+         }
+         .medications-table tr:nth-child(even) {
+             background-color: #fdfdfd; /* Subtle striping */
+         }
+         .medications-table td:first-child { font-weight: 500; } /* Make med name slightly bolder */
+
+         /* Status Messages */
+         .loading-msg, .no-prescriptions, .error-msg {
+             text-align: center;
+             padding: 30px;
+             margin-top: 20px;
+             color: #777;
+             font-style: italic;
+             background-color: #fff;
+             border-radius: 8px;
+             border: 1px dashed #ddd;
+         }
+         .error-msg { color: red; border-style: solid; border-color: red; }
+
+        /* Back Button */
+         .back-button-container { text-align: center; margin-top: 30px; }
+         .back-button {
+            background-color: #007bff; color: white; border: none; padding: 10px 20px;
+            border-radius: 5px; cursor: pointer; text-decoration: none; display: inline-block;
+            font-size: 1em; transition: background-color 0.3s ease;
+         }
+         .back-button:hover { background-color: #0056b3; }
+
+          /* Bottom Nav Styles (Keep if using separate CSS) */
+          .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background-color: #fff; display: flex; justify-content: space-around; padding: 0.75rem 0; box-shadow: 0 -2px 5px rgba(0,0,0,0.1); z-index: 100; }
+          .nav-item { display: flex; flex-direction: column; align-items: center; color: #555; text-decoration: none; transition: color 0.3s ease; }
+          .nav-item i { font-size: 1.5rem; margin-bottom: 0.25rem; }
+          .nav-item span { font-size: 0.75rem; }
+          .nav-item:hover, .nav-item.active { color: #007bff; }
+          .nav-item.active{ color: #007bff; }
+
+
+    </style>
 </head>
 <body>
+    <!-- Include Standard Header -->
     <header>
-        <h1>View Prescription</h1>
+         <div class="logo">
+            <h1 style="margin-left: 20px;"> ChroniCARE</h1>
+            <div class="header-menu">
+                 <a href="notifications.html" id="notification-link" class="notification-button" aria-label="View Notifications">
+                     <i class="fas fa-bell"></i>
+                     <span id="notification-indicator" class="notification-indicator-dot" style="display: none;"></span>
+                 </a>
+                 <button class="menu-button" aria-label="Open Menu"><i class="fas fa-ellipsis-v"></i></button>
+                 <div class="menu-dropdown">
+                     <a href="index.html">Home</a>
+                     <a href="profile.html">My Profile</a>
+                     <a href="telemedicine.html">Telemedicine</a>
+                     <a href="view-prescription.html">My Prescriptions</a> <!-- Link to self? Or remove? -->
+                     <a href="#" id="logout-button">Logout</a>
+                 </div>
+             </div>
+         </div>
     </header>
+
     <main>
-        <div id="prescription-details">
-            <!-- Content will be dynamically updated by JavaScript -->
+        <h2>My Prescriptions</h2>
+        <!-- Container where JS will add prescriptions -->
+        <div id="prescription-list-container">
+            <p class="loading-msg" id="loading-prescriptions">Loading prescriptions...</p>
+            <!-- Example Structure (JS will generate this):
+            <div class="prescription-card">
+                <div class="prescription-header">
+                    <h3>Prescribed on: April 23, 2025</h3>
+                    <span>By: Dr. Sita devi</span>
+                </div>
+                <table class="medications-table">
+                    <caption>Medications</caption>
+                    <thead> ... </thead>
+                    <tbody>
+                        <tr><td>Med A</td><td>10mg</td><td>Daily</td><td>30 days</td><td>Take with food</td></tr>
+                    </tbody>
+                </table>
+                <small>ID: 1</small>
+            </div>
+            -->
         </div>
-        <button class="back-button" onclick="goBack()">Back</button>
+        <div class="back-button-container">
+             <a href="index.html" class="back-button">Back</a>
+        </div>
     </main>
-    <nav class="bottom-nav">
-        <a href="index.html" class="nav-item">
-            <i class="fa-solid fa-house"></i>
-            <span>Home</span>
-        </a>
-        <a href="health-monitor.html" class="nav-item">
-           <i class="fa-solid fa-medkit"></i>
-            <span>Health Monitor</span>
-        </a>
-        <a href="telemedicine.html" class="nav-item active">
-            <i class="fa-solid fa-video"></i>
-            <span>Telemedicine</span>
-        </a>
-        <a href="profile.html" class="nav-item">
-            <i class="fa-solid fa-user"></i>
-            <span>Profile</span>
-        </a>
-    </nav>
+
+    <!-- Bottom Navigation -->
+     <nav class="bottom-nav">
+         <a href="index.html" class="nav-item"> <i class="fa-solid fa-house"></i> <span>Home</span> </a>
+         <a href="health-monitor.html" class="nav-item"> <i class="fa-solid fa-medkit"></i> <span>Health Monitor</span></a>
+         <a href="telemedicine.html" class="nav-item active"> <i class="fa-solid fa-video"></i> <span>Telemedicine</span></a>
+         <a href="profile.html" class="nav-item"> <i class="fa-solid fa-user"></i> <span>Profile</span></a>
+     </nav>
+
+    <!-- Include header.js for global functionality like logout and notification indicator -->
+    <script src="header.js"></script>
+
+    <!-- Script for this page -->
     <script>
+        // Script for view-prescription.html (Patient View)
         document.addEventListener('DOMContentLoaded', function() {
-    const prescriptionDetailsDiv = document.getElementById('prescription-details');
+            const listContainer = document.getElementById('prescription-list-container');
+            const loadingMsg = document.getElementById('loading-prescriptions'); // Get reference to loading paragraph
+            const API_BASE_URL = 'http://127.0.0.1:8000'; // Your API Base URL
 
-    // Simulate fetching prescription data
-    // In a real app, you'd fetch this data from your backend
-    const hasRecentPrescription = true;
-    const prescription = {
-        medication: "Amoxicillin 250mg",
-        dosage: "Three times a day",
-        doctor: "Dr. Sita Devi",
-        date: "2023-12-20"
-    };
+            // --- Helper: Get Auth Token ---
+            function getAuthToken() {
+                const token = localStorage.getItem('accessToken');
+                console.log("View Prescriptions: Token Check - ", token ? "Found" : "Not Found");
+                return token;
+            }
 
-    if (hasRecentPrescription) {
-        prescriptionDetailsDiv.innerHTML = `
-            <h2>Recent Prescription</h2>
-            <p><strong>Medication:</strong> ${prescription.medication}</p>
-            <p><strong>Dosage:</strong> ${prescription.dosage}</p>
-            <p><strong>Prescribed by:</strong> ${prescription.doctor}</p>
-            <p><strong>Date:</strong> ${new Date(prescription.date).toLocaleDateString()}</p>
-        `;
-    } else {
-        prescriptionDetailsDiv.textContent = "No recent prescriptions found.";
-    }
-});
-    
-        function goBack() {
-            window.location.href = 'telemedicine.html';
-        }
+            // --- Helper: Format Date ---
+            function formatDate(dateStr) {
+                if (!dateStr) return 'N/A';
+                try {
+                    // Add T00:00:00 assuming dateStr is YYYY-MM-DD to avoid timezone issues during parsing
+                    return new Date(dateStr + 'T00:00:00').toLocaleDateString(undefined, {
+                        year: 'numeric', month: 'long', day: 'numeric' // Example: April 24, 2025
+                    });
+                } catch(e) {
+                    console.error("Error formatting date:", dateStr, e);
+                    return dateStr; // Fallback
+                }
+            }
+
+            // --- Function to Fetch and Display ---
+            async function fetchMyPrescriptions() {
+                if (!listContainer || !loadingMsg) {
+                    console.error("DOM elements missing: Cannot find list container or loading message.");
+                    if(document.body) document.body.insertAdjacentHTML('afterbegin', '<p style="color:red; text-align:center;">Page Error: UI elements missing.</p>');
+                    return;
+                }
+                loadingMsg.style.display = 'block'; // Ensure loading message is visible
+                loadingMsg.textContent = 'Loading prescriptions...';
+                loadingMsg.className = 'loading-msg'; // Use CSS class
+                listContainer.innerHTML = ''; // Clear previous results
+                listContainer.appendChild(loadingMsg); // Put loading message back
+
+                const token = getAuthToken();
+                if (!token) {
+                    loadingMsg.textContent = "Please log in to view your prescriptions.";
+                    loadingMsg.className = 'error-msg'; // Style as error/warning
+                    return;
+                }
+
+                const apiUrl = `${API_BASE_URL}/prescriptions/my`;
+                console.log("Fetching my prescriptions from:", apiUrl);
+
+                try {
+                    const response = await fetch(apiUrl, {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    console.log("Fetch prescriptions status:", response.status);
+
+                    if (!response.ok) {
+                        if (response.status === 401 || response.status === 403) localStorage.removeItem('accessToken');
+                        const errorData = await response.json().catch(() => ({}));
+                        throw new Error(errorData.detail || `Failed to load prescriptions (${response.status})`);
+                    }
+
+                    const prescriptions = await response.json(); // Expect List[PrescriptionDetailResponse]
+                    console.log("Received prescriptions:", prescriptions);
+                    listContainer.innerHTML = ''; // Clear loading message finally
+
+                    if (!Array.isArray(prescriptions) || prescriptions.length === 0) {
+                        listContainer.innerHTML = '<p class="no-prescriptions">You have no prescriptions on record.</p>';
+                    } else {
+                        prescriptions.forEach(rx => {
+                            const card = document.createElement('div');
+                            card.className = 'prescription-card';
+
+                            // Build Medications Table HTML
+                            let medsTableHTML = `
+                                <table class="medications-table">
+                                    <caption>Medications</caption>
+                                    <thead>
+                                        <tr><th>Medication</th><th>Dosage</th><th>Frequency</th><th>Duration</th><th>Instructions</th></tr>
+                                    </thead>
+                                    <tbody>`;
+                            if (rx.medications && rx.medications.length > 0) {
+                                rx.medications.forEach(med => {
+                                    // Use || '-' for fallback on optional fields
+                                    medsTableHTML += `
+                                        <tr>
+                                            <td>${med.medication_name || ''}</td>
+                                            <td>${med.dosage || '-'}</td>
+                                            <td>${med.frequency || '-'}</td>
+                                            <td>${med.duration || '-'}</td>
+                                            <td>${med.instructions || '-'}</td>
+                                        </tr>`;
+                                });
+                            } else {
+                                medsTableHTML += '<tr><td colspan="5" style="text-align:center; font-style:italic;">No specific medication details listed.</td></tr>';
+                            }
+                            medsTableHTML += '</tbody></table>';
+
+                            // Construct the card content
+                            card.innerHTML = `
+                                <div class="prescription-header">
+                                    <h3>Prescribed on: ${formatDate(rx.prescription_date)}</h3>
+                                    <span>By: Dr. ${rx.doctor_name || 'N/A'}</span> <!-- Display fetched doctor name -->
+                                </div>
+                                ${medsTableHTML}
+                                
+                            `;
+                            
+                            listContainer.appendChild(card);
+                        });
+                    }
+
+                } catch (error) {
+                    console.error("Error fetching prescriptions:", error);
+                    // Display error within the container
+                    listContainer.innerHTML = `<p class="error-msg">Error loading prescriptions: ${error.message}</p>`;
+                }
+            } // End fetchMyPrescriptions
+
+            // --- Initial Fetch ---
+            fetchMyPrescriptions();
+
+        }); // End DOMContentLoaded
     </script>
+
 </body>
 </html>
-

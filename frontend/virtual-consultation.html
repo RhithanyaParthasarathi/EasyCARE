@@ -251,10 +251,17 @@
             console.log("Fetching upcoming appointment from:", apiUrl);
 
             try {
+                console.log(">>> BEFORE fetch call"); // DEBUG
                 const response = await fetch(apiUrl, { headers: { 'Authorization': `Bearer ${token}` } });
                 console.log(`Fetch status for ${apiUrl}: ${response.status}`);
 
-                if (!response.ok) { /* ... handle fetch errors ... */ }
+                if (!response.ok) { 
+                    if (response.status === 401 || response.status === 403) localStorage.removeItem('accessToken');
+                    let errorDetail = `Failed to fetch appointment (${response.status})`;
+                    try { errorDetail = (await response.json()).detail || errorDetail; } catch (e) {}
+                    console.error("Fetch error:", errorDetail);
+                    throw new Error(errorDetail);
+                 }
 
                 if (response.status === 204) { upcomingAppointment = null; }
                 else { upcomingAppointment = await response.json(); }

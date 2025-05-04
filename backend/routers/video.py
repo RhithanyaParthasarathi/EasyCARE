@@ -128,7 +128,8 @@ async def get_video_join_token_for_appointment( # Renamed slightly for clarity
 
     # 4. Define Room Name & User Identity
     room_name = f"chronicare_appt_{appointment.id}"
-    identity = str(current_user.id)
+    #identity = str(current_user.id)
+    identity = current_user.username # New way (or use full_name)
     print(f"Generating token - Identity: '{identity}', Room: '{room_name}'")
 
     # 5. Create Twilio Access Token

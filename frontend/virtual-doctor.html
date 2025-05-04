@@ -328,13 +328,17 @@ main {
                 }
 
                 if (response.status === 204) {
-                     upcomingAppointment = null; console.log("Received 204 No Content.");
+                    console.log("Received 204 No Content.");
+                     upcomingAppointment = null; 
                 } else {
+                    console.log(">>> BEFORE response.json()"); // DEBUG
                      upcomingAppointment = await response.json();
+                     console.log("<<< AFTER response.json(), Data:", upcomingAppointment); // DEBUG Raw data
                      console.log("Parsed upcoming appointment data:", upcomingAppointment);
                 }
 
                 // --- Logic after fetch ---
+                console.log(">>> BEFORE processing appointment data"); // DEBUG
                 if (upcomingAppointment && upcomingAppointment.appointment_date && upcomingAppointment.start_time) {
                     console.log("Valid appointment data found.");
                     const canJoin = isWithinJoinWindow(upcomingAppointment.appointment_date, upcomingAppointment.start_time);
@@ -349,6 +353,7 @@ main {
                         meetingStatusDiv.textContent = "No upcoming confirmed virtual sessions."; // Show standard message
                         currentJoinOrStartButton.classList.add('hidden');
                         upcomingAppointment = null; // Clear state
+                        console.log("Valid appointment processed."); // DEBUG
                     } else {
                         meetingStatusDiv.textContent = formatAppointmentInfo(upcomingAppointment); // Use patient formatter
 
@@ -365,7 +370,9 @@ main {
                     console.log("No valid upcoming appointment data to display.");
                     meetingStatusDiv.textContent = "No upcoming confirmed virtual sessions.";
                     currentJoinOrStartButton.classList.add('hidden');
+                    console.log("No valid appointment data processed."); // DEBUG
                 }
+                console.log("<<< AFTER processing appointment data"); // DEBUG
 
             } catch(error) {
                 console.error("Error in fetchUpcomingAppointment process:", error);

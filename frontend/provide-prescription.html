@@ -217,6 +217,43 @@
             background-color: #5a6268;
         }
 
+         /* --- NEW Styles for Patient Selection --- */
+         #patient-selection-section {
+            padding: 20px;
+            margin-bottom: 25px;
+            border-bottom: 1px solid #eee;
+        }
+        #patient-selection-section label {
+             font-weight: bold;
+             margin-right: 10px;
+        }
+        #patient-select {
+             padding: 10px;
+             min-width: 250px; /* Adjust width */
+             border: 1px solid #ccc;
+             border-radius: 5px;
+             font-size: 1em;
+        }
+        #patient-selected-info {
+             margin-top: 15px;
+             font-size: 1.1em;
+             font-weight: bold;
+        }
+
+        /* --- Style to hide form initially --- */
+        #prescription-details-section {
+            display: none; /* Start hidden */
+        }
+         #prescription-details-section.visible {
+            display: block; /* Show when patient selected */
+         }
+
+         /* Make read-only inputs look disabled */
+         input[readonly] {
+             background-color: #e9ecef;
+             cursor: not-allowed;
+         }
+
     </style>
 </head>
 <body>
@@ -226,22 +263,36 @@
 
     <main>
         <div id="prescription-form-container">
-            <h2>Create New Prescription</h2>
-            <form id="prescription-form">
 
-                <!-- Top Details Section - Modified -->
+            <!-- *** NEW Patient Selection Section *** -->
+            <section id="patient-selection-section">
+                <h2>Select Patient</h2>
+                <div class="form-group">
+                    <label for="patient-select">Patient:</label>
+                    <select id="patient-select" name="patientId">
+                        <option value="">-- Select a Patient --</option>
+                        <!-- Options populated by JavaScript -->
+                    </select>
+                    <p id="patient-select-loading" style="display: none; color: #555;">Loading patients...</p>
+                     <p id="patient-select-error" style="display: none; color: red;"></p>
+                </div>
+            </section>
+            <!-- *** END Patient Selection Section *** -->
+
+            <!-- *** Main Prescription Form - Initially Hidden *** -->
+            <form id="prescription-form" style="display: none;"> <!-- Start hidden -->
+                 <h2>Create New Prescription for: <span id="selected-patient-name" style="color: #0056b3;"></span></h2>
+
+                <!-- Top Details Section - Patient Name is now read-only -->
                 <div class="form-grid">
                     <div class="form-group">
                         <label for="patient-name">Patient Name</label>
-                        <input type="text" id="patient-name" name="patientName" required placeholder="Enter patient's full name">
+                        <input type="text" id="patient-name" name="patientName" required readonly placeholder="Select patient above">
                     </div>
-                    <!-- Added Age Field -->
                     <div class="form-group">
                         <label for="patient-age">Patient Age</label>
-                        <input type="number" id="patient-age" name="patientAge" placeholder="Enter age in years" min="0">
+                        <input type="number" id="patient-age" name="patientAge" placeholder="Enter age" min="0">
                     </div>
-                    <!-- Removed Patient ID -->
-                    <!-- Removed Consultation ID -->
                     <div class="form-group">
                         <label for="prescription-date">Date</label>
                         <input type="date" id="prescription-date" name="prescriptionDate" required>
@@ -281,151 +332,309 @@
     </main>
 
     <script>
-        // --- Helper Functions ---
+        // provide-prescription.js - Revised Workflow
+
+        // --- Helper: Get Auth Token ---
+        function getAuthToken() {
+            const token = localStorage.getItem('accessToken');
+            console.log("Prescription Page: Token Check - ", token ? "Found" : "Not Found");
+            return token;
+        }
+
+        // --- Helper: Create Input ---
         function createInput(type, name, placeholder = '', required = false) {
             const input = document.createElement(type === 'textarea' ? 'textarea' : 'input');
             if (type !== 'textarea') input.type = type;
-            input.name = name; // Use array notation for backend processing
+            // Use indexed names for medications if backend expects array
+            input.name = `medications[][${name}]`; // e.g., medications[][medication_name]
             input.placeholder = placeholder;
             if (required) input.required = true;
             return input;
         }
 
+         // --- DOM Elements ---
+        const patientSelect = document.getElementById('patient-select');
+        const patientSelectLoading = document.getElementById('patient-select-loading');
+        const patientSelectError = document.getElementById('patient-select-error');
+        const prescriptionForm = document.getElementById('prescription-form');
+        const selectedPatientNameSpan = document.getElementById('selected-patient-name');
+        const patientNameInput = document.getElementById('patient-name');
+        const patientAgeInput = document.getElementById('patient-age'); // Added
+        const dateInput = document.getElementById('prescription-date');
+        const medicationsTableBody = document.getElementById('medications-tbody');
+        const addMedicationBtn = document.getElementById('add-medication-btn');
+
+        // API Base URL
+        const API_BASE_URL = 'http://127.0.0.1:8000';
+
+        // --- State ---
+        let selectedPatientId = null; // Store the selected patient's ID
+
+
+        // --- Functions ---
+
+        // Function to add a new medication row to the table
         function addMedicationRow() {
-            const tableBody = document.getElementById('medications-tbody');
-            const newRow = tableBody.insertRow(); // Creates a new <tr> element and adds it to <tbody>
+            if (!medicationsTableBody) return;
+            const newRow = medicationsTableBody.insertRow();
 
-            // Medication Cell
-            const medCell = newRow.insertCell();
-            medCell.appendChild(createInput('text', 'medication[]', 'e.g., Paracetamol', true)); // First med required=true (handled better in submit)
+            newRow.insertCell().appendChild(createInput('text', 'medication_name', 'e.g., Paracetamol', true));
+            newRow.insertCell().appendChild(createInput('text', 'dosage', 'e.g., 500mg'));
+            newRow.insertCell().appendChild(createInput('text', 'frequency', 'e.g., Twice daily'));
+            newRow.insertCell().appendChild(createInput('text', 'duration', 'e.g., 7 days'));
+            newRow.insertCell().appendChild(createInput('textarea', 'instructions', 'e.g., Take with food'));
 
-            // Dosage Cell
-            const dosageCell = newRow.insertCell();
-            dosageCell.appendChild(createInput('text', 'dosage[]', 'e.g., 500mg'));
-
-            // Frequency Cell
-            const freqCell = newRow.insertCell();
-            freqCell.appendChild(createInput('text', 'frequency[]', 'e.g., Twice daily'));
-
-            // Duration Cell
-            const durationCell = newRow.insertCell();
-            durationCell.appendChild(createInput('text', 'duration[]', 'e.g., 7 days'));
-
-            // Instructions Cell
-            const instrCell = newRow.insertCell();
-            instrCell.appendChild(createInput('textarea', 'instructions[]', 'e.g., Take with food'));
-
-            // Action Cell (Remove Button)
             const actionCell = newRow.insertCell();
             actionCell.classList.add('actions-cell');
             const removeBtn = document.createElement('button');
             removeBtn.type = 'button';
             removeBtn.classList.add('remove-med-button');
             removeBtn.innerHTML = '<i class="fas fa-trash-alt"></i> Remove';
+            removeBtn.addEventListener('click', () => row.remove()); // Simple remove listener
             actionCell.appendChild(removeBtn);
         }
 
-        function handleTableActions(event) {
-             // Use event delegation for remove buttons
-            if (event.target.classList.contains('remove-med-button') || event.target.closest('.remove-med-button')) {
-                const button = event.target.closest('.remove-med-button');
-                const row = button.closest('tr');
-                if (row) {
-                    row.remove();
+        // Function to fetch the doctor's confirmed patient list
+        async function fetchPatientList() {
+            console.log("--- fetchPatientList START ---"); // DEBUG
+            if (!patientSelect) { console.error("Patient select dropdown not found!"); return;} //DEBUG Element check
+            patientSelectLoading.style.display = 'block';
+            patientSelectError.style.display = 'none';
+            patientSelect.disabled = true;
+
+            const token = getAuthToken();
+            console.log("Token for patient list:", token ? "Found" : "NOT FOUND"); // DEBUG Token
+            if (!token) {
+                 patientSelectError.textContent = "Authentication error. Please log in.";
+                 patientSelectError.style.display = 'block';
+                 patientSelectLoading.style.display = 'none';
+                return;
+            }
+
+            // Use the endpoint that lists patients confirmed for the doctor
+            const apiUrl = `${API_BASE_URL}/appointments/my-confirmed-patients`; // Or use /my-patients if preferred
+            console.log("Fetching patient list from URL:", apiUrl); // DEBUG URL
+            try {
+                console.log(">>> BEFORE fetch call for patient list"); // DEBUG
+                const response = await fetch(apiUrl, { 
+                    method: 'GET', // Ensure method is GET                 
+                    headers: { 'Authorization': `Bearer ${token}` } });
+                    console.log("<<< AFTER fetch call for patient list, Status:", response.status); // DEBUG Status
+                 if (!response.ok) {
+                     // Handle auth errors etc.
+                     const errorData = await response.json().catch(() => ({}));
+                     throw new Error(errorData.detail || `Failed to load patient list (${response.status})`);
+                 }
+                console.log(">>> BEFORE response.json() for patient list"); // DEBUG
+                const patients = await response.json(); // Expecting List[PatientInfo]
+                console.log("<<< AFTER response.json(), Data:", patients); // DEBUG Data
+
+                // Clear existing options except the placeholder
+                patientSelect.innerHTML = '<option value="">-- Select a Patient --</option>';
+
+                if (patients && Array.isArray(patients) && patients.length > 0) {
+             console.log(`Processing ${patients.length} patients...`); // DEBUG Count
+                     patients.forEach(patient => {
+                        console.log("Processing patient object:", patient); // <<< LOG THIS
+                         const option = document.createElement('option');
+                         option.value = patient.id; // Use patient_id from response model
+                         option.textContent = patient.patient_full_name || patient.username || `Patient ${patient.patient_id}`;  // Display name
+                         patientSelect.appendChild(option);
+                     });
+                     patientSelect.disabled = false;
+                     console.log("Patient dropdown populated."); // DEBUG Success
+                } else {
+                     patientSelectError.textContent = "No confirmed patients found.";
+                     patientSelectError.style.display = 'block';
+                     console.log("No patients found or empty array received."); // DEBUG Empty
                 }
+
+            } catch (error) {
+                 console.error("Error fetching patient list:", error);
+                 patientSelectError.textContent = `Error loading patients: ${error.message}`;
+                 patientSelectError.style.display = 'block';
+            } finally {
+                 patientSelectLoading.style.display = 'none';
+                 console.log("--- fetchPatientList END ---"); // DEBUG End
             }
         }
 
-        function handleSubmit(event) {
-            event.preventDefault(); // Prevent default form submission
+        // Function to handle patient selection change
+        function handlePatientSelect() {
+            selectedPatientId = patientSelect.value; // Get selected ID string
+            const selectedOption = patientSelect.options[patientSelect.selectedIndex];
+            const selectedName = selectedOption ? selectedOption.text : '';
+
+            if (selectedPatientId) {
+                console.log(`Patient Selected - ID: ${selectedPatientId}, Name: ${selectedName}`); // DEBUG
+                // Pre-fill form and show it
+                if(patientNameInput) {
+                    patientNameInput.value = selectedName;
+                    patientNameInput.readOnly = true; // Make read-only
+                }
+                if(selectedPatientNameSpan) selectedPatientNameSpan.textContent = selectedName; // Update header span
+
+                // Reset medication table and add one row
+                if(medicationsTableBody) medicationsTableBody.innerHTML = '';
+                addMedicationRow();
+
+                // Set default date
+                if(dateInput && !dateInput.value) { // Set only if not already set
+                    dateInput.value = new Date().toISOString().split('T')[0];
+                }
+                 // Clear age input (could fetch age in future)
+                 if(patientAgeInput) patientAgeInput.value = '';
+
+
+                // Show the main form
+                if(prescriptionForm) prescriptionForm.style.display = 'block';
+
+            } else {
+                // Hide form if "-- Select --" is chosen
+                 if(prescriptionForm) prescriptionForm.style.display = 'none';
+                 if(patientNameInput) patientNameInput.value = '';
+                 if(selectedPatientNameSpan) selectedPatientNameSpan.textContent = '';
+                 selectedPatientId = null;
+            }
+        }
+
+        // Function to handle form submission
+        async function handleSubmit(event) {
+            event.preventDefault();
+            if (!selectedPatientId) {
+                 alert("Please select a patient first.");
+                 return;
+            }
 
             const medications = [];
             const medicationRows = document.querySelectorAll('#medications-tbody tr');
+            let firstMedicationValid = false; // Track if at least one valid med row exists
 
             medicationRows.forEach(row => {
-                const medInput = row.querySelector('input[name="medication[]"]');
-                // Only add row if medication name is filled (basic validation)
-                if (medInput && medInput.value.trim() !== '') {
-                     medications.push({
-                        medication: medInput.value.trim(),
-                        dosage: row.querySelector('input[name="dosage[]"]').value.trim(),
-                        frequency: row.querySelector('input[name="frequency[]"]').value.trim(),
-                        duration: row.querySelector('input[name="duration[]"]').value.trim(),
-                        instructions: row.querySelector('textarea[name="instructions[]"]').value.trim()
+                const medInput = row.querySelector('input[name^="medications["][name$="[medication_name]"]'); // Robust selector
+                const dosageInput = row.querySelector('input[name^="medications["][name$="[dosage]"]');
+                const freqInput = row.querySelector('input[name^="medications["][name$="[frequency]"]');
+                const durationInput = row.querySelector('input[name^="medications["][name$="[duration]"]');
+                const instrTextarea = row.querySelector('textarea[name^="medications["][name$="[instructions]"]');
+
+                const medName = medInput ? medInput.value.trim() : '';
+
+                // Only add if medication name is present
+                if (medName) {
+                    firstMedicationValid = true; // Mark that we found at least one
+                    medications.push({
+                        medication_name: medName,
+                        dosage: dosageInput ? dosageInput.value.trim() : '',
+                        frequency: freqInput ? freqInput.value.trim() : '',
+                        duration: durationInput ? durationInput.value.trim() : '',
+                        instructions: instrTextarea ? instrTextarea.value.trim() : ''
                     });
                 }
             });
 
-             // Basic check: Ensure at least one medication is added if submitting
-            if (medications.length === 0) {
-                alert("Please add at least one medication to the prescription.");
-                // Optionally focus the first input if the table is empty
-                const firstMedInput = document.querySelector('#medications-tbody input[name="medication[]"]');
-                if (firstMedInput) firstMedInput.focus();
-                return; // Stop submission
+            if (!firstMedicationValid) {
+                alert("Please add at least one valid medication name to the prescription.");
+                return;
             }
 
-            // Get other form data - Modified
             const formData = {
-                patientName: document.getElementById('patient-name').value,
-                patientAge: document.getElementById('patient-age').value, // Added age
-                date: document.getElementById('prescription-date').value,
-                // patientId and consultationId removed
-                medications: medications // Array of medication objects
+                patient_id: parseInt(selectedPatientId), // Send selected patient ID as integer
+                prescription_date: dateInput.value,
+                patient_age: parseInt(patientAgeInput.value) || null, // Send age or null
+                medications: medications
             };
 
-            // **Simulation:** In a real application, you would send this 'formData' object
-            // to your backend server using fetch() or XMLHttpRequest.
-            console.log("Submitting Prescription Data:", JSON.stringify(formData, null, 2)); // Pretty print JSON
-            alert(`Prescription for ${formData.patientName} (Age: ${formData.patientAge || 'N/A'}) submitted successfully!\nContains ${formData.medications.length} medication(s).`);
-
-            // Optional: Redirect or reset form
-            // window.location.href = 'doctor-dashboard.html';
-            // Or reset the form:
-            // document.getElementById('prescription-form').reset();
-            // document.getElementById('medications-tbody').innerHTML = ''; // Clear table
-            // setupInitialState(); // Re-run setup
-        }
-
-        function setupInitialState() {
-            // Set default date to today
-            const today = new Date().toISOString().split('T')[0];
-            const dateInput = document.getElementById('prescription-date');
-            if (dateInput) {
-                 dateInput.value = today;
+            console.log("Submitting Prescription Data:", JSON.stringify(formData, null, 2));
+            const submitButton = prescriptionForm.querySelector('button[type="submit"]');
+            if(submitButton) {
+                submitButton.disabled = true;
+                submitButton.textContent = 'Submitting...';
             }
 
-            // Add one empty medication row to start with
-            addMedicationRow();
+            // --- TODO: Send data to backend POST /prescriptions ---
+            const token = getAuthToken();
+            if (!token) { alert("Authentication Error!"); /* handle */ return; }
+
+            const apiUrl = `${API_BASE_URL}/prescriptions`; // Use new endpoint prefix
+
+            try {
+                 const response = await fetch(apiUrl, {
+                     method: 'POST',
+                     headers: {
+                         'Content-Type': 'application/json',
+                         'Authorization': `Bearer ${token}`
+                     },
+                     body: JSON.stringify(formData)
+                 });
+                 const responseData = await response.json();
+                 if (!response.ok) { throw new Error(responseData.detail || `Failed to submit (${response.status})`); }
+
+                 alert(`Prescription for ${patientNameInput.value} submitted successfully!`);
+                 console.log("Prescription Submit Success:", responseData);
+                 // Reset form after successful submission
+                 prescriptionForm.reset(); // Resets native form elements
+                 medicationsTableBody.innerHTML = ''; // Clear table
+                 prescriptionForm.style.display = 'none'; // Hide form
+                 patientSelect.value = ''; // Reset dropdown
+                 selectedPatientId = null;
+                 if(selectedPatientNameSpan) selectedPatientNameSpan.textContent = '';
+
+
+            } catch (error) {
+                 console.error("Error submitting prescription:", error);
+                 alert(`Error submitting prescription: ${error.message}`);
+            } finally {
+                 if(submitButton) {
+                     submitButton.disabled = false;
+                     submitButton.textContent = 'Submit Prescription';
+                 }
+            }
+            // --- End TODO ---
         }
 
+        // --- Go Back Function ---
         function goBack() {
-            // Navigate back to the doctor's dashboard
             window.location.href = 'doctor-dashboard.html';
         }
 
-        // --- Event Listeners ---
+
+        // --- Initial Setup on DOM Load ---
         document.addEventListener('DOMContentLoaded', function() {
-            setupInitialState();
+             console.log("Provide Prescription JS Loaded");
+             setupInitialState(); // Call setup
 
             // Add medication button listener
-            const addBtn = document.getElementById('add-medication-btn');
-            if(addBtn) {
-                addBtn.addEventListener('click', addMedicationRow);
-            }
+            if(addMedicationBtn) { addMedicationBtn.addEventListener('click', addMedicationRow); }
 
-             // Event delegation for remove buttons within the table body
-            const tableBody = document.getElementById('medications-tbody');
-            if (tableBody) {
-                tableBody.addEventListener('click', handleTableActions);
-            }
+            // Event delegation for remove buttons is handled within addMedicationRow now
 
             // Form submission listener
-            const form = document.getElementById('prescription-form');
-            if(form) {
-                form.addEventListener('submit', handleSubmit);
-            }
+            if(prescriptionForm) { prescriptionForm.addEventListener('submit', handleSubmit); }
+
+            // Patient select listener
+            if(patientSelect) { patientSelect.addEventListener('change', handlePatientSelect); }
+
+             // Back button listener (if using JS instead of inline onclick)
+             const backBtn = document.querySelector('.back-button');
+             if (backBtn && !backBtn.onclick) { // Add listener only if no inline onclick
+                backBtn.addEventListener('click', goBack);
+             }
+
+            console.log(">>> About to call fetchPatientList on page load <<<"); // DEBUG
+
+             // Fetch patient list initially
+             fetchPatientList();
         });
+
+         // Initial State setup function
+         function setupInitialState() {
+             if(prescriptionForm) prescriptionForm.style.display = 'none'; // Ensure form starts hidden
+         }
+
     </script>
+    <script src="header.js"></script> <!-- Make sure header JS is included -->
+
+</body>
+</html>
 </body>
 </html>
