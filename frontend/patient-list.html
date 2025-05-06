@@ -193,18 +193,15 @@
 
             // 2. View Medication History Button
             const medicationButton = document.createElement('button');
-            medicationButton.classList.add('patient-button'); // Use existing style class
+            medicationButton.classList.add('patient-button');
             medicationButton.textContent = "View Medication History";
             medicationButton.addEventListener('click', () => {
-                // TODO: Implement navigation or modal for Medication History
-                alert(`Navigate to MEDICATION HISTORY for patient ID: ${patientInfo.id} (${patientName.textContent})`);
-                 // Example: window.location.href = `/doctor/patient/${patientInfo.id}/medications`;
+                // Corrected line: Use patientName.textContent
+                window.location.href = `doctor-view-medication-history.html?patient_id=${patientInfo.id}&patient_name=${encodeURIComponent(patientName.textContent)}`;
             });
             actionsDiv.appendChild(medicationButton);
 
             card.appendChild(actionsDiv);
-            // --- END SPECIFIC ACTION BUTTONS ---
-
             return card;
         } // --- End createPatientCard ---
     

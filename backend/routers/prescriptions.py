@@ -203,3 +203,62 @@ async def get_my_prescriptions(
 # --- End GET /my endpoint ---
 # --- TODO: Add endpoint for DOCTOR to get prescriptions for a specific patient ---
 # e.g., GET /patient/{patient_id}
+
+# --- *** NEW: Endpoint for DOCTOR to get a specific patient's prescriptions *** ---
+@router.get("/patient/{patient_id}", response_model=List[PrescriptionResponse])
+async def get_prescriptions_for_patient_by_doctor(
+    patient_id: int, # Path parameter
+    db: db_dependency,
+    current_doctor: current_doctor_dependency # Ensures only a logged-in doctor can access
+):
+    """
+    Fetches all prescriptions for a specific patient ID.
+    Only accessible by logged-in doctors.
+    """
+    print(f"Doctor {current_doctor.username} (ID: {current_doctor.id}) requesting prescriptions for patient ID: {patient_id}")
+
+    # Verify the patient exists
+    patient = db.query(User).filter(User.id == patient_id, User.role == UserRole.patient).first()
+    if not patient:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Patient with ID {patient_id} not found."
+        )
+
+    # Query prescriptions for the specified patient_id
+    prescriptions_db = db.query(Prescription).options(
+        selectinload(Prescription.medications),
+        joinedload(Prescription.doctor).joinedload(User.doctor_profile) # Eager load doctor who prescribed
+    ).filter(
+        Prescription.patient_id == patient_id
+    ).order_by(
+        Prescription.prescription_date.desc(),
+        Prescription.created_at.desc()
+    ).all()
+
+    print(f"Found {len(prescriptions_db)} prescriptions in DB for patient {patient_id}.")
+
+    response_data: List[PrescriptionResponse] = []
+    for presc in prescriptions_db:
+        med_list = [MedicationResponse.model_validate(med) for med in presc.medications]
+        doc_name = None # Name of the doctor who wrote *this specific prescription*
+        if presc.doctor:
+            if presc.doctor.doctor_profile and presc.doctor.doctor_profile.full_name:
+                doc_name = presc.doctor.doctor_profile.full_name
+            else:
+                doc_name = presc.doctor.username
+        else:
+            print(f"Warning: Doctor relationship not loaded for Prescription ID {presc.id}")
+
+        response_data.append(
+            PrescriptionResponse(
+                id=presc.id,
+                doctor_id=presc.doctor_id,
+                doctor_name=doc_name,
+                prescription_date=presc.prescription_date,
+                created_at=presc.created_at,
+                medications=med_list
+            )
+        )
+    return response_data
+# --- End NEW Endpoint ---

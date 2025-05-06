@@ -1,19 +1,19 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ChroniCARE - Medical History</title>
+    <title>ChroniCARE - Medication History</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 <style>
     body {
         font-family: sans-serif;
         margin: 0;
         padding: 0;
-        background-color: #f9f5f0; 
+        background-color: #f9f5f0;
         color: #333;
         line-height: 1.6;
-        padding-bottom: 60px;
+        padding-bottom: 80px; /* Increased padding for bottom nav */
     }
 
     header {
@@ -24,51 +24,113 @@
     }
 
     header h1 {
-        margin-bottom: 15px;
+        margin: 0; /* Adjusted margin */
         color: #1a237e;
-        font-size: 2.5em;
+        font-size: 2.2em; /* Slightly adjusted font size */
     }
 
     main {
         padding: 20px;
     }
 
-    .patient-info, .medical-history {
+    .medication-history-container h2 {
+        font-size: 1.8em; /* Main section title */
+        color: #1a237e;
         margin-bottom: 20px;
+        text-align: center;
     }
 
-    .patient-info h2, .medical-history h2 {
-        font-size: 1.5em;
+    .prescription-card {
+        background-color: #fff;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.08);
     }
 
-    .medical-history ul {
-        list-style: none;
-        padding: 0;
-    }
-
-    .medical-history li {
-        padding: 10px;
+    .prescription-card .prescription-header {
         border-bottom: 1px solid #eee;
+        padding-bottom: 10px;
+        margin-bottom: 10px;
     }
 
-    .medication-list ul {
+    .prescription-card .prescription-header p {
+        margin: 5px 0;
+        font-size: 0.95em;
+    }
+     .prescription-card .prescription-header strong {
+        color: #333;
+    }
+
+    .prescription-card h4 { /* Medications sub-title */
+        font-size: 1.1em;
+        color: #555;
+        margin-top: 15px;
+        margin-bottom: 5px;
+    }
+
+    .medications-list { /* UL for medications */
         list-style: none;
-        padding: 0;
+        padding-left: 0;
     }
 
-    .medication-list li {
+    .medications-list li {
         padding: 10px;
-        border-bottom: 1px solid #eee;
+        border-bottom: 1px dashed #f0f0f0;
+        font-size: 0.9em;
+    }
+    .medications-list li:last-child {
+        border-bottom: none;
+    }
+    
+    .medications-list .medication-name {
+        font-weight: bold;
+        font-size: medium;
+        color: #0056b3;
+    }
+    .medications-list .medication-details {
+        display: block;
+        font-size: 0.97em;
+        color: #666;
+        margin-top: 3px;
+    }
+    .medications-list .medication-instructions {
+        display: block;
+        font-size: 0.95em;
+        color: #777;
+        margin-top: 2px;
+        font-style: italic;
+    }
+
+
+    .no-records, .error-message, .loading-message {
+        text-align: center;
+        font-size: 1.1em;
+        color: #777;
+        margin-top: 30px;
+        padding: 20px;
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    .error-message {
+        color: #d9534f; /* Bootstrap danger color */
     }
 
     .back-button {
+        display: block; /* Make it a block to center it */
+        margin: 30px auto 10px auto; /* Center button */
         background-color: #007bff;
         color: white;
         border: none;
-        padding: 10px 20px;
+        padding: 12px 25px; /* Slightly larger padding */
         border-radius: 5px;
         cursor: pointer;
         font-size: 1em;
+        text-align: center;
+        text-decoration: none; /* If used as an <a> tag */
     }
 
     .back-button:hover {
@@ -109,44 +171,26 @@
     .nav-item:hover, .nav-item.active {
         color: #007bff;
     }
+    /* Removed .active class from Telemedicine for this specific page */
 
-    .nav-item.active {
-        color: #007bff;
-    }
 </style>
 </head>
 <body>
     <header>
-        <h1>Medical History</h1>
+        <h1>Medication History</h1>
     </header>
     <main>
-        <div class="patient-info">
-            <h2>Patient Name: John Doe</h2>
+        <div class="medication-history-container">
+            <!-- Dynamic content will be loaded here -->
+            <div id="medication-history-content">
+                <p class="loading-message">Loading medication history...</p>
+            </div>
         </div>
 
-        <!-- Medical History Section -->
-        <div class="medical-history">
-            <h2>Diagnosis History</h2>
-            <ul>
-                <li>Diagnosed with Diabetes - Since: 2023-03-01</li>
-                <li>Diagnosed with Hypertension - Since: 2022-07-15</li>
-                <li>Diagnosed with High Cholesterol - Since: 2024-10-05</li>
-            </ul>
-        </div>
-
-        <div class="medication-list">
-            <h2>Current Medications</h2>
-            <ul>
-                <li>Metformin 500mg (Started: 2023-03-15)</li>
-                <li>Lisinopril 10mg (Started: 2024-01-10)</li>
-                <li>Atorvastatin 20mg (Started: 2024-11-01)</li>
-            </ul>
-        </div>
-
-        <button class="back-button" onclick="goBack()">Back</button>
+        <button class="back-button" onclick="goBack()">Back </button>
     </main>
     <nav class="bottom-nav">
-        <a href="index.html" class="nav-item">
+        <a href="index.html" class="nav-item"> <!-- Assuming index.html is the dashboard or home -->
             <i class="fa-solid fa-house"></i>
             <span>Home</span>
         </a>
@@ -154,7 +198,7 @@
            <i class="fa-solid fa-medkit"></i>
             <span>Health Monitor</span>
         </a>
-        <a href="telemedicine.html" class="nav-item active">
+        <a href="telemedicine.html" class="nav-item">
             <i class="fa-solid fa-video"></i>
             <span>Telemedicine</span>
         </a>
@@ -163,10 +207,122 @@
             <span>Profile</span>
         </a>
     </nav>
+
     <script>
-        function goBack() {
-            window.location.href = 'telemedicine.html';
+        const API_BASE_URL = 'http://127.0.0.1:8000'; // Your API Base URL
+        // Function to get the JWT token (replace with your actual token retrieval logic)
+        function getToken() {
+            // Example: retrieve from localStorage
+            return localStorage.getItem('accessToken');
         }
+
+        function formatDate(dateString) {
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            return new Date(dateString).toLocaleDateString(undefined, options);
+        }
+
+        async function fetchMedicationHistory() {
+            const token = getToken();
+            const contentDiv = document.getElementById('medication-history-content');
+            contentDiv.innerHTML = '<p class="loading-message">Loading medication history...</p>'; // Show loading message
+
+            if (!token) {
+                contentDiv.innerHTML = '<p class="error-message">Authentication error. Please log in.</p>';
+                // Optionally redirect to login page
+                // window.location.href = 'login.html';
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/prescriptions/my`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.status === 401) {
+                     contentDiv.innerHTML = '<p class="error-message">Session expired or unauthorized. Please log in again.</p>';
+                     // Potentially clear token and redirect
+                     // localStorage.removeItem('accessToken');
+                     // window.location.href = 'login.html';
+                     return;
+                }
+
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({ detail: 'Failed to fetch medication history. Server returned an error.' }));
+                    throw new Error(errorData.detail || `HTTP error! status: ${response.status}`);
+                }
+
+                const prescriptions = await response.json();
+                displayMedicationHistory(prescriptions);
+
+            } catch (error) {
+                console.error('Error fetching medication history:', error);
+                contentDiv.innerHTML = `<p class="error-message">Could not load medication history: ${error.message}</p>`;
+            }
+        }
+
+        function displayMedicationHistory(prescriptions) {
+            const contentDiv = document.getElementById('medication-history-content');
+            contentDiv.innerHTML = ''; // Clear loading/previous message
+
+            if (!prescriptions || prescriptions.length === 0) {
+                // Test Case TC-23: No records available scenario
+                contentDiv.innerHTML = '<p class="no-records">No medication records found.</p>';
+                return;
+            }
+
+            // Test Case TC-22: Patient views their medication history
+            prescriptions.forEach(prescription => {
+                const prescriptionCard = document.createElement('div');
+                prescriptionCard.className = 'prescription-card';
+
+                let doctorName = prescription.doctor_name || 'N/A';
+
+                let headerHtml = `
+                    <div class="prescription-header">
+                        <p><strong>Prescription Date:</strong> ${formatDate(prescription.prescription_date)}</p>
+                        <p><strong>Prescribed by:</strong> ${doctorName}</p>
+                    </div>
+                `;
+
+                let medicationsHtml = '<h4>Medications:</h4><ul class="medications-list">';
+                if (prescription.medications && prescription.medications.length > 0) {
+                    prescription.medications.forEach(med => {
+                        medicationsHtml += `
+                            <li>
+                                <span class="medication-name">${med.medication_name}</span>
+                                <span class="medication-details">
+                                    ${med.dosage ? `Dosage: ${med.dosage} |` : ''}
+                                    ${med.frequency ? ` Frequency: ${med.frequency} |` : ''}
+                                    ${med.duration ? ` Duration: ${med.duration}` : ''}
+                                </span>
+                                ${med.instructions ? `<span class="medication-instructions">Instructions: ${med.instructions}</span>` : ''}
+                            </li>
+                        `;
+                    });
+                } else {
+                    medicationsHtml += '<li>No medications listed for this prescription.</li>';
+                }
+                medicationsHtml += '</ul>';
+
+                prescriptionCard.innerHTML = headerHtml + medicationsHtml;
+                contentDiv.appendChild(prescriptionCard);
+            });
+        }
+
+        function goBack() {
+            // As per test case step "Navigate to 'Medication History' from the dashboard",
+            // this should ideally go back to the dashboard.
+            // Using window.history.back() for a generic back or specify dashboard URL.
+            window.location.href = 'telemedicine.html'; // Replace with actual dashboard URL
+            // Or, if a generic back is preferred: window.history.back();
+        }
+
+        // Fetch data when the page loads
+        document.addEventListener('DOMContentLoaded', fetchMedicationHistory);
     </script>
 </body>
 </html>
