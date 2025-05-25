@@ -103,7 +103,7 @@
                 doctorListContainer.innerHTML = "<p>Loading doctors...</p>"; // Show loading
 
             try {
-                const response = await fetch('http://127.0.0.1:8000/appointments/doctors');
+                const response = await fetch('https://chronicare.onrender.com/appointments/doctors');
                 console.log("Fetch doctors status:", response.status); // DEBUG
 
                 if (!response.ok) {
