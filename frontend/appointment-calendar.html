@@ -264,7 +264,7 @@
             if (!doctorId || !timeSlotsDiv) return;
             console.log(`Fetching slots for Dr. ${doctorId} on ${dateISO}`);
 
-            const apiUrl = `${API_BASE_URL}appointments/doctors/${doctorId}/schedule?date=${dateISO}`;
+            const apiUrl = `${API_BASE_URL}/appointments/doctors/${doctorId}/schedule?date=${dateISO}`;
 
             try {
                 const response = await fetch(apiUrl);
