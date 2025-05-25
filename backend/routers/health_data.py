@@ -4,9 +4,9 @@ from pydantic import BaseModel, Field, field_validator, validator
 from sqlalchemy.orm import Session
 from typing import Annotated, List, Optional, Dict, Any
 from sqlalchemy import func, desc
-from backend.database import get_db
-from backend.models import User, UserRole, HealthDataEntry # Import new model
-from backend.routers.auth import get_current_active_user # Use general user auth
+from database import get_db
+from models import User, UserRole, HealthDataEntry # Import new model
+from routers.auth import get_current_active_user # Use general user auth
 from datetime import datetime, date as py_date, timezone, timedelta
 
 router = APIRouter(

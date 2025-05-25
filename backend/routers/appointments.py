@@ -4,14 +4,14 @@ from pydantic import BaseModel, field_validator
 from sqlalchemy.orm import Session, joinedload
 from sqlalchemy import distinct
 from typing import Annotated, List, Optional
-from backend.database import get_db
-from backend.models import TimeSlot, User, UserRole, Appointment, AppointmentStatus # Ensure correct import
+from database import get_db
+from models import TimeSlot, User, UserRole, Appointment, AppointmentStatus # Ensure correct import
 from sqlalchemy import exc, and_,func
 from datetime import datetime, date as py_date
 from datetime import timezone
 # Import the new dependency
-from backend.routers.auth import get_current_doctor, get_current_active_user
-from backend.models import Notification #import notification model
+from routers.auth import get_current_doctor, get_current_active_user
+from models import Notification #import notification model
 
 router = APIRouter(
     prefix="/appointments",

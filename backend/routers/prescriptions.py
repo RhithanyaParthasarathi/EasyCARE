@@ -7,9 +7,9 @@ from pydantic import BaseModel, Field
 from datetime import date,datetime # Import date
 
 # Your project imports
-from backend.database import get_db
-from backend.models import User, UserRole, Prescription, PrescriptionMedication # Import necessary models
-from backend.routers.auth import get_current_doctor, get_current_active_user # Use Doctor auth dependency
+from database import get_db
+from models import User, UserRole, Prescription, PrescriptionMedication # Import necessary models
+from routers.auth import get_current_doctor, get_current_active_user # Use Doctor auth dependency
 
 # --- Pydantic models for this router ---
 class MedicationInput(BaseModel):

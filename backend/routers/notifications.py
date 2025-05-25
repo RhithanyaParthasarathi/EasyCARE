@@ -3,9 +3,9 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from typing import Annotated, List, Optional
 
-from backend.database import get_db
-from backend.models import Notification, User # Import User if needed for auth
-from backend.routers.auth import get_current_active_user # Use general user auth
+from database import get_db
+from models import Notification, User # Import User if needed for auth
+from routers.auth import get_current_active_user # Use general user auth
 from pydantic import BaseModel
 from datetime import datetime
 

@@ -1,13 +1,13 @@
 # main.py
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from backend.routers import auth
-from backend.database import engine
-from backend.models import Base
-from backend.routers import appointments
-from backend.routers import notifications  # Import the new router
-from backend.routers import profile, health_data
-from backend.routers import auth, appointments, notifications, profile, video, prescriptions
+from routers import auth
+from database import engine
+from models import Base
+from routers import appointments
+from routers import notifications  # Import the new router
+from routers import profile, health_data
+from routers import auth, appointments, notifications, profile, video, prescriptions
  # Add video
 
 Base.metadata.create_all(bind=engine)
@@ -17,7 +17,8 @@ app = FastAPI()
 # CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://127.0.0.1:5500"],  # ONLY allow your frontend origin
+    allow_origins=["http://127.0.0.1:5500",
+                   "https://chroni-care-9o89drc7w-rhithanyaparthasarathis-projects.vercel.app"],  # ONLY allow your frontend origin
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

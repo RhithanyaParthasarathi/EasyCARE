@@ -15,8 +15,8 @@ from pydantic import BaseModel, EmailStr, field_validator, ValidationInfo
 from sqlalchemy.orm import Session
 from typing import Annotated, Optional
 from werkzeug.security import generate_password_hash, check_password_hash
-from backend.database import get_db
-from backend.models import User, UserRole
+from database import get_db
+from models import User, UserRole
 from dotenv import load_dotenv
 
 

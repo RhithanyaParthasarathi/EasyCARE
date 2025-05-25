@@ -4,11 +4,11 @@ from pydantic import BaseModel, EmailStr, Field # Make sure Field is imported
 from sqlalchemy.orm import Session, joinedload # Import joinedload for eager loading
 from typing import Annotated, Optional, Union # Import Union
 
-from backend.database import get_db
+from database import get_db
 # Import relevant models
-from backend.models import User, UserRole, PatientProfile, DoctorProfile
+from models import User, UserRole, PatientProfile, DoctorProfile
 # Import the dependency to get the logged-in user
-from backend.routers.auth import get_current_active_user
+from routers.auth import get_current_active_user
 
 # --- Pydantic Models for Profile Data ---
 

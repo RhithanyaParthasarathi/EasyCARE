@@ -1,6 +1,6 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from backend.models import Base  # Import your Base
+from models import Base  # Import your Base
 
 DATABASE_URL = "sqlite:///./site.db"  # SQLite file
 

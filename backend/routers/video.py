@@ -12,9 +12,9 @@ from twilio.jwt.access_token import AccessToken
 from twilio.jwt.access_token.grants import VideoGrant
 
 # Your project imports
-from backend.database import get_db
-from backend.models import User, UserRole, Appointment, AppointmentStatus, TimeSlot # Import necessary models
-from backend.routers.auth import get_current_active_user # Import the user dependency
+from database import get_db
+from models import User, UserRole, Appointment, AppointmentStatus, TimeSlot # Import necessary models
+from routers.auth import get_current_active_user # Import the user dependency
 
 # --- Pydantic Response Model ---
 class VideoTokenResponse(BaseModel):
