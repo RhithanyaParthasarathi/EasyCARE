@@ -1,0 +1,35 @@
+# requirements.txt
+
+# Core FastAPI and ASGI server
+fastapi
+uvicorn[standard]
+
+# Database ORM
+sqlalchemy
+
+# JWT handling
+python-jose[cryptography] # For jwt.encode, jwt.decode
+
+# Password Hashing
+passlib[bcrypt]           # For generate_password_hash, check_password_hash
+werkzeug                  # Often a dependency for passlib, good to include
+
+# Pydantic (Data validation and settings for FastAPI)
+pydantic[email]           # Includes EmailStr and other email validation
+
+# Environment variable management
+python-dotenv             # For load_dotenv()
+
+# Twilio (for video call token generation)
+twilio
+
+# Alembic (if you are still using it for migrations, which is recommended)
+alembic
+
+# Database Driver (CHOOSE ONE based on your production database)
+# psycopg2-binary           # For PostgreSQL
+# mysqlclient               # For MySQL
+# pyodbc                    # For SQL Server (often with specific ODBC drivers)
+# If you only ever plan to use SQLite (even for local dev and testing on Vercel's ephemeral storage),
+# no specific driver is typically needed here beyond SQLAlchemy itself. But for a real deployment
+# with persistent data, you'd uncomment one of the above or add the relevant driver.
