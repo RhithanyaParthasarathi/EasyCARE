@@ -2,7 +2,7 @@
 import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from backend.models import Base # Ensure this is your Base from models.py and models.py is complete
+from models import Base # Ensure this is your Base from models.py and models.py is complete
 
 DATABASE_URL = os.environ.get("DATABASE_URL", "sqlite:///./site.db")
 
