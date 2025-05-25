@@ -18,7 +18,7 @@ app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://127.0.0.1:5500",
-                   "https://chroni-care-9o89drc7w-rhithanyaparthasarathis-projects.vercel.app"],  # ONLY allow your frontend origin
+                   "https://chroni-care-ez3l.vercel.app"],  # ONLY allow your frontend origin
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
