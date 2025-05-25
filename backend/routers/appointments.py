@@ -663,15 +663,19 @@ async def get_my_confirmed_patient_list(
 
     # Query distinct patient Users associated with the doctor via CONFIRMED appointments
     # No need to explicitly load patient_profile if only username/id needed
-    distinct_patients_query = db.query(User).join(
+    distinct_patients_query = db.query(User).options(
+        joinedload(User.patient_profile)
+    ).join(
         Appointment, Appointment.patient_id == User.id
     ).filter(
         Appointment.doctor_id == current_doctor.id,
         Appointment.status == AppointmentStatus.CONFIRMED
     ).distinct(
         User.id
-    ).order_by(User.username)
-
+    ).order_by(
+         # <<< ADD User.id as the FIRST ordering criteria
+        User.username # Then order by username for consistent results within same user ID (though distinct makes this less impactful)
+    )
     distinct_patients_result = distinct_patients_query.all()
 
     # Prepare response using PatientInfo model (id, username only)
