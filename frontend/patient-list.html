@@ -181,13 +181,13 @@
             actionsDiv.style.gap = '10px'; // Space between buttons
 
             // 1. View Health Data Button
-            const healthDataButton = document.createElement('button');
-            healthDataButton.classList.add('patient-button'); // Use existing style class
+             const healthDataButton = document.createElement('button');
+            healthDataButton.classList.add('patient-button');
             healthDataButton.textContent = "View Health Data";
             healthDataButton.addEventListener('click', () => {
-                // TODO: Implement navigation or modal for Health Data (IoT)
-                alert(`Navigate to HEALTH DATA for patient ID: ${patientInfo.id} (${patientName.textContent})`);
-                // Example: window.location.href = `/doctor/patient/${patientInfo.id}/health-data`;
+                // *** NAVIGATE TO THE NEW DOCTOR VIEW PAGE ***
+                const patientUsernameForURL = encodeURIComponent(patientInfo.full_name || patientInfo.username);
+                window.location.href = `doctor-view-patient-health-data.html?patient_id=${patientInfo.id}&patient_username=${patientUsernameForURL}`;
             });
             actionsDiv.appendChild(healthDataButton);
 
