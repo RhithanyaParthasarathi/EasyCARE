@@ -268,8 +268,8 @@
                             <div class="notification-actions">
                                 <!-- Conditionally show View Details Button -->
                                 ${ (notif.appointment_id && !lowerCaseMessage.includes('reject'))
-                                    ? `<button class="btn btn-sm blue-button view-details-btn" data-appid="${notif.appointment_id}">View Details</button>`
-                                    : ''
+                                    ? `<a href="virtual-doctor.html?appointment_id=${notif.appointment_id}" class="btn btn-sm blue-button view-details-btn">View Details</a>`
+            : ''
                                  }
                             </div>
                         `;

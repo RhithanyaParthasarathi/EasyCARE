@@ -6,8 +6,9 @@ from backend.database import engine
 from backend.models import Base
 from backend.routers import appointments
 from backend.routers import notifications  # Import the new router
-from backend.routers import profile
-from backend.routers import auth, appointments, notifications, profile, video, prescriptions # Add video
+from backend.routers import profile, health_data
+from backend.routers import auth, appointments, notifications, profile, video, prescriptions
+ # Add video
 
 Base.metadata.create_all(bind=engine)
 
@@ -30,4 +31,5 @@ app.include_router(notifications.router) # Include the new router
 app.include_router(profile.router)
 app.include_router(video.router)
 app.include_router(prescriptions.router) # Include the new video router
-
+app.include_router(health_data.router)
+print("--- MAIN.PY - Routers Included ---")

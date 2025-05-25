@@ -66,6 +66,8 @@ class User(Base):
     notifications = relationship("Notification", back_populates="user", cascade="all, delete-orphan")
     doctor_prescriptions = relationship("Prescription", foreign_keys=[Prescription.doctor_id], back_populates="doctor") # Add back_populates here if needed
     patient_prescriptions = relationship("Prescription", foreign_keys=[Prescription.patient_id], back_populates="patient") # Add back_populates here if needed
+    health_data_entries = relationship("HealthDataEntry", back_populates="user", cascade="all, delete-orphan", order_by="desc(HealthDataEntry.timestamp)")
+
 
 class TimeSlot(Base):
     __tablename__ = "time_slots"
@@ -81,6 +83,8 @@ class TimeSlot(Base):
 
     # Relationship
     doctor = relationship("User", back_populates="time_slots")
+     # Optional: If TimeSlot needs to know about its one Appointment
+    # appointment = relationship("Appointment", back_populates="time_slot", uselist=False)
 
 
 # Add near other models in models.py
@@ -165,3 +169,26 @@ class DoctorProfile(Base):
     user = relationship("User", back_populates="doctor_profile")
 # --- *** END Doctor Profile Table *** ---
 
+class HealthDataEntry(Base):
+    __tablename__ = "health_data_entries"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    timestamp = Column(DateTime(timezone=True), server_default=func.now(), nullable=False, index=True) # For DB to handle
+
+    heart_rate = Column(Integer, nullable=True)
+    systolic_bp = Column(Integer, nullable=True)
+    diastolic_bp = Column(Integer, nullable=True)
+    oxygen_saturation = Column(Float, nullable=True)
+    glucose_level = Column(Float, nullable=True)
+    respiratory_rate = Column(Integer, nullable=True)
+    temperature_celsius = Column(Float, nullable=True)
+
+    heart_rate_status = Column(String, nullable=True)
+    bp_status = Column(String, nullable=True)
+    oxygen_status = Column(String, nullable=True)
+    glucose_status = Column(String, nullable=True)
+    respiratory_rate_status = Column(String, nullable=True)
+    temperature_status = Column(String, nullable=True)
+
+    user = relationship("User", back_populates="health_data_entries")

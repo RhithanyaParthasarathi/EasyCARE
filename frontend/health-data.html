@@ -165,11 +165,14 @@ canvas {
                 <canvas id="oxygenSaturationChart"></canvas>
             </section>
 
-            <section class="health-section">
-                <h2>Weight</h2>
-                <canvas id="weightChart"></canvas>
-            </section>
-
+           <section class="health-section">
+    <h2>Glucose Level</h2>
+    <canvas id="glucoseChart"></canvas>
+</section>
+<section class="health-section">
+    <h2>Respiratory Rate</h2>
+    <canvas id="respiratoryRateChart"></canvas>
+</section>
             <section class="health-section">
                 <h2>Temperature</h2>
                 <canvas id="temperatureChart"></canvas>
@@ -195,76 +198,229 @@ canvas {
             <span>Profile</span>
         </a>
     </nav>
+    <!-- health-data.html -->
+<!-- Keep all HTML and <style> as you provided -->
+<!-- REPLACE the existing <script> block at the bottom with this: -->
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-    // --- Helper function to create charts ---
-    function createChart(canvasId, label, data, color) {
-        const ctx = document.getElementById(canvasId).getContext('2d');
-        new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-                datasets: [{
-                    label: label,
-                    data: data,
-                    borderColor: color,
-                    borderWidth: 2,
-                    fill: false
-                }]
-            },
-            options: {
-                scales: {
-                    y: {
-                        beginAtZero: true
+    // health-data.js (Charts Page)
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log("Health Data Chart Page JS Loaded");
+        const API_BASE_URL = 'http://127.0.0.1:8000';
+        let charts = {}; // Store chart instances for updates/destruction
+
+        function getAuthToken() { return localStorage.getItem('accessToken'); }
+
+        // Helper to destroy old chart if it exists
+        function destroyChart(chartId) {
+            if (charts[chartId]) {
+                charts[chartId].destroy();
+                delete charts[chartId];
+                console.log(`Chart ${chartId} destroyed.`);
+            }
+        }
+
+        function createOrUpdateChart(canvasId, label, xLabels, dataPoints, color, yAxisLabel = 'Value', suggestedMin, suggestedMax) {
+            destroyChart(canvasId); // Destroy previous instance before creating new
+            const ctx = document.getElementById(canvasId);
+            if (!ctx) { console.error(`Canvas with id ${canvasId} not found!`); return; }
+
+            charts[canvasId] = new Chart(ctx.getContext('2d'), {
+                type: 'line',
+                data: {
+                    labels: xLabels, // Array of formatted timestamps for x-axis display
+                    datasets: [{
+                        label: label,
+                        data: dataPoints, // Array of metric values
+                        borderColor: color,
+                        borderWidth: 2,
+                        fill: false,
+                        tension: 0.1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            title: { display: true, text: 'Timestamp' },
+                            ticks: {
+                                 callback: function(value) { // 'value' is the index here
+                     return this.getLabelForValue(value);
+                 },
+                 autoSkip: true,
+                 maxTicksLimit: 10, // Adjust as needed for density
+                 maxRotation: 45,   // Rotate labels if they overlap
+                 minRotation: 0
+                            }
+                        },
+                        y: {
+                            title: { display: true, text: yAxisLabel },
+                            beginAtZero: (suggestedMin !== undefined && suggestedMin < 0) ? undefined : true,
+                            suggestedMin: suggestedMin,
+                            suggestedMax: suggestedMax
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                 title: function(tooltipItems) {
+                                     // Tooltip title can show the full date if labels are concise
+                                     // Assuming xLabels passed to Chart.js are full date strings
+                                     // or you can access original timestamp from data object if structured differently
+                                     return tooltipItems[0].label; // Shows the formatted x-axis label
+                                 }
+                            }
+                        }
                     }
                 }
-            }
-        });
-    }
-
-    // --- Blood Pressure Chart ---
-    createChart(
-        'bloodPressureChart',
-        'Systolic Blood Pressure',
-        [120, 125, 130, 128, 135, 132], // Example Systolic Data
-        'rgba(255, 99, 132, 1)'
-    );
-
-    // --- Heart Rate Chart ---
-    createChart(
-        'heartRateChart',
-        'Heart Rate',
-        [70, 72, 75, 73, 78, 76], // Example Heart Rate Data
-        'rgba(54, 162, 235, 1)'
-    );
-
-    // --- Oxygen Saturation Chart ---
-    createChart(
-        'oxygenSaturationChart',
-        'Oxygen Saturation (SpO2)',
-        [98, 99, 97, 98, 99, 100], // Example SpO2 Data
-        'rgba(75, 192, 192, 1)'
-    );
-
-    // --- Weight Chart ---
-    createChart(
-        'weightChart',
-        'Weight (kg)',
-        [70, 70.5, 71, 70.8, 71.2, 71.5], // Example Weight Data
-        'rgba(255, 205, 86, 1)'
-    );
-
-    // --- Temperature Chart ---
-    createChart(
-        'temperatureChart',
-        'Temperature (°C)',
-        [36.5, 36.7, 36.6, 36.8, 36.9, 37.0], // Example Temperature Data
-        'rgba(153, 102, 255, 1)'
-    );
-});
-        function goBack() {
-            window.location.href = 'telemedicine.html';
+            });
+            console.log(`Chart ${canvasId} created/updated.`);
         }
+
+       async function loadAllHealthDataForCharts() {
+            const chartContainer = document.querySelector('.health-section-container');
+            if (!chartContainer) {
+                 console.error("Chart container '.health-section-container' not found!");
+                 return;
+            }
+            // Don't clear the whole container here, just show a loading message within it
+            // or within individual chart sections. For now, let's assume sections exist.
+            // We'll update each section individually.
+
+            const token = getAuthToken();
+            if (!token) {
+                chartContainer.innerHTML = "<h1>Please log in to view health data.</h1>";
+                return;
+            }
+
+            const apiUrl = `${API_BASE_URL}/health-data/me?limit=200`;
+            console.log("Fetching all health data for charts from:", apiUrl);
+
+            try {
+                const response = await fetch(apiUrl, { headers: { 'Authorization': `Bearer ${token}` } });
+                console.log("Chart data fetch response status:", response.status);
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error("Chart data fetch failed:", response.status, errorText);
+                    chartContainer.innerHTML = `<p style="color:red; text-align:center;">Failed to load chart data (${response.status})</p>`;
+                    return;
+                }
+
+                const allEntries = await response.json();
+                console.log("Received all health data for charts (raw):", JSON.stringify(allEntries));
+                console.log(`Number of entries received: ${Array.isArray(allEntries) ? allEntries.length : 'Not an array'}`);
+
+                if (!Array.isArray(allEntries) || allEntries.length === 0) {
+                    console.log("No entries to display in charts.");
+                    // Display "No data" in each chart section
+                    const chartSections = chartContainer.querySelectorAll('.health-section');
+                    chartSections.forEach(section => {
+                        const canvas = section.querySelector('canvas');
+                        if (canvas) canvas.style.display = 'none'; // Hide the canvas element
+                        // Add a 'no data' message if one isn't already there
+                        if (!section.querySelector('.no-data-message')) {
+                            const noDataP = document.createElement('p');
+                            noDataP.className = 'no-data-message';
+                            noDataP.textContent = 'No data recorded for this metric.';
+                            noDataP.style.textAlign = 'center';
+                            noDataP.style.padding = '20px';
+                            section.appendChild(noDataP);
+                        }
+                    });
+                    return;
+                }
+
+                // If data exists, remove any "no data" messages and show canvas
+                chartContainer.querySelectorAll('.health-section').forEach(section => {
+                     const canvas = section.querySelector('canvas');
+                     const noDataMsg = section.querySelector('.no-data-message');
+                     if (canvas) canvas.style.display = 'block'; // Ensure canvas is visible
+                     if (noDataMsg) noDataMsg.remove();
+                });
+
+
+                const entries = allEntries.slice().reverse();
+                console.log("Reversed entries for plotting:", entries);
+
+                // Inside loadAllHealthDataForCharts
+const chartLabels = entries.map(e => {
+    if (!e || !e.timestamp) {
+        console.warn("Entry missing timestamp during label creation:", e);
+        return "Invalid Date";
+    }
+    try {
+        // Create a Date object (this will be in local timezone)
+        const localDate = new Date(e.timestamp); // Parses UTC string from backend into local Date
+        // Format for display
+        return localDate.toLocaleString(undefined, {
+            month: 'short',
+            day: 'numeric',
+            hour: 'numeric',
+            minute: '2-digit',
+            // hour12: true // Optional: force 12-hour AM/PM
+        });
+    } catch (err) {
+        console.error("Error formatting chart label for timestamp:", e.timestamp, err);
+        return "Error Date";
+    }
+});
+                console.log("Chart X-Axis Labels:", chartLabels);
+
+                // Blood Pressure Chart
+                const systolicData = entries.map(e => e.systolic_bp);
+                const diastolicData = entries.map(e => e.diastolic_bp);
+                //destroyChart('bloodPressureChart'); // Still good to destroy existing before recreating
+                const bpCanvas = document.getElementById('bloodPressureChart');
+                if (bpCanvas) {
+                    console.log("Creating Blood Pressure chart"); // DEBUG
+                    charts['bloodPressureChart'] = new Chart(bpCanvas.getContext('2d'), { /* ... config ... */ });
+                } else { console.error("BloodPressureChart canvas not found!"); }
+
+
+                // Other Charts
+                if (document.getElementById('heartRateChart')) {
+                     console.log("Creating Heart Rate chart"); // DEBUG
+                     createOrUpdateChart('heartRateChart', 'Heart Rate', chartLabels, entries.map(e => e.heart_rate), 'rgba(54, 162, 235, 1)', 'BPM', 40, 160);
+                }
+                if (document.getElementById('oxygenSaturationChart')) {
+                     console.log("Creating Oxygen Saturation chart"); // DEBUG
+                     createOrUpdateChart('oxygenSaturationChart', 'Oxygen Saturation (SpO2)', chartLabels, entries.map(e => e.oxygen_saturation), 'rgba(75, 192, 192, 1)', '%', 90, 100.5);
+                }
+                if (document.getElementById('temperatureChart')) {
+                     console.log("Creating Temperature chart"); // DEBUG
+                     createOrUpdateChart('temperatureChart', 'Temperature (°C)', chartLabels, entries.map(e => e.temperature_celsius), 'rgba(153, 102, 255, 1)', '°C', 35, 40);
+                }
+                if (document.getElementById('weightChart')) {
+                     console.log("Creating Weight chart"); // DEBUG
+                     createOrUpdateChart('weightChart', 'Weight (kg)', chartLabels, entries.map(e => e.weight_kg), 'rgba(255, 205, 86, 1)', 'kg');
+                }
+                if (document.getElementById('glucoseChart')) {
+                     console.log("Creating Glucose chart"); // DEBUG
+                     createOrUpdateChart('glucoseChart', 'Glucose', chartLabels, entries.map(e => e.glucose_level), 'rgba(255, 159, 64, 1)', 'mg/dL');
+                }
+                if (document.getElementById('respiratoryRateChart')) {
+                     console.log("Creating Respiratory Rate chart"); // DEBUG
+                     createOrUpdateChart('respiratoryRateChart', 'Respiratory Rate', chartLabels, entries.map(e => e.respiratory_rate), 'rgba(100, 100, 255, 1)', 'bpm');
+                }
+
+            } catch (error) {
+                console.error("Error loading chart data:", error);
+                if(chartContainer) chartContainer.innerHTML = `<p style="color:red;text-align:center;">Error loading data for charts: ${error.message}</p>`;
+            }
+        } // End of loadAllHealthDataForCharts
+
+        // Keep createOrUpdateChart, destroyChart, getAuthToken, goBack functions
+        // ...
+
+        // Initial Load
+        loadAllHealthDataForCharts();
+
+    }); // End DOMContentLoaded
+
+    function goBack() {
+        window.location.href = 'health-monitor.html'; // Or 'index.html' or wherever appropriate
+    }
     </script>
 </body>
 </html>

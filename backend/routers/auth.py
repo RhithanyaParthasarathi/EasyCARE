@@ -105,7 +105,7 @@ def create_jwt_token(data: dict):
     payload['exp'] = datetime.utcnow() + timedelta(minutes=30)  # Token expires in 30 minutes
     return jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
 
-def verify_jwt_token(token: str):
+def verify_jwt_token(token: str):  
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         return payload
