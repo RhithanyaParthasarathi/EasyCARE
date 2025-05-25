@@ -29,7 +29,7 @@ document.addEventListener("DOMContentLoaded", function() {
     const saveButton = document.getElementById("save-profile-btn");
 
     // API Base URL
-    const API_BASE_URL = 'http://127.0.0.1:8000'; // Adjust if needed
+    const API_BASE_URL = 'https://chronicare.onrender.com'; // Adjust if needed
 
     // --- Helper: Get Auth Token ---
     function getAuthToken() {

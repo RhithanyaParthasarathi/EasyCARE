@@ -1,5 +1,5 @@
 // header.js
-const API_BASE_URL_HEADER = 'http://127.0.0.1:8000'; // Define Base URL  globally
+const API_BASE_URL_HEADER = 'https://chronicare.onrender.com'; // Define Base URL  globally
 // --- Logout Functionality ---
 function handleLogout() {
     if (confirm("Are you sure you want to log out?")) {

@@ -205,7 +205,7 @@ canvas {
     // health-data.js (Charts Page)
     document.addEventListener('DOMContentLoaded', function() {
         console.log("Health Data Chart Page JS Loaded");
-        const API_BASE_URL = 'http://127.0.0.1:8000';
+        const API_BASE_URL = 'https://chronicare.onrender.com';
         let charts = {}; // Store chart instances for updates/destruction
 
         function getAuthToken() { return localStorage.getItem('accessToken'); }
@@ -370,7 +370,7 @@ const chartLabels = entries.map(e => {
                 // Blood Pressure Chart
                 const systolicData = entries.map(e => e.systolic_bp);
                 const diastolicData = entries.map(e => e.diastolic_bp);
-                //destroyChart('bloodPressureChart'); // Still good to destroy existing before recreating
+                destroyChart('bloodPressureChart'); // Still good to destroy existing before recreating
                 const bpCanvas = document.getElementById('bloodPressureChart');
                 if (bpCanvas) {
                     console.log("Creating Blood Pressure chart"); // DEBUG

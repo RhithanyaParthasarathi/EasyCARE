@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let currentCalendarDate = new Date();
     let selectedDate = null; // JS Date object
     let currentDaySlots = {}; // Format: { 'HH:MM': { saved: boolean, selected: boolean } }
-    const API_BASE_URL = 'http://127.0.0.1:8000/appointments'; // Adjust if needed
+    const API_BASE_URL = 'https://chronicare.onrender.com/appointments'; // Adjust if needed
 
     // --- Default Slot Definitions ---
     const defaultTimeSlots = {
