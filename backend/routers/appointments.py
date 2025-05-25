@@ -673,7 +673,7 @@ async def get_my_confirmed_patient_list(
     ).distinct(
         User.id
     ).order_by(
-         # <<< ADD User.id as the FIRST ordering criteria
+        User.id,  # <<< ADD User.id as the FIRST ordering criteria
         User.username # Then order by username for consistent results within same user ID (though distinct makes this less impactful)
     )
     distinct_patients_result = distinct_patients_query.all()
