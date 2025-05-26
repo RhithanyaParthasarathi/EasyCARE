@@ -1,7 +1,7 @@
 # backend/routers/appointments.py
 from fastapi import APIRouter, Depends, HTTPException, status, Query, Request
 from pydantic import BaseModel, field_validator
-from sqlalchemy.orm import Session, joinedload
+from sqlalchemy.orm import Session, joinedload, selectinload
 from sqlalchemy import distinct
 from typing import Annotated, List, Optional
 from database import get_db
@@ -180,83 +180,147 @@ async def get_my_schedule_for_date(
 
 @router.put("/schedule", status_code=status.HTTP_200_OK)
 async def save_my_schedule(
-    current_doctor: current_doctor_dependency, # Use auth dependency
-    schedule_request: ScheduleSaveRequest, # Get date & slots from body
-    db: db_dependency 
+    current_doctor: current_doctor_dependency,
+    schedule_request: ScheduleSaveRequest,
+    db: db_dependency
 ):
-    """
-    Saves/updates the logged-in doctor's schedule for the specific date
-    provided in the request body. Replaces the entire schedule for that day.
-    """
-    target_date = schedule_request.date # Already a date object from Pydantic validation
+    target_date = schedule_request.date
+    print(f"Attempting to save schedule for doctor {current_doctor.id} on {target_date}") # DEBUG
 
-    # Use a transaction
     try:
-        # 1. Delete ALL existing slots for this doctor on this specific date
-        db.query(TimeSlot).filter(
+        # 1. Identify slots to be potentially removed
+        # Get IDs of all existing slots for the doctor on that day
+        existing_slots_on_day = db.query(TimeSlot).filter(
             TimeSlot.doctor_id == current_doctor.id,
             TimeSlot.date == target_date
-        ).delete(synchronize_session=False) # Efficient delete
+        ).all()
 
-        # 2. Add the new slots provided in the request
-        new_slots_to_add = []
-        added_times = set() # To prevent duplicates *within the same request*
+        new_schedule_start_times = {slot.start_time for slot in schedule_request.slots}
+        slots_to_actually_delete_ids = []
+
+        for es in existing_slots_on_day:
+            if es.start_time not in new_schedule_start_times: # This slot is being removed by the new schedule
+                # Check if this slot has ANY appointments (pending, confirmed, etc.)
+                appointment_linked = db.query(Appointment.id).filter(Appointment.timeslot_id == es.id).first()
+                if appointment_linked:
+                    # If an appointment is linked, we cannot delete this TimeSlot due to FK constraint
+                    db.rollback() # Important to rollback before raising
+                    raise HTTPException(
+                        status_code=status.HTTP_409_CONFLICT,
+                        detail=f"Cannot update schedule. Time slot {es.start_time} on {target_date} has an existing appointment. Please manage the appointment first."
+                    )
+                else:
+                    # No appointment linked, safe to mark for deletion
+                    slots_to_actually_delete_ids.append(es.id)
+
+        # 2. Delete the identified old slots that are safe to delete
+        if slots_to_actually_delete_ids:
+            print(f"Deleting time slots with IDs: {slots_to_actually_delete_ids}") # DEBUG
+            db.query(TimeSlot).filter(
+                TimeSlot.id.in_(slots_to_actually_delete_ids)
+            ).delete(synchronize_session=False)
+            # No commit here yet, do it once at the end
+
+        # 3. Add the new slots from the request
+        # We only need to add slots that are not already in the existing_slots_on_day
+        # (unless their properties like is_booked were to change, but here they are always new/available)
+        final_existing_slot_times = {es.start_time for es in existing_slots_on_day if es.id not in slots_to_actually_delete_ids}
+        new_slots_to_add_db = []
         for slot_data in schedule_request.slots:
-             if slot_data.start_time not in added_times:
+            if slot_data.start_time not in final_existing_slot_times:
+                # This slot is genuinely new or was one of the deletable ones
                 new_time_slot = TimeSlot(
-                    start_time=slot_data.start_time, # Only start_time
+                    start_time=slot_data.start_time,
                     date=target_date,
-                    doctor_id=current_doctor.id
+                    doctor_id=current_doctor.id,
+                    is_booked=False # New slots created by doctor are available
                 )
-                new_slots_to_add.append(new_time_slot)
-                added_times.add(slot_data.start_time)
+                new_slots_to_add_db.append(new_time_slot)
 
-        if new_slots_to_add:
-            db.add_all(new_slots_to_add)
+        if new_slots_to_add_db:
+            print(f"Adding new time slots: {[s.start_time for s in new_slots_to_add_db]}") #DEBUG
+            db.add_all(new_slots_to_add_db)
 
-        # 3. Commit changes
+        # 4. Commit all changes (deletions and additions)
         db.commit()
+        print(f"Schedule for {target_date} saved successfully.") # DEBUG
 
+    except HTTPException as http_exc: # Re-raise specific HTTPExceptions
+        # db.rollback() # Already handled before raising if inside this block
+        raise http_exc
     except Exception as e:
-        db.rollback() # Important: undo changes on error
-        print(f"Error saving schedule for doctor {current_doctor.id} on {target_date}: {e}") # Log for debugging
+        db.rollback() # Rollback on any other unexpected error
+        print(f"Error saving schedule for doctor {current_doctor.id} on {target_date}: {e}")
+        # Be careful not to expose too much detail from 'e' if it's a generic Exception
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Failed to save schedule due to a server error.")
 
-    return {"message": f"Schedule for {target_date.strftime('%Y-%m-%d')} saved successfully.", "slots_added": len(new_slots_to_add)}
+    # Determine number of slots in the final schedule for the day
+    final_slots_count = db.query(TimeSlot).filter(
+        TimeSlot.doctor_id == current_doctor.id,
+        TimeSlot.date == target_date
+    ).count()
+
+    return {"message": f"Schedule for {target_date.strftime('%Y-%m-%d')} updated successfully.", "slots_in_schedule": final_slots_count}
+
 
 @router.delete("/schedule", status_code=status.HTTP_200_OK)
 async def delete_my_schedule_for_date(
-    current_doctor: current_doctor_dependency, # Use auth dependency
-    db: db_dependency ,
-    date: str = Query(..., description="Date in YYYY-MM-DD format") # Date from query param
-    
+    current_doctor: current_doctor_dependency,
+    db: db_dependency,
+    date: str = Query(..., description="Date in YYYY-MM-DD format")
 ):
-    """Deletes the logged-in doctor's schedule for a specific date."""
     try:
         target_date = datetime.strptime(date, "%Y-%m-%d").date()
     except ValueError:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid date format. Use YYYY-MM-DD.")
 
+    print(f"Attempting to delete schedule for doctor {current_doctor.id} on {target_date}") # DEBUG
+
     try:
-        # Delete slots for this doctor on this date
-        deleted_count = db.query(TimeSlot).filter(
+        # 1. Find all slots for the doctor on that date
+        slots_to_delete = db.query(TimeSlot).filter(
             TimeSlot.doctor_id == current_doctor.id,
             TimeSlot.date == target_date
-        ).delete(synchronize_session=False)
+        ).all()
+
+        if not slots_to_delete:
+            return {"message": f"No schedule found for {target_date.strftime('%Y-%m-%d')} to delete."}
+
+        # 2. Check if any of these slots have linked appointments
+        for slot in slots_to_delete:
+            appointment_linked = db.query(Appointment.id).filter(Appointment.timeslot_id == slot.id).first()
+            if appointment_linked:
+                db.rollback() # Important
+                raise HTTPException(
+                    status_code=status.HTTP_409_CONFLICT,
+                    detail=f"Cannot delete schedule: Time slot {slot.start_time} on {target_date} has an existing appointment. Please manage appointments first."
+                )
+
+        # 3. If no linked appointments, proceed with deletion
+        deleted_count = 0
+        if slots_to_delete: # Should always be true if we passed the 'if not slots_to_delete' check
+            for slot in slots_to_delete: # Delete them individually or by ID list
+                db.delete(slot)
+            # Or more efficiently:
+            # slot_ids_to_delete = [s.id for s in slots_to_delete]
+            # deleted_count_result = db.query(TimeSlot).filter(TimeSlot.id.in_(slot_ids_to_delete)).delete(synchronize_session=False)
+            # deleted_count = deleted_count_result if deleted_count_result is not None else len(slot_ids_to_delete)
+            # For simplicity with individual delete then commit:
+            deleted_count = len(slots_to_delete)
+
 
         db.commit()
+        print(f"Deleted {deleted_count} time slots for doctor {current_doctor.id} on {target_date}.") # DEBUG
 
+        return {"message": f"Schedule for {target_date.strftime('%Y-%m-%d')} deleted successfully."}
+
+    except HTTPException as http_exc: # Re-raise specific HTTPExceptions
+        raise http_exc
     except Exception as e:
         db.rollback()
         print(f"Error deleting schedule for doctor {current_doctor.id} on {target_date}: {e}")
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Failed to delete schedule due to a server error.")
-
-    if deleted_count > 0:
-        return {"message": f"Schedule for {target_date.strftime('%Y-%m-%d')} deleted successfully."}
-    else:
-        # It's okay if nothing was there to delete
-        return {"message": f"No schedule found for {target_date.strftime('%Y-%m-%d')} to delete."}
-
+    
 # --- Patient Facing Endpoint ---
 
 @router.get("/doctors/{doctor_id}/schedule", response_model=List[TimeSlotResponse])
