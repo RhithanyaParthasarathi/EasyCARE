@@ -10,138 +10,115 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         /* health-data.css */
-body {
-    font-family: sans-serif;
-    margin: 0;
-    padding: 0;
-    background-color: #f9f5f0;
-    color: #333;
-    line-height: 1.6;
-    padding-bottom: 60px;
-}
-
-/* Header Styles */
-header {
-    background-color: #fff;
-    padding: 20px;
-    text-align: center;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-header h1 {
-    margin-bottom: 15px;
-    color: #1a237e; /* Dark blue heading */
-    font-size: 2.5em; /* Larger heading */
-}
-
-
-/* Main Content */
-main {
-    padding: 20px;
-}
-
-/* Health Data Sections */
-.health-section {
-    background-color: #fff;
-    border-radius: 10px;
-    padding: 20px;
-    margin-bottom: 20px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    text-align: center; /* Center content within each section */
-    aspect-ratio: 1 / 1; /* Make it a square */
-}
-
-/* Chart Styles */
-canvas {
-    max-width: 100%; /* Responsive charts within square */
-    max-height: 100%; /* Responsive charts within square */
-    margin: 0 auto; /* Center the charts */
-    object-fit: contain; /* Ensure charts fit within the defined space */
-}
-
-/* Back Button */
-.back-button {
-    background-color: #007bff;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 1em;
-    margin: 20px auto; /* Center the button */
-    display: block;
-    width: fit-content;
-}
-
-.back-button:hover {
-    background-color: #0056b3;
-}
-
-/*Additions to display as grid*/
-.health-section-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* Adjust minmax value */
-    gap: 20px; /* Add space between grid items */
-}
-
-.back-button {
-    background-color: #007bff;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 1em;
-    margin: 20px;
-    display: block; /* Make it a block element */
-    margin-left: auto;
-    margin-right: auto; /* Center horizontally */
-    width: fit-content; /* Adjust width to content */
-}
-
-.back-button:hover {
-    background-color: #0056b3;
-}
-
-/* Bottom Navigation Bar */
-.bottom-nav {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    background-color: #fff;
-    display: flex;
-    justify-content: space-around;
-    padding: 0.75rem 0;
-    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
-    z-index: 100; /* Ensure it stays on top */
-}
-
-.nav-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    color: #555;
-    text-decoration: none;
-    transition: color 0.3s ease;
-}
-
-.nav-item i {
-    font-size: 1.5rem;
-    margin-bottom: 0.25rem;
-}
-
-.nav-item span {
-    font-size: 0.75rem;
-}
-
-.nav-item:hover, .nav-item.active {
-    color: #007bff;
-}
-
-.nav-item.active{
-    color: #007bff;
-}
+        body {
+            font-family: sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f5f0;
+            color: #333;
+            line-height: 1.6;
+            padding-bottom: 60px;
+        }
+        /* Header Styles */
+        header {
+            background-color: #fff;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        header h1 {
+            margin-bottom: 15px;
+            color: #1a237e;
+            font-size: 2.5em;
+        }
+        main {
+            padding: 20px;
+        }
+        .health-section {
+            background-color: #fff;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            aspect-ratio: 1 / 1;
+        }
+        canvas {
+            max-width: 100%;
+            max-height: 100%;
+            margin: 0 auto;
+            object-fit: contain;
+        }
+        .back-button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            margin: 20px auto;
+            display: block;
+            width: fit-content;
+        }
+        .back-button:hover {
+            background-color: #0056b3;
+        }
+        .health-section-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .back-button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            margin: 20px;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+            width: fit-content;
+        }
+        .back-button:hover {
+            background-color: #0056b3;
+        }
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: #fff;
+            display: flex;
+            justify-content: space-around;
+            padding: 0.75rem 0;
+            box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+            z-index: 100;
+        }
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #555;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        .nav-item i {
+            font-size: 1.5rem;
+            margin-bottom: 0.25rem;
+        }
+        .nav-item span {
+            font-size: 0.75rem;
+        }
+        .nav-item:hover, .nav-item.active {
+            color: #007bff;
+        }
+        .nav-item.active{
+            color: #007bff;
+        }
     </style>
 </head>
 <body>
@@ -150,29 +127,25 @@ canvas {
     </header>
     <main>
         <div class="health-section-container">
-            <section class="health-section">
-                <h2>Blood Pressure</h2>
-                <canvas id="bloodPressureChart"></canvas>
-            </section>
 
             <section class="health-section">
                 <h2>Heart Rate</h2>
                 <canvas id="heartRateChart"></canvas>
             </section>
 
-            <section class="health-section">
+            <section class="health-section"></section>
                 <h2>Oxygen Saturation (SpO2)</h2>
                 <canvas id="oxygenSaturationChart"></canvas>
             </section>
 
-           <section class="health-section">
-    <h2>Glucose Level</h2>
-    <canvas id="glucoseChart"></canvas>
-</section>
-<section class="health-section">
-    <h2>Respiratory Rate</h2>
-    <canvas id="respiratoryRateChart"></canvas>
-</section>
+            <section class="health-section">
+                <h2>Glucose Level</h2>
+                <canvas id="glucoseChart"></canvas>
+            </section>
+            <section class="health-section">
+                <h2>Respiratory Rate</h2>
+                <canvas id="respiratoryRateChart"></canvas>
+            </section>
             <section class="health-section">
                 <h2>Temperature</h2>
                 <canvas id="temperatureChart"></canvas>
@@ -199,8 +172,6 @@ canvas {
         </a>
     </nav>
     <!-- health-data.html -->
-<!-- Keep all HTML and <style> as you provided -->
-<!-- REPLACE the existing <script> block at the bottom with this: -->
     <script>
     // health-data.js (Charts Page)
     document.addEventListener('DOMContentLoaded', function() {
@@ -264,9 +235,6 @@ canvas {
                         tooltip: {
                             callbacks: {
                                  title: function(tooltipItems) {
-                                     // Tooltip title can show the full date if labels are concise
-                                     // Assuming xLabels passed to Chart.js are full date strings
-                                     // or you can access original timestamp from data object if structured differently
                                      return tooltipItems[0].label; // Shows the formatted x-axis label
                                  }
                             }
@@ -283,9 +251,6 @@ canvas {
                  console.error("Chart container '.health-section-container' not found!");
                  return;
             }
-            // Don't clear the whole container here, just show a loading message within it
-            // or within individual chart sections. For now, let's assume sections exist.
-            // We'll update each section individually.
 
             const token = getAuthToken();
             if (!token) {
@@ -343,40 +308,26 @@ canvas {
                 const entries = allEntries.slice().reverse();
                 console.log("Reversed entries for plotting:", entries);
 
-                // Inside loadAllHealthDataForCharts
-const chartLabels = entries.map(e => {
-    if (!e || !e.timestamp) {
-        console.warn("Entry missing timestamp during label creation:", e);
-        return "Invalid Date";
-    }
-    try {
-        // Create a Date object (this will be in local timezone)
-        const localDate = new Date(e.timestamp); // Parses UTC string from backend into local Date
-        // Format for display
-        return localDate.toLocaleString(undefined, {
-            month: 'short',
-            day: 'numeric',
-            hour: 'numeric',
-            minute: '2-digit',
-            // hour12: true // Optional: force 12-hour AM/PM
-        });
-    } catch (err) {
-        console.error("Error formatting chart label for timestamp:", e.timestamp, err);
-        return "Error Date";
-    }
-});
+                // Chart X-Axis Labels
+                const chartLabels = entries.map(e => {
+                    if (!e || !e.timestamp) {
+                        console.warn("Entry missing timestamp during label creation:", e);
+                        return "Invalid Date";
+                    }
+                    try {
+                        const localDate = new Date(e.timestamp);
+                        return localDate.toLocaleString(undefined, {
+                            month: 'short',
+                            day: 'numeric',
+                            hour: 'numeric',
+                            minute: '2-digit',
+                        });
+                    } catch (err) {
+                        console.error("Error formatting chart label for timestamp:", e.timestamp, err);
+                        return "Error Date";
+                    }
+                });
                 console.log("Chart X-Axis Labels:", chartLabels);
-
-                // Blood Pressure Chart
-                const systolicData = entries.map(e => e.systolic_bp);
-                const diastolicData = entries.map(e => e.diastolic_bp);
-                destroyChart('bloodPressureChart'); // Still good to destroy existing before recreating
-                const bpCanvas = document.getElementById('bloodPressureChart');
-                if (bpCanvas) {
-                    console.log("Creating Blood Pressure chart"); // DEBUG
-                    charts['bloodPressureChart'] = new Chart(bpCanvas.getContext('2d'), { /* ... config ... */ });
-                } else { console.error("BloodPressureChart canvas not found!"); }
-
 
                 // Other Charts
                 if (document.getElementById('heartRateChart')) {
@@ -409,9 +360,6 @@ const chartLabels = entries.map(e => {
                 if(chartContainer) chartContainer.innerHTML = `<p style="color:red;text-align:center;">Error loading data for charts: ${error.message}</p>`;
             }
         } // End of loadAllHealthDataForCharts
-
-        // Keep createOrUpdateChart, destroyChart, getAuthToken, goBack functions
-        // ...
 
         // Initial Load
         loadAllHealthDataForCharts();

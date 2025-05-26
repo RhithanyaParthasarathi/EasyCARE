@@ -5,29 +5,86 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ChroniCARE - Patient Health Data</title>
     <!-- Common Styles -->
-    <link rel="stylesheet" href="styles.css"> <!-- Your main shared styles -->
-    <link rel="stylesheet" href="header.css"> <!-- Your header styles -->
-    <!-- Styles for this specific page (can reuse health-data.css or create new) -->
-    <link rel="stylesheet" href="health-data.css"> <!-- Assuming similar layout to patient's chart page -->
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="header.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <!-- Include Chart.js library -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- Re-pasting relevant styles from health-data.css for completeness if not using a shared file -->
     <style>
-        body { font-family: sans-serif; margin: 0; padding: 0; background-color: #f9f5f0; color: #333; line-height: 1.6; }
-        /* Header Styles (from your main header.css or defined here) */
-        /* header { background-color: #fff; padding: 20px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); } */
-        /* header h1 { margin-bottom: 15px; color: #1a237e; font-size: 2.5em; } */
-        main { padding: 20px; }
-        .health-section-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
-        .health-section { background-color: #fff; border-radius: 10px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); text-align: center; aspect-ratio: 1 / 1; }
-        .health-section h2 { color: #1a237e; margin-top: 0; margin-bottom: 15px; }
-        canvas { max-width: 100%; max-height: 100%; margin: 0 auto; object-fit: contain; }
-        .page-title { text-align: center; color: #1a237e; font-size: 2em; margin-bottom: 20px; }
-        .back-button-container { text-align: center; margin-top: 30px; }
-        .back-button { background-color: #007bff; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 1em; text-decoration: none; }
-        .back-button:hover { background-color: #0056b3; }
-        .no-data-message {text-align: center; padding: 20px; color: #555;}
+        body {
+            font-family: sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f5f0;
+            color: #333;
+            line-height: 1.6;
+            padding-bottom: 60px;
+        }
+        header {
+            background-color: #fff;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        header h1 {
+            margin-bottom: 15px;
+            color: #1a237e;
+            font-size: 2.5em;
+        }
+        main {
+            padding: 20px;
+        }
+        .health-section {
+            background-color: #fff;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            aspect-ratio: 1 / 1;
+        }
+        canvas {
+            max-width: 100%;
+            max-height: 100%;
+            margin: 0 auto;
+            object-fit: contain;
+        }
+        .back-button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            margin: 20px auto;
+            display: block;
+            width: fit-content;
+        }
+        .back-button:hover {
+            background-color: #0056b3;
+        }
+        .health-section-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .back-button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            margin: 20px;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+            width: fit-content;
+        }
+        .back-button:hover {
+            background-color: #0056b3;
+        }
     </style>
 </head>
 <body>
@@ -36,7 +93,6 @@
         <div class="logo">
             <h1 style="margin-left: 20px;"> ChroniCARE - Doctor</h1>
             <div class="header-menu">
-                <!-- Notification icon can be kept or removed for this specific view -->
                 <a href="notifications.html?origin=doctor" id="notification-link" class="notification-button" aria-label="View Notifications">
                     <i class="fas fa-bell"></i>
                     <span id="notification-indicator" class="notification-indicator-dot" style="display: none;"></span>
@@ -45,12 +101,9 @@
                     <i class="fas fa-ellipsis-v"></i>
                 </button>
                 <div class="menu-dropdown" id="page-menu-dropdown">
-                    <a href="docprofile.html?origin=doctor">My Profile</a>
-                    <a href="patient-list.html">Patient List</a> <!-- Link back to patient list -->
-                    <a href="appointments.html">My Appointments</a> <!-- Link to appointment requests -->
-                    <a href="telemedicine-schedule.html">My Schedule</a>
-                    <a href="contact.html?origin=doctor">Contact</a>
-                    <a href="about-us.html?origin=doctor">About Us</a>
+                    <a href="docprofile.html">My Profile</a>
+                    <a href="contact.html">Contact</a>
+                    <a href="about-us.html">About Us</a>
                     <a href="#" id="logout-button">Logout</a>
                 </div>
             </div>
@@ -60,11 +113,6 @@
     <main>
         <h1 id="patientHealthDataTitle" class="page-title">Patient Health Data</h1>
         <div class="health-section-container" id="healthChartsContainer">
-            <!-- Chart sections will be identical to patient's health-data.html -->
-            <section class="health-section">
-                <h2>Blood Pressure</h2>
-                <canvas id="bloodPressureChart"></canvas>
-            </section>
             <section class="health-section">
                 <h2>Heart Rate</h2>
                 <canvas id="heartRateChart"></canvas>
@@ -85,33 +133,21 @@
                 <h2>Temperature</h2>
                 <canvas id="temperatureChart"></canvas>
             </section>
-            <!-- Add canvas for Weight if it's a metric you want to display -->
-            <!--
-            <section class="health-section">
-                <h2>Weight</h2>
-                <canvas id="weightChart"></canvas>
-            </section>
-            -->
+            <!-- Weight chart can be added here if needed -->
         </div>
         <div class="back-button-container">
             <button class="back-button" onclick="goBackToPatientList()">Back to Patient List</button>
         </div>
     </main>
 
-    <script src="header.js"></script> <!-- Include common header JS -->
+    <script src="header.js"></script>
     <script>
-    // doctor-view-patient-health.js (Inline for this example)
-
     document.addEventListener('DOMContentLoaded', function() {
-        console.log("Doctor View Patient Health JS Loaded");
+        const API_BASE_URL = 'https://chronicare.onrender.com';
+        let charts = {};
 
-        const API_BASE_URL = 'https://chronicare.onrender.com'; // Use your deployed API
-        let charts = {}; // Store chart instances
-
-        // --- Helper Functions (These should be identical to patient's health-data.js) ---
         function getAuthToken() {
             const token = localStorage.getItem('accessToken');
-            console.log("Doctor View Health: Token Check - ", token ? "Found" : "Not Found");
             return token;
         }
 
@@ -119,15 +155,13 @@
             if (charts[chartId]) {
                 charts[chartId].destroy();
                 delete charts[chartId];
-                // console.log(`Chart ${chartId} destroyed.`);
             }
         }
 
         function createOrUpdateChart(canvasId, label, xLabels, dataPoints, color, yAxisLabel = 'Value', suggestedMin, suggestedMax) {
             destroyChart(canvasId);
             const ctx = document.getElementById(canvasId);
-            if (!ctx) { console.error(`Canvas with id ${canvasId} not found!`); return; }
-
+            if (!ctx) { return; }
             charts[canvasId] = new Chart(ctx.getContext('2d'), {
                 type: 'line',
                 data: {
@@ -156,17 +190,13 @@
                     plugins: { tooltip: { callbacks: { title: (items) => items[0].label }}}
                 }
             });
-            console.log(`Chart ${canvasId} created/updated.`);
         }
 
         function getQueryParam(name) {
             const urlParams = new URLSearchParams(window.location.search);
             return urlParams.get(name);
         }
-        // --- End Helper Functions ---
 
-
-        // --- Main Function to Load and Display Patient Data ---
         async function loadPatientHealthData() {
             const patientId = getQueryParam('patient_id');
             const patientNameParam = getQueryParam('patient_name');
@@ -180,16 +210,14 @@
 
             const chartContainer = document.getElementById('healthChartsContainer');
             if (!chartContainer) {
-                 console.error("Chart container #healthChartsContainer not found!");
                  if(pageTitleElement) pageTitleElement.insertAdjacentHTML('afterend', '<p style="color:red; text-align:center;">Error: Page structure incorrect. Chart container missing.</p>');
                  return;
             }
-            // Clear previous content and show loading message
             chartContainer.querySelectorAll('.health-section').forEach(section => {
                  const canvas = section.querySelector('canvas');
-                 if (canvas) canvas.style.display = 'none'; // Hide canvas
+                 if (canvas) canvas.style.display = 'none';
                  const noDataMsg = section.querySelector('.no-data-message');
-                 if (noDataMsg) noDataMsg.remove(); // Remove old no-data message
+                 if (noDataMsg) noDataMsg.remove();
                  const loadingMsg = document.createElement('p');
                  loadingMsg.className = 'loading-chart-message';
                  loadingMsg.textContent = 'Loading data...';
@@ -197,30 +225,23 @@
                  section.appendChild(loadingMsg);
             });
 
-
             if (!patientId) {
                 chartContainer.innerHTML = "<p style='color:red; text-align:center;'>Error: Patient ID not provided in URL.</p>";
                 return;
             }
 
-            const token = getAuthToken(); // Doctor's token
+            const token = getAuthToken();
             if (!token) {
                 chartContainer.innerHTML = "<p style='color:orange; text-align:center;'>Authentication error. Please log in as a doctor.</p>";
-                // Consider redirect: window.location.href = 'login.html';
                 return;
             }
 
-            // *** Use the NEW backend endpoint for doctors to get specific patient's data ***
-            const apiUrl = `${API_BASE_URL}/health-data/patient/${patientId}?limit=200`; // Fetch historical data
-            console.log("Doctor fetching patient health data from:", apiUrl);
-
+            const apiUrl = `${API_BASE_URL}/health-data/patient/${patientId}?limit=200`;
             try {
                 const response = await fetch(apiUrl, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
-                console.log("Patient health data fetch status for doctor:", response.status);
 
-                // Clear loading messages from all sections
                 chartContainer.querySelectorAll('.loading-chart-message').forEach(msg => msg.remove());
 
                 if (!response.ok) {
@@ -229,17 +250,15 @@
                         localStorage.removeItem('accessToken');
                         throw new Error(errorData.detail || "Authorization error. Please log in again.");
                     }
-                     if (response.status === 404) {
-                         throw new Error(errorData.detail || "Patient not found or no data accessible.");
-                     }
+                    if (response.status === 404) {
+                        throw new Error(errorData.detail || "Patient not found or no data accessible.");
+                    }
                     throw new Error(errorData.detail || `Failed to load patient health data (${response.status})`);
                 }
 
                 const allEntries = await response.json();
-                console.log("Received patient health data:", allEntries);
 
                 if (!Array.isArray(allEntries) || allEntries.length === 0) {
-                    console.log("No health entries for this patient.");
                     chartContainer.querySelectorAll('.health-section').forEach(section => {
                         const canvas = section.querySelector('canvas');
                         if (canvas) canvas.style.display = 'none';
@@ -254,7 +273,6 @@
                     return;
                 }
 
-                // Data exists, prepare for charting
                 chartContainer.querySelectorAll('.health-section').forEach(section => {
                     const canvas = section.querySelector('canvas');
                     const noDataMsg = section.querySelector('.no-data-message');
@@ -262,35 +280,11 @@
                     if (noDataMsg) noDataMsg.remove();
                 });
 
-                const entries = allEntries.slice().reverse(); // Oldest to newest
+                const entries = allEntries.slice().reverse();
                 const chartLabels = entries.map(e => {
                     if (!e || !e.timestamp) return "Invalid Date";
                     return new Date(e.timestamp).toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour:'numeric', minute:'2-digit' });
                 });
-
-                // Render charts (same logic as patient's health-data.js)
-                // Blood Pressure
-                const systolicData = entries.map(e => e.systolic_bp);
-                const diastolicData = entries.map(e => e.diastolic_bp);
-                destroyChart('bloodPressureChart');
-                const bpCanvas = document.getElementById('bloodPressureChart');
-                if (bpCanvas) {
-                    charts['bloodPressureChart'] = new Chart(bpCanvas.getContext('2d'), {
-                         type: 'line',
-                         data: {
-                             labels: chartLabels,
-                             datasets: [
-                                 { label: 'Systolic BP', data: systolicData, borderColor: 'rgba(255, 99, 132, 1)', tension: 0.1, fill: false },
-                                 { label: 'Diastolic BP', data: diastolicData, borderColor: 'rgba(54, 162, 235, 1)', tension: 0.1, fill: false }
-                             ]
-                         },
-                         options: {
-                             responsive: true, maintainAspectRatio: false,
-                             scales: { x: { title: {display: true, text: 'Timestamp'}}, y: { title: {display: true, text: 'mmHg'}, suggestedMin: 50, suggestedMax: 200 } },
-                             plugins: { tooltip: {callbacks: { title: (items) => new Date(entries[items[0].dataIndex].timestamp).toLocaleString() }}} // Show full date on hover
-                         }
-                    });
-                } else { console.error("Doctor view: BloodPressureChart canvas not found!"); }
 
                 if(document.getElementById('heartRateChart')) createOrUpdateChart('heartRateChart', 'Heart Rate', chartLabels, entries.map(e => e.heart_rate), 'rgba(54, 162, 235, 1)', 'BPM', 40, 160);
                 if(document.getElementById('oxygenSaturationChart')) createOrUpdateChart('oxygenSaturationChart', 'Oxygen Saturation (SpO2)', chartLabels, entries.map(e => e.oxygen_saturation), 'rgba(75, 192, 192, 1)', '%', 90, 100.5);
@@ -298,23 +292,17 @@
                 if(document.getElementById('respiratoryRateChart')) createOrUpdateChart('respiratoryRateChart', 'Respiratory Rate', chartLabels, entries.map(e => e.respiratory_rate), 'rgba(100, 100, 255, 1)', 'bpm');
                 if(document.getElementById('temperatureChart')) createOrUpdateChart('temperatureChart', 'Temperature (°C)', chartLabels, entries.map(e => e.temperature_celsius), 'rgba(153, 102, 255, 1)', '°C', 35, 40);
                 // Add weight chart if canvas exists
-                // const weightData = entries.map(e => e.weight_kg);
-                // if(document.getElementById('weightChart')) createOrUpdateChart('weightChart', 'Weight (kg)', chartLabels, weightData, 'rgba(255, 205, 86, 1)', 'kg');
-
-
+                // if(document.getElementById('weightChart')) createOrUpdateChart('weightChart', 'Weight (kg)', chartLabels, entries.map(e => e.weight_kg), 'rgba(255, 205, 86, 1)', 'kg');
             } catch (error) {
-                console.error("Error loading patient health data:", error);
                 chartContainer.innerHTML = `<p style="color:red; text-align:center;">Error loading data: ${error.message}</p>`;
             }
         }
 
-        // --- Initial Load ---
         loadPatientHealthData();
-
-    }); // End DOMContentLoaded
+    });
 
     function goBackToPatientList() {
-        window.location.href = 'patient-list.html'; // Back to the doctor's patient list
+        window.location.href = 'patient-list.html';
     }
     </script>
 </body>

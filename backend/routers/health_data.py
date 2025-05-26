@@ -1,12 +1,12 @@
 # backend/routers/health_data.py
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from pydantic import BaseModel, Field, field_validator, validator
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from typing import Annotated, List, Optional, Dict, Any
 from sqlalchemy import func, desc
 from database import get_db
-from models import User, UserRole, HealthDataEntry # Import new model
-from routers.auth import get_current_active_user # Use general user auth
+from models import User, UserRole, HealthDataEntry, Appointment# Import new model
+from routers.auth import get_current_active_user, get_current_doctor # Use general user auth
 from datetime import datetime, date as py_date, timezone, timedelta
 
 router = APIRouter(
@@ -16,6 +16,7 @@ router = APIRouter(
 
 db_dependency = Annotated[Session, Depends(get_db)]
 current_user_dependency = Annotated[User, Depends(get_current_active_user)]
+current_doctor_dependency = Annotated[User, Depends(get_current_doctor)]
 
 # --- Pydantic Models for Health Data ---
 
@@ -264,3 +265,54 @@ async def get_my_latest_health_snapshot(
     if not snapshot: # If no data at all was found for any metric
         return None
     return LatestHealthSnapshot(**snapshot) # Create Pydantic model from dict
+
+@router.get("/patient/{patient_id}", response_model=List[HealthDataResponse])
+async def get_patient_health_data_for_doctor(
+    patient_id: int,
+    current_doctor: current_doctor_dependency, # Doctor authentication
+    db: db_dependency,
+    limit: Optional[int] = Query(200, ge=1, le=1000, description="Number of recent entries to fetch"), # Default limit 200 for charts
+    start_date: Optional[py_date] = Query(None),
+    end_date: Optional[py_date] = Query(None)
+):
+    """
+    Allows an authenticated doctor to fetch health data entries for a specific patient.
+    Includes a basic check to see if the doctor has any appointment record with the patient.
+    """
+    print(f"Doctor {current_doctor.id} attempting to fetch health data for patient {patient_id}")
+
+    # 1. Verify patient exists and is actually a patient
+    patient = db.query(User).filter(User.id == patient_id, User.role == UserRole.patient).first()
+    if not patient:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Patient not found.")
+
+    # 2. Authorization Check: Does this doctor have any appointment (any status) with this patient?
+    # This is a basic check. A more robust system might have explicit doctor-patient linking.
+    association_check = db.query(Appointment.id).filter(
+        Appointment.doctor_id == current_doctor.id,
+        Appointment.patient_id == patient_id
+    ).first()
+
+    if not association_check:
+        # If no association, doctor cannot view this patient's private health data
+        print(f"Authorization failed: Doctor {current_doctor.id} not associated with patient {patient_id}.")
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You are not authorized to view this patient's health data."
+        )
+    print(f"Doctor {current_doctor.id} is authorized to view patient {patient_id} data.")
+
+    # 3. Fetch health data for the specified patient
+    query = db.query(HealthDataEntry).filter(HealthDataEntry.user_id == patient_id)
+
+    if start_date:
+        start_datetime = datetime.combine(start_date, datetime.min.time(), tzinfo=timezone.utc)
+        query = query.filter(HealthDataEntry.timestamp >= start_datetime)
+    if end_date:
+        end_datetime = datetime.combine(end_date, datetime.max.time(), tzinfo=timezone.utc)
+        query = query.filter(HealthDataEntry.timestamp <= end_datetime)
+
+    entries = query.order_by(HealthDataEntry.timestamp.desc()).limit(limit).all()
+    print(f"Found {len(entries)} health data entries for patient {patient_id} for doctor view.")
+    return entries
+# --- *** END OF NEW ENDPOINT *** ---

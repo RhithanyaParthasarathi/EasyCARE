@@ -11,7 +11,6 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font/css/materialdesignicons.min.css">
 
     <style>
-        /* Ensure these styles are present or in health-monitor.css */
         .monitor-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; padding: 20px; }
         .monitor-item { background-color: #fff; padding: 20px; border-radius: 10px; text-align: center; font-size: 1.1em; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08); border-left: 5px solid #007bff; }
         .monitor-item.clickable { cursor: pointer; transition: transform 0.2s ease; }
@@ -47,52 +46,43 @@
         <div class="monitor-item clickable" data-metric="heart_rate" data-unit="BPM" data-label="Heart Rate">
             <i class="fas fa-heartbeat"></i>
             <span>Heart Rate: <span id="heart-rate-value">--</span> BPM</span>
-            <small id="heart_rate-status" class="status-text"></small> <!-- Corrected ID to match JS -->
+            <small id="heart_rate-status" class="status-text"></small>
         </div>
-        <div class="monitor-item clickable" data-metric="blood_pressure" data-unit="mmHg" data-label="Blood Pressure">
-            <i class="fas fa-tint"></i>
-            <span>Blood Pressure: <span id="blood-pressure-value">--</span> mmHg</span>
-            <small id="bp-status" class="status-text"></small> <!-- Corrected ID -->
-        </div>
+        
         <div class="monitor-item clickable" data-metric="oxygen_saturation" data-unit="%" data-label="Oxygen Saturation (SpO2)">
             <i class="fa-solid fa-wind"></i>
             <span>Oxygen Saturation: <span id="oxygen-saturation-value">--</span>%</span>
-            <small id="oxygen_saturation-status" class="status-text"></small> <!-- Corrected ID -->
+            <small id="oxygen_saturation-status" class="status-text"></small>
         </div>
         <div class="monitor-item clickable" data-metric="respiratory_rate" data-unit="bpm" data-label="Respiratory Rate">
-    <i class="fa-solid fa-lungs"></i>
-    <span>Respiratory Rate: <span id="respiratory-rate-value">--</span> bpm</span>
-    <small id="respiratory_rate-status" class="status-text"></small>
-</div>
+            <i class="fa-solid fa-lungs"></i>
+            <span>Respiratory Rate: <span id="respiratory-rate-value">--</span> bpm</span>
+            <small id="respiratory_rate-status" class="status-text"></small>
+        </div>
         <div class="monitor-item clickable" data-metric="glucose_level" data-unit="mg/dL" data-label="Glucose Level">
             <i class="fas fa-prescription-bottle"></i>
             <span>Glucose Level: <span id="glucose-level-value">--</span> mg/dL</span>
-            <small id="glucose_level-status" class="status-text"></small> <!-- Corrected ID -->
+            <small id="glucose_level-status" class="status-text"></small>
         </div>
         <div class="monitor-item clickable" data-metric="temperature_celsius" data-unit="°C" data-label="Temperature">
             <i class="fa-solid fa-temperature-three-quarters"></i>
             <span>Temperature: <span id="temperature-value">--</span> °C</span>
-            <small id="temperature_celsius-status" class="status-text"></small> <!-- Corrected ID -->
+            <small id="temperature_celsius-status" class="status-text"></small>
         </div>    
         <div class="monitor-item actions-item">
             <div style="width:100%; display:flex; justify-content:center;">
-        <button class="healthdata-button">View Health Data</button></div>
+                <button class="healthdata-button">View Health Data</button>
+            </div>
         </div>
     </main>
 
-    <!-- Modal for Data Input -->
+    <!-- Modal for Data Input (BP inputs removed) -->
     <div id="dataInputModal" class="modal">
         <div class="modal-content">
             <span class="close-modal-btn">×</span>
             <h3 id="modalTitle">Log New Value</h3>
             <label for="metricValueInput" id="modalInputLabel">Value:</label>
             <input type="number" id="metricValueInput" step="any" placeholder="Enter value">
-            <div id="bpInputs" style="display:none;">
-                <label for="systolicBpInput">Systolic BP (mmHg):</label>
-                <input type="number" id="systolicBpInput" placeholder="e.g., 120">
-                <label for="diastolicBpInput">Diastolic BP (mmHg):</label>
-                <input type="number" id="diastolicBpInput" placeholder="e.g., 80">
-            </div>
             <div id="modalSaveStatus" style="margin-top:10px; min-height:1.2em;"></div>
             <button id="saveMetricBtn" class="profile-button" style="background-color: #28a745; color:white;">Save Data</button>
         </div>
@@ -104,12 +94,8 @@
         <a href="telemedicine.html" class="nav-item"><i class="fa-solid fa-video"></i><span>Telemedicine</span></a>
         <a href="profile.html" class="nav-item"><i class="fa-solid fa-user"></i><span>Profile</span></a>
     </nav>
-    <!-- health-monitor.html -->
-<!-- Keep all HTML and <style> as you provided -->
-<!-- REPLACE the existing <script> block at the bottom with this: -->
-    <script src="header.js"></script> <!-- Assuming header.js is separate -->
+    <script src="header.js"></script>
     <script>
-    // health-monitor.js
     document.addEventListener('DOMContentLoaded', function() {
         console.log("Health Monitor JS Loaded");
 
@@ -120,32 +106,25 @@
         const modalTitle = document.getElementById('modalTitle');
         const modalInputLabel = document.getElementById('modalInputLabel');
         const metricValueInput = document.getElementById('metricValueInput');
-        const bpInputsDiv = document.getElementById('bpInputs');
-        const systolicBpInput = document.getElementById('systolicBpInput');
-        const diastolicBpInput = document.getElementById('diastolicBpInput');
         const saveMetricBtn = document.getElementById('saveMetricBtn');
-        const modalCloseBtn = dataInputModal?.querySelector('.close-modal-btn'); // Optional chaining
+        const modalCloseBtn = dataInputModal?.querySelector('.close-modal-btn');
         const modalSaveStatus = document.getElementById('modalSaveStatus');
-        const viewHealthHistoryBtn = document.querySelector('.healthdata-button'); // Assuming only one such button
+        const viewHealthHistoryBtn = document.querySelector('.healthdata-button');
 
         const API_BASE_URL = 'https://chronicare.onrender.com';
-        let currentMetricToLog = null; // Key like 'heart_rate'
-        let currentMetricLabel = '';   // User-friendly label like 'Heart Rate'
+        let currentMetricToLog = null;
+        let currentMetricLabel = '';
 
         function getAuthToken() { return localStorage.getItem('accessToken'); }
-        // We don't need getUserId() as backend uses authenticated user
 
         function setStatusText(metricKey, statusText, valueForStatus = null) {
-            // Example: metricKey = 'heart_rate', statusText = 'Normal'
-            // Example: metricKey = 'blood_pressure', statusText = 'High BP (Stage 1)'
-            // Example: metricKey = 'oxygen_saturation', statusText = 'Low'
             const statusElement = document.getElementById(`${metricKey}-status`);
             if (!statusElement) {
                 console.warn(`Status element not found for metric key: ${metricKey}-status. Original metric: ${metricKey}`);
                 return;
             }
             statusElement.textContent = statusText || '';
-            statusElement.className = 'status-text'; // Reset
+            statusElement.className = 'status-text';
             if (statusText) {
                 const cssClass = `status-${statusText.toLowerCase().replace(/[^a-z0-9]/gi, '-').replace(/-+/g, '-')}`;
                 statusElement.classList.add(cssClass);
@@ -153,28 +132,16 @@
         }
 
         function openDataInputModal(metric, label, unit) {
-            currentMetricToLog = metric; // e.g., 'heart_rate'
-            currentMetricLabel = label; // e.g., 'Heart Rate'
+            currentMetricToLog = metric;
+            currentMetricLabel = label;
             if(modalTitle) modalTitle.textContent = `Log New ${label}`;
             if(modalSaveStatus) modalSaveStatus.textContent = '';
             if(metricValueInput) metricValueInput.value = '';
-            if(systolicBpInput) systolicBpInput.value = '';
-            if(diastolicBpInput) diastolicBpInput.value = '';
 
-            if (metric === 'blood_pressure') {
-                if(metricValueInput) metricValueInput.style.display = 'none';
-                if(modalInputLabel) modalInputLabel.style.display = 'none';
-                if(bpInputsDiv) bpInputsDiv.style.display = 'block';
-            } else {
-                if(metricValueInput) metricValueInput.style.display = 'block';
-                if(modalInputLabel) modalInputLabel.style.display = 'block';
-                if(modalInputLabel) modalInputLabel.textContent = `${label} (${unit}):`;
-                if(bpInputsDiv) bpInputsDiv.style.display = 'none';
-                if(metricValueInput) {
-                    metricValueInput.step = (metric === 'oxygen_saturation' || metric === 'glucose_level' || metric === 'temperature_celsius') ? '0.1' : '1';
-                    metricValueInput.placeholder = `Enter ${label.toLowerCase()}`;
-                }
-            }
+            if(metricValueInput) metricValueInput.style.display = 'block';
+            if(modalInputLabel) modalInputLabel.style.display = 'block';
+            if(modalInputLabel) modalInputLabel.textContent = `${label} (${unit}):`;
+
             if(dataInputModal) dataInputModal.style.display = 'block';
         }
 
@@ -188,97 +155,83 @@
         });
 
         async function loadLatestHealthData() {
-    if(loadingDashboardMsg) loadingDashboardMsg.style.display = 'block';
-    console.log("loadLatestHealthData: Fetching snapshot...");
+            if(loadingDashboardMsg) loadingDashboardMsg.style.display = 'block';
+            console.log("loadLatestHealthData: Fetching snapshot...");
 
-    // Reset display values before fetching
-    const defaultText = '--';
-    document.getElementById('heart-rate-value').textContent = defaultText;
-    document.getElementById('blood-pressure-value').textContent = defaultText;
-    document.getElementById('oxygen-saturation-value').textContent = defaultText;
-    document.getElementById('glucose-level-value').textContent = defaultText;
-    document.getElementById('temperature-value').textContent = defaultText;
-    document.getElementById('respiratory-rate-value').textContent = defaultText;
-    setStatusText('heart_rate', '');
-    setStatusText('blood_pressure', ''); // HTML ID for BP status span is 'bp-status'
-    setStatusText('oxygen_saturation', '');
-    setStatusText('glucose_level', '');
-    setStatusText('temperature_celsius', '');
-    setStatusText('respiratory_rate', '');
+            const defaultText = '--';
+            document.getElementById('heart-rate-value').textContent = defaultText;
+            document.getElementById('oxygen-saturation-value').textContent = defaultText;
+            document.getElementById('glucose-level-value').textContent = defaultText;
+            document.getElementById('temperature-value').textContent = defaultText;
+            document.getElementById('respiratory-rate-value').textContent = defaultText;
+            setStatusText('heart_rate', '');
+            setStatusText('oxygen_saturation', '');
+            setStatusText('glucose_level', '');
+            setStatusText('temperature_celsius', '');
+            setStatusText('respiratory_rate', '');
 
-
-    const token = getAuthToken();
-    if (!token) {
-        if(loadingDashboardMsg) loadingDashboardMsg.textContent = 'Please log in to view data.';
-        return;
-    }
-
-    // *** CALL NEW ENDPOINT ***
-    const apiUrl = `${API_BASE_URL}/health-data/me/latest-snapshot`;
-    console.log("Fetching latest health snapshot from:", apiUrl);
-
-    try {
-        const response = await fetch(apiUrl, { headers: { 'Authorization': `Bearer ${token}` } });
-        if(loadingDashboardMsg) loadingDashboardMsg.style.display = 'none';
-
-        if (!response.ok) {
-            if (response.status === 401 || response.status === 403) localStorage.removeItem('accessToken');
-            // If 204 (No Content) or 404 (Not Found) from this endpoint, it means no snapshot data
-            if (response.status === 204 || response.status === 404) {
-                 console.log("No health snapshot data found.");
-                 // Display "No data recorded yet" message (already handled below if snapshot is null)
-                 return;
+            const token = getAuthToken();
+            if (!token) {
+                if(loadingDashboardMsg) loadingDashboardMsg.textContent = 'Please log in to view data.';
+                return;
             }
-            const errorData = await response.json().catch(() => ({}));
-            throw new Error(errorData.detail || `Failed to fetch latest data (${response.status})`);
-        }
 
-        const snapshot = await response.json(); // Expects LatestHealthSnapshot or null
-        console.log("Received health snapshot:", snapshot);
+            const apiUrl = `${API_BASE_URL}/health-data/me/latest-snapshot`;
+            console.log("Fetching latest health snapshot from:", apiUrl);
 
-        if (snapshot) { // Check if snapshot is not null
-            // Remove "No data recorded yet" message if it exists
-            const noDataMsgEl = document.getElementById('no-data-monitor-msg');
-            if (noDataMsgEl) noDataMsgEl.remove();
+            try {
+                const response = await fetch(apiUrl, { headers: { 'Authorization': `Bearer ${token}` } });
+                if(loadingDashboardMsg) loadingDashboardMsg.style.display = 'none';
 
-            // Update UI based on 'snapshot' data
-            if(snapshot.heart_rate !== null) document.getElementById('heart-rate-value').textContent = snapshot.heart_rate;
-            setStatusText('heart_rate', snapshot.heart_rate_status);
+                if (!response.ok) {
+                    if (response.status === 401 || response.status === 403) localStorage.removeItem('accessToken');
+                    if (response.status === 204 || response.status === 404) {
+                        console.log("No health snapshot data found.");
+                        return;
+                    }
+                    const errorData = await response.json().catch(() => ({}));
+                    throw new Error(errorData.detail || `Failed to fetch latest data (${response.status})`);
+                }
 
-            if(snapshot.systolic_bp !== null && snapshot.diastolic_bp !== null) {
-                document.getElementById('blood-pressure-value').textContent = `${snapshot.systolic_bp}/${snapshot.diastolic_bp}`;
-            }
-            setStatusText('blood_pressure', snapshot.bp_status); // Matches HTML ID for bp-status
+                const snapshot = await response.json();
+                console.log("Received health snapshot:", snapshot);
 
-            if(snapshot.oxygen_saturation !== null) document.getElementById('oxygen-saturation-value').textContent = snapshot.oxygen_saturation;
-            setStatusText('oxygen_saturation', snapshot.oxygen_status);
+                if (snapshot) {
+                    const noDataMsgEl = document.getElementById('no-data-monitor-msg');
+                    if (noDataMsgEl) noDataMsgEl.remove();
 
-            if(snapshot.glucose_level !== null) document.getElementById('glucose-level-value').textContent = snapshot.glucose_level;
-            setStatusText('glucose_level', snapshot.glucose_status);
+                    if(snapshot.heart_rate !== null) document.getElementById('heart-rate-value').textContent = snapshot.heart_rate;
+                    setStatusText('heart_rate', snapshot.heart_rate_status);
 
-            if(snapshot.temperature_celsius !== null) document.getElementById('temperature-value').textContent = snapshot.temperature_celsius;
-            setStatusText('temperature_celsius', snapshot.temperature_status);
+                    if(snapshot.oxygen_saturation !== null) document.getElementById('oxygen-saturation-value').textContent = snapshot.oxygen_saturation;
+                    setStatusText('oxygen_saturation', snapshot.oxygen_status);
 
-            if(snapshot.respiratory_rate !== null) document.getElementById('respiratory-rate-value').textContent = snapshot.respiratory_rate;
-            setStatusText('respiratory_rate', snapshot.respiratory_rate_status);
+                    if(snapshot.glucose_level !== null) document.getElementById('glucose-level-value').textContent = snapshot.glucose_level;
+                    setStatusText('glucose_level', snapshot.glucose_status);
 
-        } else {
-            console.log("No health data recorded yet (snapshot was null).");
-            const mainGrid = document.querySelector('.monitor-grid');
-            if (mainGrid && !document.getElementById('no-data-monitor-msg')) {
-                 const noDataMsg = document.createElement('p');
-                 noDataMsg.id = 'no-data-monitor-msg';
-                 noDataMsg.textContent = 'No health data recorded yet. Click on a metric to add your first entry!';
-                 noDataMsg.style.textAlign = 'center';
-                 noDataMsg.style.gridColumn = '1 / -1';
-                 mainGrid.prepend(noDataMsg);
+                    if(snapshot.temperature_celsius !== null) document.getElementById('temperature-value').textContent = snapshot.temperature_celsius;
+                    setStatusText('temperature_celsius', snapshot.temperature_status);
+
+                    if(snapshot.respiratory_rate !== null) document.getElementById('respiratory-rate-value').textContent = snapshot.respiratory_rate;
+                    setStatusText('respiratory_rate', snapshot.respiratory_rate_status);
+
+                } else {
+                    console.log("No health data recorded yet (snapshot was null).");
+                    const mainGrid = document.querySelector('.monitor-grid');
+                    if (mainGrid && !document.getElementById('no-data-monitor-msg')) {
+                        const noDataMsg = document.createElement('p');
+                        noDataMsg.id = 'no-data-monitor-msg';
+                        noDataMsg.textContent = 'No health data recorded yet. Click on a metric to add your first entry!';
+                        noDataMsg.style.textAlign = 'center';
+                        noDataMsg.style.gridColumn = '1 / -1';
+                        mainGrid.prepend(noDataMsg);
+                    }
+                }
+            } catch (error) {
+                console.error("Error loading latest health snapshot:", error);
+                if(loadingDashboardMsg) loadingDashboardMsg.textContent = `Error: ${error.message}`;
             }
         }
-    } catch (error) {
-        console.error("Error loading latest health snapshot:", error);
-        if(loadingDashboardMsg) loadingDashboardMsg.textContent = `Error: ${error.message}`;
-    }
-}
 
         if(saveMetricBtn) {
             saveMetricBtn.addEventListener('click', async () => {
@@ -292,30 +245,19 @@
                 }
 
                 let payload = {};
-                let value, systolic, diastolic;
+                let value;
                 let validValue = true;
                 if(modalSaveStatus) modalSaveStatus.textContent = '';
 
-                if (currentMetricToLog === 'blood_pressure') {
-                    systolic = parseInt(systolicBpInput.value);
-                    diastolic = parseInt(diastolicBpInput.value);
-                    if (isNaN(systolic) || isNaN(diastolic) || systolic <= 30 || diastolic <= 20 || systolic <= diastolic || systolic > 350 || diastolic > 250) {
-                        if(modalSaveStatus) modalSaveStatus.textContent = 'Invalid BP (Sys:30-350, Dia:20-250, Sys > Dia).'; validValue = false;
-                    } else {
-                        payload.systolic_bp = systolic;
-                        payload.diastolic_bp = diastolic;
-                    }
-                } else {
-                    value = parseFloat(metricValueInput.value);
-                    if (isNaN(value)) { validValue = false; if(modalSaveStatus) modalSaveStatus.textContent = 'Please enter a numeric value.'; }
-                    else if (currentMetricToLog === 'heart_rate' && (value < 20 || value > 300)) { validValue = false; if(modalSaveStatus) modalSaveStatus.textContent = 'Heart rate out of range (20-300 BPM).'; }
-                    else if (currentMetricToLog === 'oxygen_saturation' && (value < 70 || value > 100)) { validValue = false; if(modalSaveStatus) modalSaveStatus.textContent = 'SpO2 out of range (70-100%).'; }
-                    else if (currentMetricToLog === 'glucose_level' && (value < 10 || value > 1000)) { validValue = false; if(modalSaveStatus) modalSaveStatus.textContent = 'Glucose out of range (10-1000 mg/dL).'; }
-                    else if (currentMetricToLog === 'temperature_celsius' && (value < 30 || value > 45)) { validValue = false; if(modalSaveStatus) modalSaveStatus.textContent = 'Temp. out of range (30-45°C).'; }
-                    else if (currentMetricToLog === 'respiratory_rate' && (value < 5 || value > 60)) { validValue = false; if(modalSaveStatus) modalSaveStatus.textContent = 'Resp. rate out of range (5-60 bpm).'; }
+                value = parseFloat(metricValueInput.value);
+                if (isNaN(value)) { validValue = false; if(modalSaveStatus) modalSaveStatus.textContent = 'Please enter a numeric value.'; }
+                else if (currentMetricToLog === 'heart_rate' && (value < 20 || value > 300)) { validValue = false; if(modalSaveStatus) modalSaveStatus.textContent = 'Heart rate out of range (20-300 BPM).'; }
+                else if (currentMetricToLog === 'oxygen_saturation' && (value < 70 || value > 100)) { validValue = false; if(modalSaveStatus) modalSaveStatus.textContent = 'SpO2 out of range (70-100%).'; }
+                else if (currentMetricToLog === 'glucose_level' && (value < 10 || value > 1000)) { validValue = false; if(modalSaveStatus) modalSaveStatus.textContent = 'Glucose out of range (10-1000 mg/dL).'; }
+                else if (currentMetricToLog === 'temperature_celsius' && (value < 30 || value > 45)) { validValue = false; if(modalSaveStatus) modalSaveStatus.textContent = 'Temp. out of range (30-45°C).'; }
+                else if (currentMetricToLog === 'respiratory_rate' && (value < 5 || value > 60)) { validValue = false; if(modalSaveStatus) modalSaveStatus.textContent = 'Resp. rate out of range (5-60 bpm).'; }
 
-                    if (validValue) { payload[currentMetricToLog] = value; }
-                }
+                if (validValue) { payload[currentMetricToLog] = value; }
 
                 if (!validValue) { if(modalSaveStatus) modalSaveStatus.style.color = 'red'; return; }
 
@@ -332,7 +274,7 @@
                     const responseData = await response.json();
                     if (!response.ok) throw new Error(responseData.detail || `Error ${response.status}`);
                     if(modalSaveStatus) { modalSaveStatus.textContent = 'Data saved!'; modalSaveStatus.style.color = 'green';}
-                    loadLatestHealthData(); // Refresh dashboard
+                    loadLatestHealthData();
                     setTimeout(closeDataInputModal, 1500);
                 } catch (error) {
                     if(modalSaveStatus) { modalSaveStatus.textContent = `Error: ${error.message}`; modalSaveStatus.style.color = 'red';}
@@ -343,7 +285,6 @@
             });
         }
 
-
         monitorItemsClickable.forEach(item => {
             item.addEventListener('click', function() {
                 const metric = this.dataset.metric;
@@ -353,13 +294,12 @@
             });
         });
 
-        if (viewHealthHistoryBtn) { // Link to the chart page
+        if (viewHealthHistoryBtn) {
             viewHealthHistoryBtn.addEventListener('click', () => {
-                window.location.href = 'health-data.html'; // This is your chart page
+                window.location.href = 'health-data.html';
             });
         }
 
-        // Initial load of dashboard data
         loadLatestHealthData();
     });
     </script>
