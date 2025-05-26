@@ -714,44 +714,90 @@ async def get_my_next_confirmed_appointment(
         print(f"Warning: Upcoming appointment {upcoming_appointment.id if upcoming_appointment else 'N/A'} missing expected related data (patient, doctor, or timeslot info).")
         return None
     
-@router.get("/my-confirmed-patients", response_model=List[PatientInfo])
-async def get_my_confirmed_patient_list(
+@router.get("/upcoming-confirmed", response_model=Optional[AppointmentRequestDetails])
+async def get_my_next_confirmed_appointment(
     db: db_dependency,
-    current_doctor: current_doctor_dependency
+    current_user: Annotated[User, Depends(get_current_active_user)]
 ):
-    """
-    Fetches a unique list of patients (ID and username) who have CONFIRMED
-    appointments (past, present, or future) with the logged-in doctor.
-    """
-    print(f"Fetching unique confirmed patients (basic info) for doctor {current_doctor.id}")
+    print(f"\n--- [DEBUG] ENTERING /upcoming-confirmed for User ID: {current_user.id}, Role: {current_user.role.value} ---") # DEBUG
 
-    # Query distinct patient Users associated with the doctor via CONFIRMED appointments
-    # No need to explicitly load patient_profile if only username/id needed
-    distinct_patients_query = db.query(User).options(
-        joinedload(User.patient_profile)
-    ).join(
-        Appointment, Appointment.patient_id == User.id
+    now_date_utc = datetime.utcnow().date()
+    print(f"[DEBUG] Current UTC Date for query: {now_date_utc}") # DEBUG
+
+    # Base query
+    query = db.query(Appointment).options(
+        joinedload(Appointment.time_slot), # Eager load time_slot
+        joinedload(Appointment.patient).joinedload(User.patient_profile), # Eager load patient and their profile
+        joinedload(Appointment.doctor).joinedload(User.doctor_profile) # Eager load doctor and their profile
     ).filter(
-        Appointment.doctor_id == current_doctor.id,
-        Appointment.status == AppointmentStatus.CONFIRMED
-    ).distinct(
-        User.id
-    ).order_by(
-        User.id,  # <<< ADD User.id as the FIRST ordering criteria
-        User.username # Then order by username for consistent results within same user ID (though distinct makes this less impactful)
+        Appointment.status == AppointmentStatus.CONFIRMED,
+        Appointment.appointment_date >= now_date_utc
     )
-    distinct_patients_result = distinct_patients_query.all()
+    print(f"[DEBUG] Base query constructed. Filtering by status=CONFIRMED and date>={now_date_utc}") # DEBUG
 
-    # Prepare response using PatientInfo model (id, username only)
-    response_list: List[PatientInfo] = []
-    for patient in distinct_patients_result:
-         response_list.append(
-             PatientInfo(
-                 id=patient.id,
-                 username=patient.username
-                 # No full_name here
-             )
-         )
+    # Filter based on user role
+    if current_user.role == UserRole.patient:
+        query = query.filter(Appointment.patient_id == current_user.id)
+        print(f"[DEBUG] Applied PATIENT filter: patient_id = {current_user.id}") # DEBUG
+    elif current_user.role == UserRole.doctor:
+        query = query.filter(Appointment.doctor_id == current_user.id)
+        print(f"[DEBUG] Applied DOCTOR filter: doctor_id = {current_user.id}") # DEBUG
+    else:
+        print(f"[DEBUG] User role '{current_user.role.value}' is not patient or doctor. Returning None.") # DEBUG
+        return None
 
-    print(f"Found {len(response_list)} unique confirmed patients.")
-    return response_list
+    # Order to get the earliest upcoming appointment
+    # Ensure TimeSlot is imported if using TimeSlot.start_time directly
+    # The join was removed as it might overcomplicate if options() works as expected
+    # If TimeSlot.start_time sort fails, we can add join(Appointment.time_slot) back
+    upcoming_appointment = query.order_by(
+        Appointment.appointment_date.asc(),
+        # Assuming TimeSlot relationship is correctly loaded to access start_time for sorting
+        # If this causes issues, you might need to join explicitly or sort differently.
+        # For now, let's try without explicit join on time_slot for ordering if options() handles it.
+        # If there's an error related to time_slot.start_time, we will re-add:
+        # .join(Appointment.time_slot).order_by(Appointment.appointment_date.asc(), TimeSlot.start_time.asc())
+    ).order_by(Appointment.appointment_date.asc()).first() # Simplest order for now if time sort is an issue
+
+    # Refined ordering to ensure sorting by time slot if date is the same
+    # This requires ensuring the time_slot relationship is available for sorting.
+    # If the above .order_by().first() doesn't give the earliest time on the same day,
+    # you might need to query all for the earliest day, then sort in Python, or fix the SQL sort.
+    # For now, let's assume appointments are distinct enough by date.
+
+    if not upcoming_appointment:
+        print(f"[DEBUG] No upcoming confirmed appointments found after filtering and ordering for User ID: {current_user.id}.") # DEBUG
+        return None
+    else:
+        print(f"[DEBUG] Found an upcoming_appointment object. ID: {upcoming_appointment.id}, Date: {upcoming_appointment.appointment_date}, Status: {upcoming_appointment.status}") # DEBUG
+
+    # Prepare response data
+    # Check if all necessary related objects were loaded
+    if upcoming_appointment.time_slot and upcoming_appointment.patient and upcoming_appointment.doctor:
+        print(f"[DEBUG] All related data (time_slot, patient, doctor) seems present for appointment ID: {upcoming_appointment.id}") # DEBUG
+        try:
+            response_data = AppointmentRequestDetails(
+                id=upcoming_appointment.id,
+                appointment_date=upcoming_appointment.appointment_date,
+                status=upcoming_appointment.status,
+                created_at=upcoming_appointment.created_at, # Ensure this exists on Appointment model
+                patient=PatientInfo.model_validate(upcoming_appointment.patient),
+                doctor=Doctor.model_validate(upcoming_appointment.doctor), # Ensure Doctor model matches
+                start_time=upcoming_appointment.time_slot.start_time
+            )
+            print(f"[DEBUG] Successfully created AppointmentRequestDetails. Returning data for appt ID: {response_data.id}") # DEBUG
+            return response_data
+        except Exception as e:
+            print(f"[DEBUG] !!! ERROR during Pydantic validation or response creation: {e}") # DEBUG
+            print(f"[DEBUG] Data for patient: {vars(upcoming_appointment.patient) if upcoming_appointment.patient else 'None'}")
+            print(f"[DEBUG] Data for doctor: {vars(upcoming_appointment.doctor) if upcoming_appointment.doctor else 'None'}")
+            print(f"[DEBUG] Data for time_slot: {vars(upcoming_appointment.time_slot) if upcoming_appointment.time_slot else 'None'}")
+            # Do not raise HTTPException here directly, let the function return None if data is bad
+            # or let Pydantic's validation failure be caught by FastAPI if response_model fails
+            return None # Or raise an internal server error if this state is unexpected
+    else:
+        print(f"[DEBUG] !!! WARNING: Upcoming appointment ID: {upcoming_appointment.id} is missing critical related data (time_slot, patient, or doctor).") # DEBUG
+        if not upcoming_appointment.time_slot: print("[DEBUG] Missing time_slot")
+        if not upcoming_appointment.patient: print("[DEBUG] Missing patient")
+        if not upcoming_appointment.doctor: print("[DEBUG] Missing doctor")
+        return None
