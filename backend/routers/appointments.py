@@ -721,7 +721,7 @@ async def get_my_next_confirmed_appointment(
 ):
     print(f"\n--- [DEBUG] ENTERING /upcoming-confirmed for User ID: {current_user.id}, Role: {current_user.role.value} ---") # DEBUG
 
-    now_date_utc = datetime.utcnow().date()
+    now_date_utc = datetime.now(timezone.utc).date()
     print(f"[DEBUG] Current UTC Date for query: {now_date_utc}") # DEBUG
 
     # Base query
