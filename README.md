@@ -1,10 +1,10 @@
-# ChroniCARE
+# EasyCARE
 
-ChroniCARE is a full-featured web application that bridges the gap between patients with chronic conditions and their healthcare providers. It offers seamless appointment scheduling, personal health data tracking, user profile management, and in-app notifications—enabling proactive, coordinated long-term care.
+EasyCARE is a full-featured web application that bridges the gap between patients and their healthcare providers. It offers seamless appointment scheduling, personal health data tracking, user profile management, and in-app notifications—enabling proactive, coordinated long-term care.
 
 # Project Overview
 
-ChroniCARE simplifies chronic care management for both patients and doctors.
+EasyCARE simplifies health care management for both patients and doctors.
 
 Patients: Easily log health metrics, view visual health trends, and book telemedicine appointments, virtually consult doctors
 
