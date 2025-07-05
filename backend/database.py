@@ -4,7 +4,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from models import Base # Ensure this is your Base from models.py and models.py is complete
 
-DATABASE_URL = os.environ.get("DATABASE_URL", "sqlite:///./site.db")
+DATABASE_URL = os.environ.get("DATABASE_URL", "sqlite:///./data/site.db")
 
 print(f"Attempting to connect to database (details redacted for log): {DATABASE_URL.split('@')[-1] if '@' in DATABASE_URL else DATABASE_URL}")
 
@@ -36,9 +36,10 @@ def create_db_tables():
 
 # Call this function when the application starts (e.g., when database.py is imported)
 # This ensures tables are created if connected to a new, empty database.
-if not DATABASE_URL.startswith("sqlite"): # Only run for cloud DB on app startup
+'''if not DATABASE_URL.startswith("sqlite"): # Only run for cloud DB on app startup
     print("Running create_db_tables for cloud database...")
     create_db_tables()
 elif os.environ.get("CREATE_LOCAL_DB_TABLES") == "true": # Or a flag for local
     print("Running create_db_tables for local SQLite database...")
-    create_db_tables()
+    create_db_tables()'''
+create_db_tables()
