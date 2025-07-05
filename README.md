@@ -100,7 +100,7 @@ EasyCARE simplifies health care management for both patients and doctors.
 
 - **Frontend deployed on:** Vercel  
 - **Backend deployed on:** Render  
-- **Database used:** SQLite for development; PostgreSQL planned for production.  
+- **Database used:** SQLite for development
 - **CORS configured** to allow requests from the deployed frontend.  
 - **API Base URL configured** for production environment.
 
